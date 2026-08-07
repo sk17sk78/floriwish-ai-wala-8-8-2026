@@ -46,7 +46,6 @@ export default function ContentDetailInfo({
         <Accordion
           type="single"
           collapsible
-          defaultValue="delivery"
           className="overflow-hidden rounded-2xl border border-zinc-100 bg-white shadow-sm text-sm"
         >
           <AccordionItem
