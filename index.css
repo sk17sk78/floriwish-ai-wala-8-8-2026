@@ -1,0 +1,105 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #f8f5f0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+  background: #fff;
+}
+
+.logo {
+  font-weight: bold;
+}
+
+.product {
+  padding: 20px;
+  background: #fff;
+}
+
+.product-img {
+  width: 100%;
+  max-width: 280px;
+  display: block;
+  margin: auto;
+}
+
+.rating span {
+  color: #555;
+}
+
+.price {
+  margin: 10px 0;
+}
+
+.current {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.old {
+  margin-left: 10px;
+  text-decoration: line-through;
+  color: #999;
+}
+
+.sizes button {
+  padding: 10px;
+  margin: 5px;
+  border: 1px solid #ccc;
+}
+
+.sizes .active {
+  background: #000;
+  color: #fff;
+}
+
+.qty {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.qty button {
+  padding: 10px;
+}
+
+.buy-btn {
+  width: 100%;
+  padding: 15px;
+  background: #000;
+  color: #fff;
+  border: none;
+  font-size: 18px;
+}
+
+.trust, .experience, .reviews {
+  padding: 20px;
+  background: #fff;
+  margin-top: 10px;
+}
+
+.review {
+  background: #f3f3f3;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+.sticky-footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+}

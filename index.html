@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cupid Perfume</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <h2 class="logo">ALT</h2>
+  <button class="cart-btn">🛒</button>
+</header>
+
+<!-- PRODUCT SECTION -->
+<section class="product">
+  <img src="images/perfume.png" class="product-img">
+
+  <h1>CUPID PHEROMONE PERFUME</h1>
+  <div class="rating">⭐⭐⭐⭐⭐ <span>4.9 (360 reviews)</span></div>
+
+  <p class="tagline">
+    Boost Confidence | Increase Attraction | Best Seller
+  </p>
+
+  <div class="price">
+    <span class="current">₹699</span>
+    <span class="old">₹1999</span>
+  </div>
+
+  <!-- SIZE -->
+  <div class="sizes">
+    <button class="size active">50 ML</button>
+    <button class="size">100 ML</button>
+  </div>
+
+  <!-- QTY -->
+  <div class="qty">
+    <button onclick="changeQty(-1)">-</button>
+    <span id="qty">1</span>
+    <button onclick="changeQty(1)">+</button>
+  </div>
+
+  <button class="buy-btn">BUY NOW</button>
+</section>
+
+<!-- TRUST BADGES -->
+<section class="trust">
+  <div>✔ Scientifically Formulated</div>
+  <div>✔ 30-Day Money Back</div>
+  <div>✔ Secure Payment</div>
+</section>
+
+<!-- EXPERIENCE -->
+<section class="experience">
+  <h2>WHAT YOU’LL EXPERIENCE</h2>
+  <ul>
+    <li>👀 Her eyes light up again</li>
+    <li>🔥 Flirt easier. Connect deeper.</li>
+    <li>👑 Radiate confidence</li>
+  </ul>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews">
+  <h2>Customer Reviews</h2>
+
+  <div class="review">
+    ⭐⭐⭐⭐⭐  
+    <p>2 din me compliments milne lage 🔥</p>
+    <small>Rahul – Delhi</small>
+  </div>
+
+  <div class="review">
+    ⭐⭐⭐⭐⭐  
+    <p>Smell long lasting hai, confidence boost hua</p>
+    <small>Aman – Mumbai</small>
+  </div>
+
+  <div class="review">
+    ⭐⭐⭐⭐⭐  
+    <p>Worth every rupee 💯</p>
+    <small>Vikas – Jaipur</small>
+  </div>
+
+  <button class="load-more">Load More Reviews</button>
+</section>
+
+<!-- STICKY FOOTER -->
+<footer class="sticky-footer">
+  <span>₹699</span>
+  <button class="buy-btn">BUY NOW</button>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

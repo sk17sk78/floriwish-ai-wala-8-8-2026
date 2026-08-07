@@ -1,0 +1,15 @@
+User-agent: *
+Disallow: /api/
+Disallow: /hsiwirolfkey8080/
+Disallow: /cart
+Disallow: /checkout
+Disallow: /search
+Disallow: /user
+Disallow: /account
+Disallow: /register
+Disallow: /login
+Disallow: /dashboard
+Allow: /
+
+Host: https://floriwish.com
+Sitemap: https://floriwish.com/sitemap.xml

@@ -1,0 +1,98 @@
+.parent {
+  display: flex;
+  flex-direction: column;
+  padding: 40px 0;
+  gap: 1.25rem;
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: "Poppins", sans-serif !important;
+    font-weight: 600 !important;
+    color: #1a1a1a !important;
+    line-height: 1.4 !important;
+    position: relative;
+    padding-left: 14px;
+    letter-spacing: -0.01em;
+    text-align: left !important;
+    
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 20%;
+      height: 60%;
+      width: 2px; // Thinner accent
+      background: #b76e79;
+      border-radius: 1px;
+    }
+  }
+
+  h1,
+  h1 > * {
+    font-size: 22px !important; // Minimalist sizing
+    margin: 1.25rem 0 0.25rem !important;
+  }
+
+  h2,
+  h2 > * {
+    font-size: 19px !important;
+    margin: 1rem 0 0.25rem !important;
+  }
+
+  h3,
+  h3 > * {
+    font-size: 17px !important;
+    margin: 0.75rem 0 0.25rem !important;
+  }
+
+  h4,
+  h4 > * {
+    font-size: 15px !important;
+    margin: 0.5rem 0 0.25rem !important;
+  }
+
+  p {
+    color: #1a1a1a !important; // Darker for accessibility
+    font-size: 13.5px !important; // Smaller, cleaner text
+    line-height: 1.8 !important; // High readability
+    margin: 0 !important;
+    letter-spacing: 0.015em;
+    text-align: inherit !important;
+  }
+
+  ul, ol {
+    padding-left: 1.25rem;
+    color: #1a1a1a !important;
+    font-size: 13.5px !important;
+    line-height: 1.7;
+    margin: 0.25rem 0;
+    text-align: inherit !important;
+
+    li {
+      margin-bottom: 0.4rem;
+    }
+  }
+
+  ul {
+    list-style: disc;
+  }
+
+  ol {
+    list-style: decimal;
+  }
+
+  a {
+    text-decoration: none;
+    font-weight: 500;
+    color: #994d58 !important; // Darker sienna
+    border-bottom: 1px solid rgba(153, 77, 88, 0.4);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      color: #7d3c45 !important;
+      border-bottom-color: #994d58;
+    }
+  }
+}
