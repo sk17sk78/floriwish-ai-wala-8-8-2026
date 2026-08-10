@@ -1,11 +1,10 @@
 "use client";
 
 // libraries
-import moment from "moment";
 import { getEarliestDeliveryDate, formatEarliestDelivery } from "@/common/utils/delivery";
 
 // icons
-import { ChevronLeftIcon, ChevronRightIcon, Star as StarIcon, StarHalf, Zap } from "lucide-react";
+import { Star as StarIcon, StarHalf, Zap } from "lucide-react";
 
 // animation
 import { ShineAnimation } from "../../../ShineAnimation/ShineAnimation";
@@ -13,10 +12,7 @@ import { ShineAnimation } from "../../../ShineAnimation/ShineAnimation";
 // constants
 import { FRONTEND_LINKS } from "@/common/routes/frontend/staticLinks";
 import { INRSymbol } from "@/common/constants/symbols";
-import {
-  NonVegSymbol,
-  VegSymbol,
-} from "@/components/(_common)/Symbols/Edibles";
+import { NonVegSymbol, VegSymbol } from "@/components/(_common)/Symbols/Edibles";
 
 // utils
 import { alwaysDecimal } from "@/components/pages/(frontend)/Content/components/Details/helpers/alwaysDecimal";
@@ -37,7 +33,6 @@ import { type ContentDocument } from "@/common/types/documentation/contents/cont
 import { type ContentDeliveryDocument } from "@/common/types/documentation/nestedDocuments/contentDelivery";
 import { type ContentQualityDocument } from "@/common/types/documentation/nestedDocuments/contentQuality";
 import { type ContentsSortType } from "@/components/pages/(frontend)/CategoryList/static/types";
-import { type DeliveryTypeDocument } from "@/common/types/documentation/presets/deliveryType";
 import { type ImageDocument } from "@/common/types/documentation/media/image";
 import { type EdibleDocument } from "@/common/types/documentation/nestedDocuments/edible";
 import { type ProcessingTimeDocument } from "@/common/types/documentation/presets/processingTime";
@@ -66,18 +61,14 @@ export default function FrontendProductTilesUI({
   productList: ContentDocument[];
   selectedCity: CityDocument | null;
 }) {
-  const [products, setProducts] = useState<ContentDocument[]>(
-    productList || [],
-  );
+  const [products, setProducts] = useState<ContentDocument[]>(productList || []);
   const [screenW, setScreenW] = useState<number>(300);
 
   const useIdId = useId();
   const trayId = id || useIdId;
 
   useEffect(() => {
-    const updateWindowWidth = () => {
-      setScreenW((prev) => innerWidth);
-    };
+    const updateWindowWidth = () => setScreenW(innerWidth);
     window.addEventListener("resize", updateWindowWidth);
     updateWindowWidth();
     return () => window.removeEventListener("resize", updateWindowWidth);
@@ -85,36 +76,34 @@ export default function FrontendProductTilesUI({
 
   const handleScroll = (dir: "left" | "right") => {
     const tray = document.getElementById(trayId) as HTMLElement;
-
-    const currOffset = tray.scrollLeft;
-
     tray.scrollTo({
-      left: currOffset + (dir === "left" ? -1 : 1) * (screenW * 0.65),
+      left: tray.scrollLeft + (dir === "left" ? -1 : 1) * (screenW * 0.65),
       behavior: "smooth",
     });
   };
 
   useEffect(() => {
-    if (sync || inAdmin) {
-      setProducts((prev) => productList);
-    }
+    if (sync || inAdmin) setProducts(productList);
   }, [sync, inAdmin, productList]);
 
   const [loadingSlug, setLoadingSlug] = useState<string | null>(null);
 
+  const isScrollable = type === "scrollable";
+  const isList = !type || type === "list";
+
   return (
     <div
       id={trayId}
-      className={`${!type || type === "list" ? `grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-0 ${inCategoryPage ? "sm:gap-y-6 sm:gap-x-3" : "sm:gap-6"} items-start justify-center` : "relative flex items-center justify-start gap-2 sm:gap-5 overflow-x-scroll scrollbar-hide "}`}
+      className={
+        isList
+          ? `grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 items-start`
+          : `relative flex items-start justify-start gap-3 sm:gap-4 overflow-x-scroll scrollbar-hide`
+      }
     >
-      {/* Buttons removed for native scrolling experience */}
-
       {products.slice(0, limit || products.length).map((content, index) => {
         const {
-          _id,
           media: { primary },
           name,
-          price,
           slug,
           quality,
           edible,
@@ -126,284 +115,160 @@ export default function FrontendProductTilesUI({
           ? { mrp: 0, price: 0 }
           : getCityWiseContentPrices({ city: selectedCity, content });
 
-        const showVeganType = edible
-          ? (edible as EdibleDocument).isEdible
-          : false;
+        const discountPct =
+          contentMrp && contentPrice && contentMrp > contentPrice
+            ? Math.ceil((1 - contentPrice / contentMrp) * 100)
+            : 0;
 
         const isVegan: "unspecified" | "veg" | "non-veg" | undefined =
           edible && (edible as EdibleDocument).isEdible
             ? (edible as EdibleDocument).type || "unspecified"
             : undefined;
 
-        // delivery logic
         const processingTime = inAdmin
           ? 0
-          : (delivery
-            ? (
-              (delivery as ContentDeliveryDocument)
-                .processingTime as ProcessingTimeDocument
-            ).hours || 0
-            : 0);
+          : delivery
+          ? ((delivery as ContentDeliveryDocument).processingTime as ProcessingTimeDocument)?.hours || 0
+          : 0;
 
         const slots = (delivery as ContentDeliveryDocument)?.slots;
         const earliestDate = getEarliestDeliveryDate(processingTime, slots);
         const earliestDeliveryBy = formatEarliestDelivery(earliestDate);
 
         const sticker =
-          content.tag && content.tag.promotionTag && inAdmin !== true
+          content.tag?.promotionTag && !inAdmin
             ? {
                 label: (content.tag.promotionTag as PromotionTagDocument).name,
-                bgColor: (
-                  (content.tag.promotionTag as PromotionTagDocument)
-                    .color as ColorDocument
-                ).hexCode,
+                bgColor: ((content.tag.promotionTag as PromotionTagDocument).color as ColorDocument).hexCode,
                 textColor: getChromaticallyAbberatedShade(
-                  (
-                    (content.tag.promotionTag as PromotionTagDocument)
-                      .color as ColorDocument
-                  ).hexCode,
+                  ((content.tag.promotionTag as PromotionTagDocument).color as ColorDocument).hexCode
                 ),
               }
             : undefined;
 
+        const ratingValue = (quality as ContentQualityDocument)?.rating?.value;
+        const ratingCount = (quality as ContentQualityDocument)?.rating?.count;
         const isThisLoading = loadingSlug === slug;
+
+        // Build stars
+        const renderStars = (val: number) => {
+          const full = Math.floor(val);
+          const half = val % 1 >= 0.5;
+          return (
+            <span className="flex items-center gap-[1px]">
+              {Array.from({ length: full }).map((_, i) => (
+                <StarIcon key={i} width={11} height={11} className="fill-amber-400 stroke-transparent" />
+              ))}
+              {half && <StarHalf width={11} height={11} className="fill-amber-400 stroke-transparent" />}
+            </span>
+          );
+        };
 
         return (
           <Link
             href={`${contentType === "product" ? FRONTEND_LINKS.PRODUCT_PAGE : FRONTEND_LINKS.SERVICE_PAGE}/${slug}`}
             key={index}
             onClick={() => setLoadingSlug(slug)}
-            className={`group grid *:row-start-1 *:col-start-1 shrink-0 ${!type || type === "list" ? `min-w-[40dvw] sm:min-w-0` : "min-w-[38dvw] max-w-[38dvw] sm:min-w-[18dvw] sm:max-w-[18dvw]"} rounded-none h-fit min-h-fit transition-all duration-300 ${isThisLoading ? "opacity-70 pointer-events-none grayscale-[0.3]" : ""}`}
+            className={`group flex flex-col shrink-0 bg-white rounded-xl overflow-hidden border border-zinc-100 hover:border-zinc-200 hover:shadow-md transition-all duration-300 ${
+              isScrollable ? "min-w-[44vw] sm:min-w-[200px] max-w-[44vw] sm:max-w-[200px]" : "w-full"
+            } ${isThisLoading ? "opacity-60 pointer-events-none" : ""}`}
           >
-            <div
-              className={`relative z-20 transition-all duration-300 rounded-none sm:rounded-xl bg-transparent ${!type || type === "list" ? `${index > 1 ? "max-sm:border-t-[0.5px]" : ""} max-sm:pt-2.5 max-sm:pb-1 ${index % 2 === 0 ? "max-sm:pl-2.5 max-sm:pr-[6px]" : "max-sm:pl-[6px] max-sm:pr-2.5"}` : "max-sm:pt-2.5 max-sm:pb-1 max-sm:px-2.5"} border-ash/25`}
-            >
-              <div
-                className={`relative aspect-square max-sm:p-1 rounded-t-xl sm:rounded-t-2xl overflow-hidden `}
-              >
-                <OptimizedImage
-                  src={(primary as ImageDocument)?.url || ""}
-                  alt={
-                    (primary as ImageDocument)?.alt ||
-                    (primary as ImageDocument)?.defaultAlt ||
-                    "Content Image"
-                  }
-                  fill
-                  quality={75}
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                  className="absolute inset-0"
-                  imageClassName={`${extraCurved ? "max-sm:rounded-xl" : "max-sm:rounded-md"} object-cover object-center scale-105 group-hover:scale-100 transition-all duration-500`}
-                />
-                <span className="absolute bottom-1 left-1 sm:left-1">
-                  {showVeganType ? (
-                    isVegan === "veg" ? (
-                      <VegSymbol className="w-[20px] sm:w-[19px] sm:max-w-[19px] sm:translate-x-1" />
-                    ) : isVegan === "non-veg" ? (
-                      <NonVegSymbol className="w-[20px] sm:w-[19px] sm:max-w-[19px] sm:translate-x-1" />
-                    ) : (
-                      <></>
-                    )
+            {/* ── IMAGE ── */}
+            <div className="relative aspect-square w-full overflow-hidden bg-zinc-50">
+              <OptimizedImage
+                src={(primary as ImageDocument)?.url || ""}
+                alt={
+                  (primary as ImageDocument)?.alt ||
+                  (primary as ImageDocument)?.defaultAlt ||
+                  name
+                }
+                fill
+                quality={80}
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                className="absolute inset-0"
+                imageClassName="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+              />
+
+              {/* Veg/Non-veg symbol */}
+              {isVegan && isVegan !== "unspecified" && (
+                <span className="absolute bottom-1.5 left-1.5">
+                  {isVegan === "veg" ? (
+                    <VegSymbol className="w-[18px]" />
                   ) : (
-                    <></>
+                    <NonVegSymbol className="w-[18px]" />
                   )}
                 </span>
+              )}
 
-                {sticker && (
-                  <div
-                    className="absolute top-2 left-0 py-1 px-2 sm:px-3 rounded-r-lg text-[11px] sm:text-sm"
-                    style={{
-                      background: sticker.bgColor,
-                      color: sticker.textColor,
-                    }}
-                  >
-                    {sticker.label}
-                  </div>
-                )}
-
-                {/* {(quality as ContentQualityDocument)?.rating?.count && (
-                      <div
-                        className={`absolute bottom-1 right-1 flex items-center justify-end gap-1 text-xs sm:text-sm py-0.5 px-1.5 rounded-sm backdrop-blur-sm backdrop-brightness-105 ${(quality as ContentQualityDocument)?.rating?.count === 5 ? "" : "bg-ivory-1/35 text-charcoal-3/90"}`}
-                      >
-                        {(quality as ContentQualityDocument)?.rating?.value || 5}{" "}
-                        <StarIcon
-                          width={16}
-                          height={16}
-                          className="fill-sienna-1 stroke-transparent brightness-105"
-                        />
-                        | {(quality as ContentQualityDocument)?.rating?.count}
-                      </div>
-                    )} */}
-
-                {type === "scrollable" || inCategoryPage ? (
-                  <ShineAnimation />
-                ) : (
-                  <></>
-                )}
-              </div>
-
-              <div
-                className={`relative pt-2 flex flex-col gap-y-0.5 rounded-b-xl sm:rounded-b-2xl overflow-hidden bg-transparent mt-0 sm:border-[1.5px] sm:border-ash/40 border-t-0`}
-              >
-                {!inAdmin &&
-                earliestDeliveryBy &&
-                earliestDeliveryBy.length > 0 ? (
-                  <div className="px-1 sm:px-3 pt-1 pb-1">
-                    <div className="flex items-center justify-center gap-x-1 bg-sienna-3/20 w-fit px-2 py-[2px] rounded text-sienna-1">
-                      <Zap
-                        className="fill-sienna-1 stroke-transparent"
-                        width={11}
-                        height={11}
-                      />
-                      <span className="text-[10px] sm:text-[11px] font-semibold tracking-wide uppercase whitespace-nowrap">
-                        {earliestDeliveryBy}{" "}
-                        {earliestDeliveryBy === "Today" ||
-                        earliestDeliveryBy === "Tomorrow"
-                          ? "Delivery"
-                          : ""}
-                      </span>
-                    </div>
-                  </div>
-                ) : null}
+              {/* Promotion sticker */}
+              {sticker && (
                 <div
-                  className={`${showVeganType ? "pr-0 grid grid-cols-[1fr_20px] items-center" : "grid grid-cols-1 items-center"} px-1 max-sm:pt-1 sm:px-3 z-30 text-[15px] sm:text-base text-charcoal-3/80 leading-tight relative `}
+                  className="absolute top-2 left-0 py-1 px-2 sm:px-3 rounded-r-lg text-[11px] sm:text-sm"
+                  style={{ background: sticker.bgColor, color: sticker.textColor }}
                 >
-                  <div
-                    className={` ${type === "scrollable" ? "line-clamp-1" : "line-clamp-2 pt-0.5 max-sm:pb-0.5"} leading-tight text-left w-full`}
-                  >
-                    {name}
-                  </div>
-
-                  {/* <span className="justify-self-end">
-                        {showVeganType ? (
-                          isVegan === "veg" ? (
-                            <VegSymbol className="w-[20px] sm:w-[19px] sm:max-w-[19px] sm:translate-x-1" />
-                          ) : isVegan === "non-veg" ? (
-                            <NonVegSymbol className="w-[20px] sm:w-[19px] sm:max-w-[19px] sm:translate-x-1" />
-                          ) : (
-                            <></>
-                          )
-                        ) : (
-                          <></>
-                        )}
-                      </span> */}
+                  {sticker.label}
                 </div>
-                <div
-                  className={`px-1 sm:px-3 ${false ? "" : contentType !== "service" && earliestDeliveryBy && earliestDeliveryBy.length > 0 ? "" : " "} relative flex items-baseline justify-start gap-2 w-full z-20`}
-                >
-                  {contentPrice && (
-                    <h4 className="text-[14px] sm:text-[18px] text-charcoal-3 group-hover:text-sienna-1 font-semibold transition-all duration-300">
-                      {inAdmin ? "" : INRSymbol}{" "}
-                      {inAdmin ? "Price" : contentPrice}
-                    </h4>
-                  )}
-                  {/* {(price as ContentPriceDocument).base.mrp && (
-                        <del className="text-[12.5px] sm:text-[15px] text-charcoal-3/50 transition-all duration-300">
-                          &nbsp;{INRSymbol}{" "}
-                          {(price as ContentPriceDocument).base.mrp}&nbsp;
-                        </del>
-                      )} */}
-                  {(quality as ContentQualityDocument)?.rating &&
-                  (quality as ContentQualityDocument)?.rating?.value ? (
-                    <div className="flex items-center justify-start gap-0.5 text-xs sm:text-sm text-charcoal-3/80 sm:ml-1.5 translate-y-1 sm:translate-y-0.5">
-                      <div className="flex items-center">
-                        {(() => {
-                          const ratingNum = Number((quality as ContentQualityDocument)?.rating?.value || 5);
-                          const fullStars = Math.floor(ratingNum);
-                          const hasHalfStar = ratingNum % 1 >= 0.5;
-                          const stars = [];
+              )}
 
-                          for (let i = 0; i < fullStars; i++) {
-                            stars.push(
-                              <StarIcon
-                                key={`full-${i}`}
-                                width={11}
-                                height={11}
-                                className="fill-sienna-1 stroke-transparent brightness-105"
-                              />
-                            );
-                          }
+              {/* Discount badge — top right — removed, shown in price row */}
 
-                          if (hasHalfStar) {
-                            stars.push(
-                              <StarHalf
-                                key="half"
-                                width={11}
-                                height={11}
-                                className="fill-sienna-1 stroke-transparent brightness-105"
-                              />
-                            );
-                          }
-
-                          return stars;
-                        })()}
-                      </div>
-                      {alwaysDecimal(
-                        (quality as ContentQualityDocument)?.rating?.value || 5,
-                      )}{" "}
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-
-                  {contentMrp &&
-                  contentPrice &&
-                  Math.ceil((1 - contentPrice / contentMrp) * 100) > 0 ? (
-                    <div className="text-[10.5px] ml-1 leading-none bg-emerald-700 text-white py-0.5 px-2 rounded-full font-medium">
-                      {Math.ceil((1 - contentPrice / contentMrp) * 100)}% off
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                </div>
-
-                {/* {(quality as ContentQualityDocument)?.rating?.count && (
-                      <div
-                        className={`sm:absolute ${earliestDeliveryBy && earliestDeliveryBy.length > 0 ? "sm:bottom-9" : "sm:bottom-3"} sm:right-2 max-sm:pb-1.5 max-sm:pt-1 flex items-center justify-start sm:justify-end gap-1 text-xs sm:text-sm py-0.5 pl-1 sm:px-0 rounded-full backdrop-brightness-105 ${(quality as ContentQualityDocument)?.rating?.count === 5 ? "" : "bg-transparent text-charcoal-3/90"}`}
-                      >
-                        {(quality as ContentQualityDocument)?.rating?.value || 5}{" "}
-                        <StarIcon
-                          width={16}
-                          height={16}
-                          className="fill-sienna-1 stroke-transparent brightness-105 scale-95"
-                        />
-                        | {(quality as ContentQualityDocument)?.rating?.count}
-                      </div>
-                    )} */}
-
-                {/* {contentType === "service" && !inAdmin ? (
-                    <div
-                      className={`px-1 sm:px-3 pb-1.5 sm:pb-2.5 pt-0.5 relative flex items-center justify-start gap-1.5 text-sm text-green-800 z-20`}
-                    >
-                      You save {INRSymbol}
-                      {contentMrp - contentPrice}
-                    </div>
-                  ) : (
-                    <></>
-                  )} */}
-              </div>
+              {(isScrollable || inCategoryPage) && <ShineAnimation />}
             </div>
 
-            {/* background effect ---------------------------------------------------------------- */}
-            <div
-              className={
-                type === "scrollable"
-                  ? "z-30 relative bg-transparent rounded-md sm:rounded-xl border border-transparent group-hover:border-charcoal-3/10 transition-all duration-300"
-                  : "max-sm:hidden z-30 relative bg-transparent rounded-md sm:rounded-xl border border-transparent group-hover:border-charcoal-3/10 transition-all duration-300"
-              }
-            />
-            {!inCategoryPage && (!type || type === "list") ? (
-              <div className="z-10 relative bg-transparent rounded-2xl sm:rounded-3xl">
-                <div className="absolute -top-0.5 sm:-top-1 -right-0.5 sm:-right-1 scale-0 group-hover:scale-[1.15] bg-transparent border-[1.4px] sm:border-[1.9px] border-sienna-1 aspect-square w-7 sm:w-14 h-7 sm:h-14 transition-all duration-500" />
-                <div className="absolute -bottom-0.5 sm:-bottom-1 -left-0.5 sm:-left-1 scale-0 group-hover:scale-[1.15] bg-transparent border-[1.4px] sm:border-[1.9px] border-sienna-1 aspect-square w-7 sm:w-14 h-7 sm:h-14 transition-all duration-500" />
+            {/* ── INFO ── */}
+            <div className="flex flex-col gap-1 px-2 sm:px-3 pt-2 pb-2.5">
+
+              {/* Delivery badge */}
+              {!inAdmin && earliestDeliveryBy && (
+                <div className="flex items-center gap-1 w-fit bg-rose-50 border border-rose-100 rounded-md px-2 py-[3px]">
+                  <Zap className="fill-rose-900 stroke-transparent shrink-0" width={9} height={9} />
+                  <span className="text-[9px] sm:text-[10px] font-bold tracking-wide uppercase text-rose-900 whitespace-nowrap">
+                    {earliestDeliveryBy}{" "}
+                    {earliestDeliveryBy === "Today" || earliestDeliveryBy === "Tomorrow" ? "Delivery" : ""}
+                  </span>
+                </div>
+              )}
+
+              {/* Product name — 1 line truncated */}
+              <p className="text-[13px] sm:text-[14px] font-medium text-zinc-800 leading-snug truncate">
+                {name}
+              </p>
+
+              {/* Price row */}
+              <div className="flex items-baseline gap-1.5 flex-wrap">
+                {contentPrice ? (
+                  <span className="text-[14px] sm:text-[15px] font-bold text-zinc-900">
+                    {inAdmin ? "Price" : `${INRSymbol}${contentPrice}`}
+                  </span>
+                ) : null}
+                {contentMrp && contentPrice && contentMrp > contentPrice && (
+                  <del className="text-[11px] sm:text-[12px] text-zinc-400 font-normal">
+                    {INRSymbol}{contentMrp}
+                  </del>
+                )}
+                {discountPct > 0 && (
+                  <span className="text-[10px] sm:text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2 py-[2px] whitespace-nowrap">
+                    {discountPct}% OFF
+                  </span>
+                )}
               </div>
-            ) : (
-              <></>
-            )}
+
+              {/* Rating row */}
+              {ratingValue ? (
+                <div className="flex items-center gap-1 text-[11px] sm:text-[12px] text-zinc-500">
+                  {renderStars(Number(ratingValue))}
+                  <span className="font-medium text-zinc-600">
+                    {alwaysDecimal(Number(ratingValue))}
+                  </span>
+                  {ratingCount ? (
+                    <span className="text-zinc-400">({ratingCount} reviews)</span>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
           </Link>
         );
       })}
-
-      {/* Buttons removed for native scrolling experience */}
     </div>
   );
 }

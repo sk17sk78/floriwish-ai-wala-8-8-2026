@@ -105,46 +105,46 @@ export default function CartItemDeliveryDateTime({
   };
 
   return (
-    <div className="flex flex-col gap-4 w-full max-w-full overflow-hidden bg-white rounded-3xl border border-zinc-200/80 p-3.5 sm:p-5 md:p-6 shadow-2xs mt-1 mb-2">
+    <div className="flex flex-col gap-3 sm:gap-4 w-full max-w-full overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sienna-1/10 border border-sienna-1/20 text-sienna-1 shrink-0">
-          <Calendar width={20} height={20} />
+      <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-xl sm:rounded-2xl bg-sienna-1/10 border border-sienna-1/20 text-sienna-1 shrink-0">
+          <Calendar width={16} height={16} className="sm:w-5 sm:h-5" />
         </div>
         <div className="flex flex-col min-w-0">
-          <h3 className="text-sm sm:text-base font-bold text-zinc-900 font-poppins leading-tight truncate">
+          <h3 className="text-xs sm:text-sm md:text-base font-bold text-zinc-900 font-poppins leading-tight truncate">
             Delivery Schedule
           </h3>
-          <p className="text-[11px] sm:text-xs text-zinc-500 font-medium truncate">
+          <p className="text-[10px] sm:text-[11px] md:text-xs text-zinc-500 font-medium truncate">
             When should your order be <strong className="text-zinc-900 font-semibold">delivered</strong>?
           </p>
         </div>
       </div>
 
       {/* Notice Banner */}
-      <div className="flex items-center gap-2.5 p-3 sm:p-3.5 rounded-2xl bg-sienna-1/10 border border-sienna-1/20 text-sienna-1 text-xs font-medium">
-        <Clock width={16} height={16} className="shrink-0 text-sienna-1" />
+      <div className="flex items-center gap-2 sm:gap-2.5 p-2.5 sm:p-3 md:p-3.5 rounded-xl sm:rounded-2xl bg-sienna-1/10 border border-sienna-1/20 text-sienna-1 text-[10px] sm:text-xs font-medium">
+        <Clock width={14} height={14} className="sm:w-4 sm:h-4 shrink-0 text-sienna-1" />
         <span className="leading-snug">
           Your order will be <strong className="font-bold text-sienna-1">prepared & delivered</strong> within the selected 2-hour window.
         </span>
       </div>
 
       {/* SELECT DATE Section */}
-      <div className="flex flex-col gap-2.5 w-full">
+      <div className="flex flex-col gap-2 sm:gap-2.5 w-full">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
+          <span className="text-[10px] sm:text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
             SELECT DATE
           </span>
           {selectedDateState && (
-            <span className="text-[11px] font-bold text-sienna-1 flex items-center gap-1 bg-sienna-1/10 px-2 py-0.5 rounded-lg">
-              <Check width={12} height={12} className="stroke-[3]" />
-              Selected: {formattedDate(selectedDateState, "MINI")}
+            <span className="text-[10px] sm:text-[11px] font-bold text-sienna-1 flex items-center gap-1 bg-sienna-1/10 px-1.5 sm:px-2 py-0.5 rounded-lg">
+              <Check width={10} height={10} className="sm:w-3 sm:h-3 stroke-[3]" />
+              <span className="hidden xs:inline">Selected: </span>{formattedDate(selectedDateState, "MINI")}
             </span>
           )}
         </div>
 
         {/* Date Cards Slider (Always Visible) */}
-        <div className="flex items-center gap-2 sm:gap-2.5 overflow-x-auto pb-2 scrollbar-hide w-full max-w-full snap-x snap-mandatory pr-4">
+        <div className="flex items-center gap-1.5 sm:gap-2 md:gap-2.5 overflow-x-auto pb-2 scrollbar-hide w-full max-w-full snap-x snap-mandatory pr-2 sm:pr-4">
           {(() => {
             const baseList = dates.slice(0, 5).map((d) => new Date(d));
             let cardList = baseList;
@@ -170,35 +170,35 @@ export default function CartItemDeliveryDateTime({
                   key={index}
                   type="button"
                   onClick={() => handleSelectDateCard(dObj)}
-                  className={`relative flex flex-col items-center justify-center py-2 sm:py-2.5 px-1.5 sm:px-2 rounded-xl sm:rounded-2xl border transition-all duration-200 shrink-0 w-[74px] sm:w-[82px] snap-start select-none ${
+                  className={`relative flex flex-col items-center justify-center py-1.5 sm:py-2 md:py-2.5 px-1.5 sm:px-2 rounded-lg sm:rounded-xl md:rounded-2xl border transition-all duration-200 shrink-0 w-[68px] sm:w-[74px] md:w-[82px] snap-start select-none ${
                     isSelected
-                      ? "border-2 border-sienna-1 bg-sienna-1 text-white shadow-md shadow-sienna-1/25 scale-[1.03]"
+                      ? "border-2 border-sienna-1 bg-sienna-1 text-white shadow-md shadow-sienna-1/25"
                       : "border-zinc-200 bg-white text-zinc-800 hover:border-zinc-300 hover:bg-zinc-50"
                   }`}
                 >
                   {/* Selected Active Check Circle Badge */}
                   {isSelected && (
-                    <div className="absolute top-1 right-1 h-3.5 w-3.5 rounded-full bg-white text-sienna-1 flex items-center justify-center shadow-2xs">
-                      <Check width={10} height={10} className="stroke-[3]" />
+                    <div className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 h-3 w-3 sm:h-3.5 sm:w-3.5 rounded-full bg-white text-sienna-1 flex items-center justify-center shadow-2xs">
+                      <Check width={9} height={9} className="sm:w-[10px] sm:h-[10px] stroke-[3]" />
                     </div>
                   )}
 
                   {isFast && (
                     <span
-                      className={`text-[7.5px] font-black tracking-tight uppercase px-1.5 py-0.5 rounded-full mb-0.5 whitespace-nowrap leading-none ${
+                      className={`text-[7px] sm:text-[7.5px] font-black tracking-tight uppercase px-1 sm:px-1.5 py-0.5 rounded-full mb-0.5 whitespace-nowrap leading-none ${
                         isSelected ? "bg-white/20 text-white" : "bg-rose-600 text-white"
                       }`}
                     >
                       FILLING FAST
                     </span>
                   )}
-                  <span className={`text-[9.5px] font-extrabold uppercase ${isSelected ? "text-rose-100" : "text-zinc-500"}`}>
+                  <span className={`text-[9px] sm:text-[9.5px] font-extrabold uppercase ${isSelected ? "text-rose-100" : "text-zinc-500"}`}>
                     {dayLabel}
                   </span>
-                  <span className={`text-sm sm:text-base font-black leading-tight my-0.5 ${isSelected ? "text-white" : "text-zinc-900"}`}>
+                  <span className={`text-xs sm:text-sm md:text-base font-black leading-tight my-0.5 ${isSelected ? "text-white" : "text-zinc-900"}`}>
                     {dateNum}
                   </span>
-                  <span className={`text-[9.5px] font-semibold ${isSelected ? "text-rose-100" : "text-zinc-400"}`}>
+                  <span className={`text-[9px] sm:text-[9.5px] font-semibold ${isSelected ? "text-rose-100" : "text-zinc-400"}`}>
                     {monthName}
                   </span>
                 </button>
@@ -210,15 +210,15 @@ export default function CartItemDeliveryDateTime({
           <button
             type="button"
             onClick={() => setShowCalendar(!showCalendar)}
-            className={`flex flex-col items-center justify-center py-2 sm:py-2.5 px-1.5 sm:px-2 rounded-xl sm:rounded-2xl border-2 border-dashed transition-all shrink-0 w-[74px] sm:w-[82px] snap-start select-none ${
+            className={`flex flex-col items-center justify-center py-1.5 sm:py-2 md:py-2.5 px-1.5 sm:px-2 rounded-lg sm:rounded-xl md:rounded-2xl border-2 border-dashed transition-all shrink-0 w-[68px] sm:w-[74px] md:w-[82px] snap-start select-none ${
               showCalendar
                 ? "border-sienna-1 bg-sienna-1/10 text-sienna-1 font-bold"
                 : "border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300 hover:bg-zinc-50"
             }`}
           >
-            <span className="text-[8.5px] font-bold uppercase text-zinc-400">MORE</span>
-            <Calendar width={15} height={15} className="my-0.5 text-zinc-500" />
-            <span className="text-[9.5px] font-semibold text-zinc-400">dates</span>
+            <span className="text-[8px] sm:text-[8.5px] font-bold uppercase text-zinc-400">MORE</span>
+            <Calendar width={14} height={14} className="sm:w-[15px] sm:h-[15px] my-0.5 text-zinc-500" />
+            <span className="text-[9px] sm:text-[9.5px] font-semibold text-zinc-400">dates</span>
           </button>
         </div>
 
@@ -292,33 +292,33 @@ export default function CartItemDeliveryDateTime({
 
       {/* SELECT TIME SLOT Section */}
       {!isAvailableInAllIndia && (
-        <div className="flex flex-col gap-2.5 border-t border-zinc-100 pt-4 w-full">
+        <div className="flex flex-col gap-2 sm:gap-2.5 border-t border-zinc-100 pt-3 sm:pt-4 w-full">
           <div className="flex items-center justify-between gap-2 flex-wrap">
-            <span className="text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
+            <span className="text-[10px] sm:text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
               SELECT TIME SLOT
             </span>
             {selectedDateState && earliestSlotText && (
-              <span className="text-[11px] font-bold text-sienna-1">
+              <span className="text-[10px] sm:text-[11px] font-bold text-sienna-1">
                 Earliest: {earliestSlotText}
               </span>
             )}
           </div>
 
           {!selectedDateState ? (
-            <div className="p-3.5 rounded-2xl border border-zinc-100 bg-zinc-50/70 text-zinc-500 text-xs font-medium flex items-center gap-2">
-              <Clock width={15} height={15} className="text-zinc-400 shrink-0" />
+            <div className="p-2.5 sm:p-3 md:p-3.5 rounded-xl sm:rounded-2xl border border-zinc-100 bg-zinc-50/70 text-zinc-500 text-[10px] sm:text-xs font-medium flex items-center gap-2">
+              <Clock width={14} height={14} className="sm:w-[15px] sm:h-[15px] text-zinc-400 shrink-0" />
               <span>Time slots appear after you select a date</span>
             </div>
           ) : (
-            <div className="flex flex-col gap-3 w-full">
+            <div className="flex flex-col gap-2.5 sm:gap-3 w-full">
               {allSlotGroups.map((group, gIdx) => (
                 <div key={gIdx} className="flex flex-col gap-2 w-full">
                   {allSlotGroups.length > 1 && (
-                    <span className="text-xs font-bold text-zinc-700">
+                    <span className="text-[11px] sm:text-xs font-bold text-zinc-700">
                       {group.deliveryType.name}
                     </span>
                   )}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-2.5">
                     {group.slotItems.map((item, sIdx) => {
                       const isSlotSelected =
                         timeSlot && String(timeSlot._id) === String(item.timeSlot._id);
@@ -327,12 +327,12 @@ export default function CartItemDeliveryDateTime({
                         return (
                           <div
                             key={String(item.timeSlot._id)}
-                            className="flex flex-col items-center justify-center p-3 rounded-2xl border border-zinc-100 bg-zinc-50/50 text-zinc-400 opacity-40 cursor-not-allowed select-none text-center min-h-[54px]"
+                            className="flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border border-zinc-100 bg-zinc-50/50 text-zinc-400 opacity-40 cursor-not-allowed select-none text-center min-h-[50px] sm:min-h-[54px]"
                           >
-                            <span className="text-xs font-bold line-through">
+                            <span className="text-[11px] sm:text-xs font-bold line-through">
                               {item.timeSlot.label}
                             </span>
-                            <span className="text-[10px] text-zinc-400 mt-0.5">
+                            <span className="text-[9px] sm:text-[10px] text-zinc-400 mt-0.5">
                               Not available
                             </span>
                           </div>
@@ -344,16 +344,16 @@ export default function CartItemDeliveryDateTime({
                           key={String(item.timeSlot._id)}
                           type="button"
                           onClick={() => handleSelectTimeSlot(group.deliveryType, item.timeSlot)}
-                          className={`flex flex-col items-center justify-center p-3 rounded-2xl border transition-all duration-200 min-h-[54px] ${
+                          className={`flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border transition-all duration-200 min-h-[50px] sm:min-h-[54px] ${
                             isSlotSelected
-                              ? "border-2 border-sienna-1 bg-sienna-1/5 text-sienna-1 font-extrabold shadow-2xs scale-[1.02]"
+                              ? "border-2 border-sienna-1 bg-sienna-1/5 text-sienna-1 font-extrabold shadow-2xs"
                               : "border-zinc-200 bg-white text-zinc-900 hover:border-zinc-300 hover:bg-zinc-50 font-bold"
                           }`}
                         >
-                          <span className="text-xs font-extrabold">
+                          <span className="text-[11px] sm:text-xs font-extrabold">
                             {item.timeSlot.label}
                           </span>
-                          <span className={`text-[10px] ${isSlotSelected ? "text-sienna-1/80 font-bold" : "text-zinc-400 font-medium"}`}>
+                          <span className={`text-[9px] sm:text-[10px] ${isSlotSelected ? "text-sienna-1/80 font-bold" : "text-zinc-400 font-medium"}`}>
                             2-hr window
                           </span>
                         </button>
@@ -371,22 +371,22 @@ export default function CartItemDeliveryDateTime({
               href={whatsappContact("Hi, I want to book a custom delivery time slot for today.")}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-2 flex items-center justify-between p-3.5 rounded-2xl bg-[#fffbeb] border border-[#fef08a] transition-all hover:bg-[#fef3c7] group w-full"
+              className="mt-1 sm:mt-2 flex items-center justify-between p-2.5 sm:p-3 md:p-3.5 rounded-xl sm:rounded-2xl bg-[#fffbeb] border border-[#fef08a] transition-all hover:bg-[#fef3c7] group w-full"
             >
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#25D366] text-white shadow-2xs shrink-0">
-                  <WhatsappSVG dimensions={20} className="fill-current text-white" />
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-[#25D366] text-white shadow-2xs shrink-0">
+                  <WhatsappSVG dimensions={18} className="sm:w-5 sm:h-5 fill-current text-white" />
                 </div>
                 <div className="flex flex-col text-left min-w-0">
-                  <span className="text-xs font-extrabold text-amber-950 truncate">
+                  <span className="text-[11px] sm:text-xs font-extrabold text-amber-950 truncate">
                     Only 1 slot left today
                   </span>
-                  <span className="text-[11px] font-medium text-amber-900/80 truncate">
+                  <span className="text-[10px] sm:text-[11px] font-medium text-amber-900/80 truncate">
                     None work? WhatsApp us for a custom time
                   </span>
                 </div>
               </div>
-              <ChevronRight width={18} height={18} className="text-amber-700 group-hover:translate-x-0.5 transition-transform shrink-0" />
+              <ChevronRight width={16} height={16} className="sm:w-[18px] sm:h-[18px] text-amber-700 group-hover:translate-x-0.5 transition-transform shrink-0" />
             </a>
           )}
         </div>

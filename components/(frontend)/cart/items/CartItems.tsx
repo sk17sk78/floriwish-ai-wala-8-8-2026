@@ -32,7 +32,7 @@ export default function CartItems({
   return (
     <div
       className={
-        "flex flex-col justify-start transition-all duration-300 gap-4 mb-3 max-lg:py-3 max-lg:px-2"
+        "flex flex-col justify-start transition-all duration-300 gap-4"
       }
     >
 

@@ -87,21 +87,20 @@ export default function CartCouponSection() {
   };
 
   const getOfferTitle = (coupon: CouponDocument) => {
-    if (coupon.type === "discount" && coupon.discount) {
-      if (coupon.discount.type === "percentage" && coupon.discount.percentage) {
-        return `${coupon.discount.percentage}% off up to ${INRSymbol}${coupon.discount.limit}`;
-      }
-      return `${INRSymbol}${coupon.discount.limit} off`;
+    // Only show description, not auto-generated discount text
+    if (coupon.description) {
+      return coupon.description;
     }
-    return "Free Delivery";
+    // Fallback if no description
+    return "Special Offer";
   };
 
   const getOfferSubtitle = (coupon: CouponDocument) => {
-    if (coupon.description) return coupon.description;
+    // Remove subtitle since description is now the main title
     if (coupon.minimumOrderAmount) {
       return `Min. order ${INRSymbol}${coupon.minimumOrderAmount.toLocaleString("en-IN")}`;
     }
-    return "Valid on all orders";
+    return "";
   };
 
   return (
@@ -109,16 +108,16 @@ export default function CartCouponSection() {
       {/* 1. Applied Coupon Header View */}
       {appliedCoupon ? (
         <div className="flex flex-col gap-2.5">
-          <div className="flex items-center justify-between gap-2.5 p-3 rounded-xl bg-sienna-1/10 border border-sienna-1/20">
+          <div className="flex items-center justify-between gap-2.5 p-3 rounded-xl bg-emerald-50 border border-emerald-200">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sienna-1 text-white shrink-0 shadow-2xs">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white shrink-0 shadow-2xs">
                 <CheckCircle2 width={17} height={17} />
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-xs font-extrabold text-sienna-1 truncate">
+                <span className="text-xs font-extrabold text-emerald-700 truncate">
                   Code &quot;{appliedCoupon.code}&quot; applied!
                 </span>
-                <span className="text-[10.5px] font-semibold text-sienna-1/80">
+                <span className="text-[10.5px] font-semibold text-emerald-600">
                   Saved {INRSymbol}{couponDiscount} on this order
                 </span>
               </div>
@@ -148,8 +147,8 @@ export default function CartCouponSection() {
           className="flex items-center justify-between gap-2.5 cursor-pointer select-none py-0.5"
         >
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-sienna-1/10 border border-sienna-1/20 text-sienna-1 shrink-0">
-              <Tag width={16} height={16} className="fill-sienna-1/30" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 shrink-0">
+              <Tag width={16} height={16} className="fill-emerald-100" />
             </div>
             <div className="flex flex-col min-w-0">
               <h3 className="text-xs sm:text-sm font-bold text-zinc-900 leading-tight">
@@ -172,7 +171,7 @@ export default function CartCouponSection() {
       {isExpanded && (
         <div className="flex flex-col gap-3 border-t border-zinc-100 pt-3 mt-3">
           {/* Custom Input Row */}
-          <div className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50/60 p-1 pl-3 focus-within:border-sienna-1 focus-within:bg-white focus-within:ring-2 focus-within:ring-sienna-1/10 transition-all">
+          <div className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50/60 p-1 pl-3 focus-within:border-emerald-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-emerald-100 transition-all">
             <Tag width={14} height={14} className="text-zinc-400 shrink-0" />
             <input
               type="text"
@@ -191,7 +190,7 @@ export default function CartCouponSection() {
               type="button"
               disabled={!inputCode.trim()}
               onClick={handleApplyCustomCode}
-              className="px-3.5 py-1.5 rounded-lg bg-zinc-200 text-zinc-600 font-bold text-xs hover:bg-sienna-1 hover:text-white disabled:opacity-40 disabled:hover:bg-zinc-200 disabled:hover:text-zinc-600 transition-all cursor-pointer disabled:cursor-not-allowed"
+              className="px-3.5 py-1.5 rounded-lg bg-zinc-200 text-zinc-600 font-bold text-xs hover:bg-emerald-500 hover:text-white disabled:opacity-40 disabled:hover:bg-zinc-200 disabled:hover:text-zinc-600 transition-all cursor-pointer disabled:cursor-not-allowed"
             >
               Apply
             </button>
@@ -217,28 +216,30 @@ export default function CartCouponSection() {
               {displayCoupons.map((coupon) => (
                 <div
                   key={String(coupon._id)}
-                  className="flex items-center justify-between gap-2.5 p-2.5 sm:p-3 rounded-xl border border-dashed border-sienna-1/30 bg-sienna-1/5 hover:border-sienna-1 transition-all"
+                  className="flex items-center justify-between gap-2.5 p-2.5 sm:p-3 rounded-xl border border-dashed border-emerald-300 bg-emerald-50 hover:border-emerald-400 hover:bg-emerald-100 transition-all"
                 >
                   {/* Code Badge */}
-                  <span className="bg-sienna-1/15 text-sienna-1 font-black text-[11px] tracking-wider uppercase py-1.5 px-2.5 rounded-lg shrink-0">
+                  <span className="bg-emerald-100 text-emerald-700 font-black text-[11px] tracking-wider uppercase py-1.5 px-2.5 rounded-lg shrink-0">
                     {coupon.code}
                   </span>
 
                   {/* Offer Info */}
                   <div className="flex flex-col min-w-0 flex-1">
-                    <span className="text-xs font-bold text-zinc-900 leading-tight truncate">
+                    <span className="text-xs font-bold text-zinc-900 leading-tight line-clamp-2">
                       {getOfferTitle(coupon)}
                     </span>
-                    <span className="text-[10.5px] text-zinc-500 font-medium mt-0.5 line-clamp-2">
-                      {getOfferSubtitle(coupon)}
-                    </span>
+                    {getOfferSubtitle(coupon) && (
+                      <span className="text-[10.5px] text-zinc-500 font-medium mt-0.5">
+                        {getOfferSubtitle(coupon)}
+                      </span>
+                    )}
                   </div>
 
                   {/* Apply Chevron Button */}
                   <button
                     type="button"
                     onClick={() => handleApplyCoupon(coupon)}
-                    className="flex h-7 w-7 items-center justify-center rounded-full bg-sienna-1/15 text-sienna-1 hover:bg-sienna-1 hover:text-white transition-all shrink-0 cursor-pointer"
+                    className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-200 text-emerald-700 hover:bg-emerald-500 hover:text-white transition-all shrink-0 cursor-pointer"
                   >
                     <ChevronRight width={14} height={14} />
                   </button>

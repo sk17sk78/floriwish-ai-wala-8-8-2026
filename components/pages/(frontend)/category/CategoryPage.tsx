@@ -21,7 +21,6 @@ import CategoryBottomContentSection from "@/components/(frontend)/category/compo
 import CategoryContents from "@/components/pages/(frontend)/category/components/CategoryContents";
 import CategoryContentCountSort from "@/components/(frontend)/category/components/CategoryContentCountSort";
 import CategoryFAQSection from "@/components/(frontend)/category/components/faq/CategoryFAQSection";
-import CategoryMobileFilterSort from "@/components/(frontend)/category/components/CategoryMobileFilterSort";
 import CategoryQuickLinkSection from "@/components/(frontend)/category/components/quickLink/CategoryQuickLinksSection";
 import CategoryRelatedCategorySection from "@/components/(frontend)/category/components/relatedCategory/CategoryRelatedCategorySection";
 import CategoryReviewSection from "@/components/(frontend)/category/components/review/CategoryReviewSection";

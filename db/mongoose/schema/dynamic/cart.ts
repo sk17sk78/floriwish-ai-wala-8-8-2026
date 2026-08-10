@@ -23,7 +23,7 @@ export const cartSchema = new Schema<CartDocument, CartModel>(
     customer: {
       type: Schema.Types.ObjectId,
       ref: "Customer",
-      required: true
+      required: false
     },
     items: [
       {

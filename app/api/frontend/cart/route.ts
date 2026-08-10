@@ -28,7 +28,7 @@ export const POST = async (
     const document = await addCart({ cart: addData });
 
     if (!document) {
-      return Response<CartDocument>(notFoundErrorResponse);
+      return Response<CartDocument>(serverErrorResponse);
     }
 
     return Response(successData(document));

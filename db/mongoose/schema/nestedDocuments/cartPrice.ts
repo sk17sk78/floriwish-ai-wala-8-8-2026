@@ -9,7 +9,8 @@ export const cartPriceSchema = new Schema<CartPriceDocument>(
   {
     content: {
       type: Number,
-      required: true
+      required: false,
+      default: 0
     },
     addon: {
       type: Number,
@@ -23,7 +24,8 @@ export const cartPriceSchema = new Schema<CartPriceDocument>(
     },
     deliveryCharge: {
       type: Number,
-      required: true
+      required: false,
+      default: 0
     },
     platformFee: {
       type: Number,
@@ -32,7 +34,8 @@ export const cartPriceSchema = new Schema<CartPriceDocument>(
     },
     total: {
       type: Number,
-      required: true
+      required: false,
+      default: 0
     },
     paymentPercentage: {
       type: Number,
@@ -46,11 +49,13 @@ export const cartPriceSchema = new Schema<CartPriceDocument>(
     },
     payable: {
       type: Number,
-      required: true
+      required: false,
+      default: 0
     },
     due: {
       type: Number,
-      required: true
+      required: false,
+      default: 0
     }
   },
   { timestamps: true }

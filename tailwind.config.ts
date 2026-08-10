@@ -58,6 +58,7 @@ const customAnimations = {
   "shine-infinite-slow": "once 10s linear infinite",
   "shine-infinite-slow-reversed": "once 5s infinite reverse",
   "spin-slow": "spinSlow 8s linear infinite",
+  blink: "blink 0.9s step-end infinite",
 };
 
 const customKeyframes = {
@@ -74,6 +75,10 @@ const customKeyframes = {
     "0%": { rotate: "0deg" },
     "50%": { rotate: "180deg" },
     "100%": { rotate: "360deg" },
+  },
+  blink: {
+    "0%, 100%": { opacity: "1" },
+    "50%": { opacity: "0" },
   },
 };
 

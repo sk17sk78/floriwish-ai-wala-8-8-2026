@@ -38,7 +38,7 @@ export default function ContentDetailInfo({
   const careInfo = (info.careInfo as CareInfoDocument)?.content || [];
 
   return (
-    <ContentHorizontalSpacing className="my-6 lg:pl-5">
+    <ContentHorizontalSpacing className="my-2 lg:my-0 lg:pl-5">
       <div className="space-y-3">
         <h2 className="text-sm font-semibold tracking-tight text-zinc-800">
           About This Product

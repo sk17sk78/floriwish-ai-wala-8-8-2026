@@ -38,7 +38,7 @@ export default function ContentDetailCouponSection({
 
   return (
     <>
-      <ContentHorizontalSpacing className="sm:pt-6 pt-2.5 pb-3.5">
+      <ContentHorizontalSpacing className="pt-2.5 pb-3.5 lg:pt-1.5 lg:pb-1.5">
         <div className="rounded-xl overflow-hidden sm:max-w-[calc(470px_+_24px)]">
           <button
             className="w-full bg-sienna-1/10 border border-sienna-1/20 py-2 sm:py-3.5 px-4 flex items-center justify-between cursor-pointer transition-all duration-300 hover:bg-sienna-1/15 rounded-xl"

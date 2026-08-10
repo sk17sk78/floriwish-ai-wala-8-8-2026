@@ -21,7 +21,7 @@ export const cartItemSchema = new Schema<CartItemDocument>(
     content: {
       type: Schema.Types.ObjectId,
       ref: "Content",
-      required: true
+      required: false
     },
     customVariant: {
       type: Schema.Types.ObjectId,
@@ -33,11 +33,13 @@ export const cartItemSchema = new Schema<CartItemDocument>(
     },
     pricePerUnit: {
       type: Number,
-      required: true
+      required: false,
+      default: 0
     },
     quantity: {
       type: Number,
-      required: true
+      required: false,
+      default: 1
     },
     delivery: {
       type: cartItemDeliverySchema,

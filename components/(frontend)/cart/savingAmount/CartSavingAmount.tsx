@@ -16,17 +16,29 @@ export default function CartSavingAmount() {
   const { savingAmount } = useCart();
 
   return (
-    <div className="w-full bg-sienna-1/10 border-y border-sienna-1/20 py-2.5 mb-1">
-      <HorizontalSpacing className="flex items-center gap-3 max-w-[1280px] mx-auto">
-        <div className="bg-sienna-1 rounded-full p-1 flex-shrink-0">
+    <div 
+      className="w-full border-b py-2"
+      style={{ 
+        backgroundColor: 'rgba(90, 15, 46, 0.03)',
+        borderBottomColor: 'rgba(90, 15, 46, 0.08)'
+      }}
+    >
+      <HorizontalSpacing className="flex items-center gap-2 max-w-[1280px] mx-auto">
+        <div 
+          className="rounded-full p-1 flex-shrink-0"
+          style={{ backgroundColor: '#5A0F2E' }}
+        >
           <BadgePercent
             strokeWidth={3}
-            width={14}
-            height={14}
+            width={12}
+            height={12}
             className="text-white"
           />
         </div>
-        <span className="text-sienna-1 text-[13px] font-bold tracking-tight">
+        <span 
+          className="text-[12px] sm:text-[13px] font-bold tracking-tight"
+          style={{ color: '#5A0F2E' }}
+        >
           {`You're saving `}
           <span>{`${INRSymbol} ${savingAmount}`}</span>
           {` on this order!`}

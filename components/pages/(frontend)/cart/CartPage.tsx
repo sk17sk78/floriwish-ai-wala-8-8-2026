@@ -68,80 +68,66 @@ export default function CartPage() {
 
   return (
     <div className="bg-ivory-1 min-h-screen w-full mx-auto">
-      {/* 1. Full-Width Savings Banner */}
+      {/* Savings Banner */}
       <CartSavingAmount />
 
-      <HorizontalSpacing className="py-8 sm:py-12">
-        <div className="max-w-[1280px] mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
-            {/* Left Column: Products and Title */}
-            <div className="md:col-span-8 flex flex-col gap-8">
-              <div className="flex flex-col gap-5">
-                <h2 className="px-1 text-[12px] font-bold tracking-[0.2em] text-zinc-400 uppercase">
-                  Your Order • {items.length}{" "}
-                  {items.length === 1 ? "Item" : "Items"}
-                </h2>
+      <div className="max-w-[1280px] mx-auto px-3 sm:px-4 py-3 sm:py-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-6 items-start">
 
-                {/* Trust Badges Row */}
-                <div className="flex flex-wrap items-center gap-3">
-                  <div className="flex shrink-0 items-center gap-1.5 rounded-full border border-zinc-100 bg-white px-3.5 py-2 shadow-sm transition-all hover:border-zinc-200">
-                    <ShieldCheck className="w-3.5 h-3.5 text-green-600" />
-                    <span className="text-[11px] font-semibold whitespace-nowrap text-zinc-500">
-                      100% Secure Payments
-                    </span>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-1.5 rounded-full border border-zinc-100 bg-white px-3 py-1.5 shadow-sm">
-                    <Truck className="w-3.5 h-3.5 text-blue-600" />
-                    <span className="text-[11px] font-semibold whitespace-nowrap text-zinc-500">
-                      Fast & On-time Delivery
-                    </span>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-1.5 rounded-full border border-zinc-100 bg-white px-3 py-1.5 shadow-sm">
-                    <Star className="w-3.5 h-3.5 text-amber-600" />
-                    <span className="text-[11px] font-semibold whitespace-nowrap text-zinc-500">
-                      10,000+ Happy Customers
-                    </span>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-1.5 rounded-full border border-zinc-100 bg-white px-3 py-1.5 shadow-sm">
-                    <RefreshCcw className="w-3.5 h-3.5 text-purple-600" />
-                    <span className="text-[11px] font-semibold whitespace-nowrap text-zinc-500">
-                      Hassle-free Returns
-                    </span>
-                  </div>
+          {/* Left Column */}
+          <div className="md:col-span-8 flex flex-col gap-3 px-0 sm:px-0 py-0 sm:py-0">
+
+            {/* Title + Trust badges */}
+            <div className="flex flex-col gap-2 px-0 sm:px-0">
+              <h2 className="text-[11px] font-bold tracking-[0.2em] text-zinc-400 uppercase">
+                Your Order • {items.length}{" "}
+                {items.length === 1 ? "Item" : "Items"}
+              </h2>
+              <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide w-full pb-1 -mb-1 px-0 sm:px-0">
+                <div className="flex shrink-0 items-center gap-1.5 rounded-full border border-zinc-100 bg-white px-3 py-1.5 shadow-sm">
+                  <ShieldCheck className="w-3 h-3 text-green-600" />
+                  <span className="text-[11px] font-semibold whitespace-nowrap text-zinc-500">100% Secure Payments</span>
                 </div>
+                <div className="flex shrink-0 items-center gap-1.5 rounded-full border border-zinc-100 bg-white px-3 py-1.5 shadow-sm">
+                  <Truck className="w-3 h-3 text-blue-600" />
+                  <span className="text-[11px] font-semibold whitespace-nowrap text-zinc-500">Fast & On-time Delivery</span>
+                </div>
+                <div className="flex shrink-0 items-center gap-1.5 rounded-full border border-zinc-100 bg-white px-3 py-1.5 shadow-sm">
+                  <Star className="w-3 h-3 text-amber-600" />
+                  <span className="text-[11px] font-semibold whitespace-nowrap text-zinc-500">10,000+ Happy Customers</span>
+                </div>
+                <div className="flex shrink-0 items-center gap-1.5 rounded-full border border-zinc-100 bg-white px-3 py-1.5 shadow-sm">
+                  <RefreshCcw className="w-3 h-3 text-purple-600" />
+                  <span className="text-[11px] font-semibold whitespace-nowrap text-zinc-500">Hassle-free Returns</span>
+                </div>
+                <div className="shrink-0 w-2" />
               </div>
-
-              
-
-              <CartItems validationTriggered={validationTriggered} />
             </div>
 
-            {/* Right Column: Sidebar (Sticky) */}
-            <aside className="md:col-span-4 flex flex-col gap-5 md:sticky top-[100px] md:pt-[92px]">
-              <CartCheckout
-                showCheckoutDetail={showCheckoutDetail}
-                onChangeShowCheckoutDetail={setShowCheckoutDetail}
-              />
-
-              <div className="flex flex-col gap-5">
-                <CartPrice />
-                <div className="mt-2">
-                  <ShopMore />
-                </div>
-                <CartCouponSection />
-                <CartPaymentPercentage />
-              </div>
-
-              <SettingProvider>
-                <CartPaymentButton
-                  onChangeShowCheckoutDetail={setShowCheckoutDetail}
-                  onValidationTrigger={() => setValidationTriggered(true)}
-                />
-              </SettingProvider>
-            </aside>
+            <CartItems validationTriggered={validationTriggered} />
           </div>
+
+          {/* Right Column: Sidebar */}
+          <aside className="md:col-span-4 flex flex-col gap-3 md:sticky top-[100px] px-0 sm:px-0">
+            <CartCheckout
+              showCheckoutDetail={showCheckoutDetail}
+              onChangeShowCheckoutDetail={setShowCheckoutDetail}
+            />
+            <div className="flex flex-col gap-3">
+              <CartPrice />
+              <ShopMore />
+              <CartCouponSection />
+              <CartPaymentPercentage />
+            </div>
+            <SettingProvider>
+              <CartPaymentButton
+                onChangeShowCheckoutDetail={setShowCheckoutDetail}
+                onValidationTrigger={() => setValidationTriggered(true)}
+              />
+            </SettingProvider>
+          </aside>
         </div>
-      </HorizontalSpacing>
+      </div>
 
       <Suspense>
         <CustomerAuth />

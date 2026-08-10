@@ -57,6 +57,7 @@ export const addCart = async ({
 
     return document;
   } catch (error: any) {
+    console.error("[addCart] error:", error?.message || error);
     return null;
   }
 };
@@ -148,23 +149,20 @@ export const updateCart = async ({
   try {
     await connectDB();
 
-    const document = await Carts.findOneAndUpdate(
-      {
-        _id: id,
-        isOrdered: false
-      },
+    const document = await Carts.findByIdAndUpdate(
+      id,
       cart as Partial<CartDocument>,
-      {
-        new: true
-      }
+      { new: true }
     );
 
     if (!document) {
+      console.error("[updateCart] Cart not found for id:", id);
       return null;
     }
 
     return document;
   } catch (error: any) {
+    console.error("[updateCart] error:", error?.message || error);
     return null;
   }
 };

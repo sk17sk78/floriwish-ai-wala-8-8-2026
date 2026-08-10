@@ -19,7 +19,7 @@ export default function CartItemConfirmDelete({
 
   return (
     <div
-      className="absolute inset-0 z-[60] bg-white/60 backdrop-blur-[2px] flex flex-col items-center justify-center p-4 transition-all duration-300 animate-in fade-in"
+      className="absolute inset-0 z-[100] bg-white/95 backdrop-blur-[3px] flex flex-col items-center justify-center p-4 transition-all duration-300 animate-in fade-in rounded-xl sm:rounded-2xl"
     >
       <div className="bg-white border border-red-100 shadow-2xl rounded-2xl p-6 flex flex-col items-center gap-4 max-w-[280px] w-full transform scale-100 animate-in zoom-in-95 duration-200">
         <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center text-red-500">

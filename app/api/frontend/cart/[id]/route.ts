@@ -2,11 +2,10 @@
 export const dynamic = "force-dynamic";
 
 // controllers
-import { getCart, updateCart } from "../controller";
+import { getCart, updateCart, addCart } from "../controller";
 
 // constants
 import {
-  notFoundErrorResponse,
   serverErrorResponse
 } from "@/common/utils/api/error";
 
@@ -27,7 +26,8 @@ export const GET = async (
     const cart = await getCart({ id });
 
     if (!cart) {
-      return Response<CartDocument>(notFoundErrorResponse);
+      // Cart not found — return empty success so client can create a new one
+      return Response(successData(null as any));
     }
 
     return Response(successData(cart));
@@ -43,10 +43,17 @@ export const PATCH = async (
   try {
     const cart = (await req.json()) as CartDocument;
 
-    const document = await updateCart({ id, cart });
+    // Try to update existing cart
+    let document = await updateCart({ id, cart });
+
+    // If cart not found (stale ID), create a new one
+    if (!document) {
+      console.warn("[PATCH cart] Cart not found for id:", id, "— creating new cart");
+      document = await addCart({ cart });
+    }
 
     if (!document) {
-      return Response<CartDocument>(notFoundErrorResponse);
+      return Response<CartDocument>(serverErrorResponse as any);
     }
 
     return Response(successData(document));

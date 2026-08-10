@@ -12,7 +12,10 @@ export const addCart = (cart: CartDocument) => {
       try {
         const response: Response = await fetch(`${DOMAIN}/api/frontend/cart`, {
           method: "POST",
-          headers: { "x-api-key": XApiKey },
+          headers: {
+            "x-api-key": XApiKey,
+            "Content-Type": "application/json"
+          },
           body: JSON.stringify(cart)
         });
         const responseData: ResponseDataType<CartDocument> =

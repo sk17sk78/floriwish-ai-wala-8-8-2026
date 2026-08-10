@@ -567,8 +567,8 @@ function ContentDetail({
 
   return (
     <>
-      <section className="relative z-[10] flex h-full flex-col justify-start pt-2 pb-4 max-lg:bg-white lg:pt-5">
-        <div className="relative flex h-full flex-col justify-start gap-1.5 lg:gap-5 lg:pl-5 lg:pr-3">
+      <section className="relative z-[10] flex h-full flex-col justify-start pt-2 pb-4 max-lg:bg-white">
+        <div className="relative flex h-full flex-col justify-start gap-3 lg:pl-5 lg:pr-3">
           <div className="flex flex-col gap-2.5 order-2 lg:order-none">
             <div className="space-y-2">
               <ContentDetailTitleSection
@@ -706,22 +706,7 @@ function ContentDetail({
                 />
               )}
               {hasCustomizationOptions && (
-                <div className="flex flex-col gap-4 my-2">
-
-                  {Boolean(contentCustomization?.uploadText) && (
-                    <Suspense fallback={<></>}>
-                      <LazyContentCustomizeUploadText
-                        uploadText={contentCustomization!.uploadText as any}
-                        cartItemUploadedText={customization.uploadedText as any}
-                        onChangeCartItemUploadedText={(uploadedText) => {
-                          setCustomization((prev) => ({
-                            ...prev,
-                            uploadedText,
-                          }));
-                        }}
-                      />
-                    </Suspense>
-                  )}
+                <div className="flex flex-col gap-2 my-0">
 
                   {Boolean(contentCustomization?.balloonColor) && (
                     <Suspense fallback={<></>}>
@@ -803,11 +788,11 @@ function ContentDetail({
             </div>
           </ContentHorizontalSpacing>
 
-          <ContentHorizontalSpacing className="mt-2 order-5 lg:order-none lg:pl-5">
+          <ContentHorizontalSpacing className="order-5 lg:order-none lg:pl-5">
             <ContentDetailCityCard isAvailable={isAvailable} />
           </ContentHorizontalSpacing>
 
-          <ContentHorizontalSpacing className="mt-2 order-6 lg:order-none lg:pl-5">
+          <ContentHorizontalSpacing className="order-6 lg:order-none lg:pl-5">
             <Link
               href={whatsappContact(whatsappMessage)}
               target="_blank"
@@ -828,7 +813,7 @@ function ContentDetail({
             </Link>
           </ContentHorizontalSpacing>
 
-          <ContentHorizontalSpacing className="lg:hidden sticky bottom-2 z-[100] mt-2 order-7">
+          <ContentHorizontalSpacing className="lg:hidden sticky bottom-2 z-[100] order-7">
             <div className="overflow-hidden rounded-2xl border border-zinc-100 bg-white shadow-sm">
               <MobileStickyFooter
                 pricePerUnit={pricePerUnit}
