@@ -15,9 +15,7 @@ const isEmpty = (str: string | null) => (str && str.length > 0 ? false : true);
 
 export const GET = async (
   req: NextRequest
-): Promise<
-  APIResponseType<{ aiTags: any; categories: any; contents: any }>
-> => {
+): Promise<APIResponseType<any>> => {
   try {
     await connectRedis();
 

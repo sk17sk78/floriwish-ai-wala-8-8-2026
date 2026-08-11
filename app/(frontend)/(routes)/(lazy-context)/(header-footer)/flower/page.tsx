@@ -1,6 +1,8 @@
 // config
 import { RENDERING_STRATEGY } from "@/config/renderingStrategy";
 
+export const dynamic = "force-dynamic";
+
 // requests
 import { fetchContentCategoryPageData } from "@/request/categories/contentCategoryPageData";
 import { fetchContentCategoryPageMeta } from "@/request/categories/contentCategoryPageMeta";

@@ -136,7 +136,7 @@ function ContentDetail({
   const [delivery, setDelivery] =
     useState<CartItemDeliveryDocument>(INITIAL_DELIVERY);
   const [customization, setCustomization] =
-    useState<CartItemCustomizationDocument>(INITIAL_CUSTOMIZATION);
+    useState<any>(INITIAL_CUSTOMIZATION);
   const [addons, setAddons] = useState<CartItemAddonDocument[]>([]);
 
   const [showCustomization, setShowCustomization] = useState<boolean>(false);
@@ -321,7 +321,7 @@ function ContentDetail({
     () =>
       getContentPrice({ price, city: selectedCity }).price +
       (customization?.enhancement?.items?.reduce(
-        (enhancementTotal, enhancementItem) =>
+        (enhancementTotal: number, enhancementItem: any) =>
           (enhancementTotal += enhancementItem.price),
         0,
       ) || 0) +
@@ -714,7 +714,7 @@ function ContentDetail({
                         balloonColor={contentCustomization!.balloonColor as any}
                         cartItemBalloonColor={customization.balloonColor}
                         onChangeCartItemBalloonColor={(balloonColor) => {
-                          setCustomization((prev) => ({
+                          setCustomization((prev: any) => ({
                             ...prev,
                             balloonColor,
                           }));
@@ -729,7 +729,7 @@ function ContentDetail({
                         enhancement={contentCustomization!.enhancement as any}
                         cartItemEnhancement={customization.enhancement as any}
                         onChangeCartItemEnhancement={(enhancement) => {
-                          setCustomization((prev) => ({
+                          setCustomization((prev: any) => ({
                             ...prev,
                             enhancement,
                           }));
@@ -744,7 +744,7 @@ function ContentDetail({
                         flavour={contentCustomization!.flavour as any}
                         cartItemFlavour={customization.flavour as any}
                         onChangeCartItemFlavour={(flavour) => {
-                          setCustomization((prev) => ({
+                          setCustomization((prev: any) => ({
                             ...prev,
                             flavour,
                           }));
@@ -759,7 +759,7 @@ function ContentDetail({
                         upgrade={contentCustomization!.upgrade as any}
                         cartItemUpgrade={customization.upgrade as any}
                         onChangeCartItemUpgrade={(upgrade) => {
-                          setCustomization((prev) => ({
+                          setCustomization((prev: any) => ({
                             ...prev,
                             upgrade,
                           }));
@@ -775,7 +775,7 @@ function ContentDetail({
                         uploadImage={contentCustomization!.uploadImage as any}
                         cartItemUploadedImage={customization.uploadedImage}
                         onChangeCartItemUploadedImage={(uploadedImage) => {
-                          setCustomization((prev) => ({
+                          setCustomization((prev: any) => ({
                             ...prev,
                             uploadedImage,
                           }));

@@ -13,6 +13,8 @@ import { ContentAddonDocument } from "@/common/types/documentation/nestedDocumen
 import { ContentDeliveryDocument } from "@/common/types/documentation/nestedDocuments/contentDelivery";
 import { ContentDeliverySlotDocument } from "@/common/types/documentation/nestedDocuments/contentDeliverySlot";
 import { CouponDiscountDocument } from "@/common/types/documentation/nestedDocuments/couponDiscount";
+import { CategoryChargesDocument } from "@/common/types/documentation/nestedDocuments/categoryCharges";
+import { ContentCategoryDocument } from "@/common/types/documentation/categories/contentCategory";
 import { DeliveryTypeDocument } from "@/common/types/documentation/presets/deliveryType";
 import { SetStateType } from "@/common/types/reactTypes";
 import { CartItemChoiceType } from "@/components/(frontend)/transaction/cart/static/types";

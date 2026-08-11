@@ -46,7 +46,7 @@ export default function CartHeader() {
       const hasSlot = !!item.delivery?.slot && 
                       (typeof item.delivery.slot === 'string' 
                         ? item.delivery.slot.length > 0 
-                        : !!item.delivery.slot._id);
+                        : !!(item.delivery.slot as any)?._id);
       return hasDate && hasSlot;
     });
 
