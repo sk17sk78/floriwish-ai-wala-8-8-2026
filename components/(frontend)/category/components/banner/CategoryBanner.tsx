@@ -49,14 +49,14 @@ function CategoryBanner({
   const dimensions = useMemo(
     () =>
       type === "large"
-        ? "aspect-[3/2]"
+        ? "aspect-[2/1] sm:aspect-[3/2]"
         : type === "micro"
-          ? "h-[90px]"
+          ? "aspect-[2/1] sm:h-[90px]"
           : type === "mini"
-            ? "h-[150px] scale-110"
+            ? "aspect-[2/1] sm:h-[150px] sm:scale-110"
             : type === "square"
-              ? "aspect-[1/1]"
-              : "min-h-[68px]",
+              ? "aspect-[2/1] sm:aspect-[1/1]"
+              : "aspect-[2/1] sm:aspect-[3/1]",
     [type]
   );
 
@@ -89,7 +89,7 @@ function CategoryBanner({
     <div className="py-2 max-sm:px-3.5">
       <Carousel
         plugins={autoScroll ? [plugin.current] : undefined}
-        className="grid *:row-start-1 *:col-start-1"
+        className={`grid *:row-start-1 *:col-start-1 w-full ${dimensions}`}
         opts={{
           loop: loopInfinitely
         }}
@@ -97,11 +97,11 @@ function CategoryBanner({
         onMouseLeave={plugin.current.reset}
         setApi={setCountManager}
       >
-        <CarouselContent className="z-10">
+        <CarouselContent className="z-10 ml-0 -ml-0">
           {(Array.isArray(images) ? images : []).map((image, i) => (
             <CarouselItem
               key={i}
-              className={`overflow-hidden ${dimensions}`}
+              className={`overflow-hidden pl-0 rounded-2xl sm:rounded-3xl ${dimensions}`}
             >
               <CategoryBannerImage bannerImage={image} />
             </CarouselItem>

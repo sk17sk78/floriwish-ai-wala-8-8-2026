@@ -8,8 +8,22 @@ import { XApiKey } from "@/common/constants/apiKey";
 import { type CityDocument } from "@/common/types/documentation/presets/city";
 import { type ResponseDataType } from "@/common/types/apiTypes";
 
+// In-memory client cache to prevent redundant duplicate API calls
+let cachedLocationData: ResponseDataType<CityDocument[]> | null = null;
+let locationDataPromise: Promise<ResponseDataType<CityDocument[]>> | null = null;
+
 export const fetchLocationData = (renderingStrategy?: "SSR" | "ISR") => {
-  return new Promise<ResponseDataType<CityDocument[]>>(
+  // Return cached result immediately on client side
+  if (typeof window !== "undefined" && cachedLocationData) {
+    return Promise.resolve(cachedLocationData);
+  }
+
+  // Deduplicate concurrent in-flight requests
+  if (typeof window !== "undefined" && locationDataPromise) {
+    return locationDataPromise;
+  }
+
+  const promise = new Promise<ResponseDataType<CityDocument[]>>(
     async (resolve, reject) => {
       try {
         const renderingStrategyData = renderingStrategy
@@ -45,6 +59,9 @@ export const fetchLocationData = (renderingStrategy?: "SSR" | "ISR") => {
           await response.json();
 
         if (response.ok) {
+          if (typeof window !== "undefined") {
+            cachedLocationData = responseData;
+          }
           resolve(responseData);
         } else {
           reject(responseData);
@@ -59,7 +76,17 @@ export const fetchLocationData = (renderingStrategy?: "SSR" | "ISR") => {
             }
           ]
         });
+      } finally {
+        if (typeof window !== "undefined") {
+          locationDataPromise = null;
+        }
       }
     }
   );
+
+  if (typeof window !== "undefined") {
+    locationDataPromise = promise;
+  }
+
+  return promise;
 };

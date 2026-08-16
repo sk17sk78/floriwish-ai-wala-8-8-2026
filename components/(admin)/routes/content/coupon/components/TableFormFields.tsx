@@ -129,7 +129,41 @@ export default function TableFormFields({
         labelConfig={{
           label: "Limit Per Customer"
         }}
-        defaultValue={initialDocument?.limitPerCustomer?.toString() || ""}
+        defaultValue={initialDocument?.limitPerCustomer?.toString() || "1"}
+        errorCheck={false}
+        validCheck={false}
+      />
+      <Input
+        type="dropdown"
+        name="visibility"
+        isRequired
+        labelConfig={{
+          label: "Coupon Visibility",
+          layoutStyle: ""
+        }}
+        errorCheck={false}
+        validCheck={false}
+        nullOption={false}
+        defaultValue={initialDocument?.isPublic === false ? "private" : "public"}
+        options={[
+          {
+            label: "Public (Shown on Website)",
+            value: "public"
+          },
+          {
+            label: "Private (1 Customer Only — Hidden from Site)",
+            value: "private"
+          }
+        ]}
+      />
+      <Input
+        type="number"
+        name="maxTotalUses"
+        isRequired
+        labelConfig={{
+          label: "Max Total Uses (0 = Unlimited)"
+        }}
+        defaultValue={initialDocument?.maxTotalUses?.toString() || "0"}
         errorCheck={false}
         validCheck={false}
       />

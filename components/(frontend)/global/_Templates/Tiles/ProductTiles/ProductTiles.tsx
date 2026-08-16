@@ -160,10 +160,11 @@ const ProductTiles = memo(function ProductTiles({
                 <NextImage
                   src={url}
                   alt={alt || "Content Image"}
-                  height={500}
-                  width={500}
-                  priority
-                  className={`${type === "scrollable" ? "" : "max-sm:rounded-md"} w-full h-full object-cover object-center scale-105 group-hover:scale-100 transition-all duration-500`}
+                  height={320}
+                  width={320}
+                  sizes="(max-width: 640px) 180px, (max-width: 1024px) 250px, 320px"
+                  priority={index < 6}
+                  className={`${type === "scrollable" ? "" : "max-sm:rounded-md"} w-full h-full object-cover object-center scale-100`}
                 />
 
                 <div

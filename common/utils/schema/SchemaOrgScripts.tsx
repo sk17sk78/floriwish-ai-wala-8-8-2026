@@ -1,4 +1,12 @@
-import { COMPANY_LOGO_URL, COMPANY_NUMBER } from "@/common/constants/companyDetails";
+import {
+  COMPANY_LOGO_URL,
+  COMPANY_NUMBER,
+  FACEBOOK_LINK,
+  INSTAGRAM_LINK,
+  LINKEDIN_LINK,
+  TWITTER_LINK,
+  YOUTUBE_LINK
+} from "@/common/constants/companyDetails";
 import { DOMAIN, WEBSITE_NAME } from "@/common/constants/environmentVariables";
 import {
   BlogPostingSchemaType,
@@ -14,11 +22,19 @@ import {
 } from "@/common/types/seoTypes";
 import * as Schema from "schema-dts";
 
-const DEFAULT_URL = `https://${WEBSITE_NAME.toLowerCase()}.com`;
-export const ORGANIZATION_NAME = WEBSITE_NAME;
-const ALTERNATE_NAME = "";
+const DEFAULT_URL = DOMAIN || "https://floriwish.com";
+export const ORGANIZATION_NAME = WEBSITE_NAME || "Floriwish";
+const ALTERNATE_NAME = "Floriwish.com";
 const ORGANIZATION_LOGO = COMPANY_LOGO_URL;
 const MOBILE_NO = COMPANY_NUMBER;
+
+const SOCIAL_LINKS = [
+  INSTAGRAM_LINK,
+  FACEBOOK_LINK,
+  YOUTUBE_LINK,
+  LINKEDIN_LINK,
+  TWITTER_LINK
+].filter(Boolean);
 
 export function generateRandomGTIN14() {
   function checkDigit14(gtinArray: any) {
@@ -71,6 +87,8 @@ export const SchemaOrgScripts = ({
   url: string;
   data: SchemaDataType;
 }) => {
+  const CANONICAL_URL = url || DEFAULT_URL;
+
   const WEBSITE_SCHEMA: Schema.WebSite = {
     "@type": "WebSite",
     name: ORGANIZATION_NAME,
@@ -78,7 +96,15 @@ export const SchemaOrgScripts = ({
     url: DEFAULT_URL,
     image: ORGANIZATION_LOGO,
     copyrightYear: new Date().getFullYear(),
-    copyrightHolder: { "@type": "Organization", name: ORGANIZATION_NAME }
+    copyrightHolder: { "@type": "Organization", name: ORGANIZATION_NAME },
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${DEFAULT_URL}/flower?search={search_term_string}`
+      },
+      "query-input": "required name=search_term_string"
+    } as any
   };
 
   const ORGANIZATION_SCHEMA: Schema.Organization = {
@@ -86,12 +112,15 @@ export const SchemaOrgScripts = ({
     name: ORGANIZATION_NAME,
     alternateName: ALTERNATE_NAME,
     url: DEFAULT_URL,
+    logo: ORGANIZATION_LOGO,
+    sameAs: SOCIAL_LINKS,
     contactPoint: {
       "@type": "ContactPoint",
       telephone: MOBILE_NO,
       contactType: "customer service",
       contactOption: "TollFree",
-      areaServed: "IN"
+      areaServed: "IN",
+      availableLanguage: ["English", "Hindi"]
     }
   };
 
@@ -100,12 +129,15 @@ export const SchemaOrgScripts = ({
     name: ORGANIZATION_NAME,
     alternateName: ALTERNATE_NAME,
     url: DEFAULT_URL,
+    logo: ORGANIZATION_LOGO,
+    sameAs: SOCIAL_LINKS,
     contactPoint: {
       "@type": "ContactPoint",
       telephone: MOBILE_NO,
       contactType: "customer service",
       contactOption: "TollFree",
-      areaServed: "IN"
+      areaServed: "IN",
+      availableLanguage: ["English", "Hindi"]
     }
   };
 

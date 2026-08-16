@@ -284,7 +284,11 @@ export const getMeta = async ({
 }: {
   slug: string;
 }): Promise<ContentDocument | null> => {
+  const cacheKey = `content_page_meta_${slug}`;
   try {
+    const cached = await getFromRedis<ContentDocument>({ key: cacheKey });
+    if (cached) return cached;
+
     await connectDB();
 
     const document = await Contents.findOne({
@@ -307,7 +311,9 @@ export const getMeta = async ({
       return null;
     }
 
-    return document;
+    const parsed = JSON.parse(JSON.stringify(document));
+    await setToRedis({ key: cacheKey, value: parsed });
+    return parsed;
   } catch (error: any) {
     return null;
   }
@@ -688,11 +694,10 @@ export const getFullProductData = async (slug: string): Promise<ContentDocument 
 
     const document = JSON.parse(JSON.stringify(rawDocument)) as unknown as ContentDocument;
 
-    // Cache the result in Redis for 1 hour (3600 seconds)
+    // Cache the result in Redis without auto-expiring TTL (cache is only invalidated on explicit admin refresh)
     await setToRedis({
       key: cacheKey,
-      value: document,
-      ttl: 3600
+      value: document
     });
 
     return document;

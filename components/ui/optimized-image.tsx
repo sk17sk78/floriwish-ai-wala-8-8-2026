@@ -22,10 +22,6 @@ interface OptimizedImageProps {
   draggable?: boolean;
 }
 
-// Tiny 1x1 pixel base64 placeholder
-const DEFAULT_BLUR =
-  "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=";
-
 export default function OptimizedImage({
   src,
   alt,
@@ -38,10 +34,8 @@ export default function OptimizedImage({
   sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
   fill = false,
   placeholder = "empty",
-  blurDataURL,
   draggable,
 }: OptimizedImageProps) {
-  const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
 
   if (hasError) {
@@ -59,7 +53,7 @@ export default function OptimizedImage({
   }
 
   return (
-    <div className={cn("relative overflow-hidden", className)}>
+    <div className={cn("relative overflow-hidden bg-stone-100/50", className)}>
       <NextImage
         src={src}
         alt={alt}
@@ -70,25 +64,16 @@ export default function OptimizedImage({
         quality={quality}
         sizes={sizes}
         placeholder={placeholder}
-        blurDataURL={blurDataURL || DEFAULT_BLUR}
         draggable={draggable}
         className={cn(
-          "transition-opacity duration-500",
-          isLoading ? "opacity-0" : "opacity-100",
-          // Default object-fit only if no imageClassName overrides it
+          "opacity-100 transition-none",
           !imageClassName && "object-cover w-full h-full",
           imageClassName
         )}
-        onLoad={() => setIsLoading(false)}
         onError={() => {
-          setIsLoading(false);
           setHasError(true);
         }}
       />
-      {/* Shimmer skeleton while loading */}
-      {isLoading && (
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
-      )}
     </div>
   );
 }

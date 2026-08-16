@@ -13,6 +13,7 @@ import { getChromaticAberrationColor } from "@/components/(frontend)/category/ut
 import { getContentPrice } from "@/components/(frontend)/category/utils/getContentPrice";
 import { handleError } from "@/common/utils/api/error";
 import { normalizeRating } from "@/common/helpers/normalizeRating";
+import { resolveActiveGlobalCategoryBanner } from "@/common/utils/category/resolveCategoryBanner";
 
 // types
 import { type MongooseErrorType } from "@/common/types/apiTypes";
@@ -183,19 +184,24 @@ export const getTopicPageDetailsI = async ({
   try {
     await connectDB();
 
-    const category = await ContentCategories.findOne({
-      isActive: true,
-      slug: categorySlug
-    }).select(["_id"]);
+    const [category, globalBanner] = await Promise.all([
+      ContentCategories.findOne({
+        slug: categorySlug,
+        isActive: true
+      })
+        .select(["_id"])
+        .lean(),
+      resolveActiveGlobalCategoryBanner(topicSlug)
+    ]);
 
     if (!category) {
       return null;
     }
 
     const document = await Topics.findOne({
-      isActive: true,
+      slug: topicSlug,
       category: category._id,
-      slug: topicSlug
+      isActive: true
     })
       .select([
         "name",
@@ -258,7 +264,13 @@ export const getTopicPageDetailsI = async ({
       return null;
     }
 
-    return document;
+    const docObj: any = document.toObject();
+    if (globalBanner) {
+      if (!docObj.media) docObj.media = {};
+      docObj.media.banner = globalBanner;
+    }
+
+    return docObj as unknown as TopicDocument;
   } catch (error: any) {
     return null;
   }
@@ -378,7 +390,7 @@ export const getTopicPageDetailsII = async ({
           url: (content.media.primary as ImageDocument).url
         },
         price: price,
-        discount: Math.round(((mrp - price) / mrp) * 100),
+        discount: mrp > price && mrp > 0 ? Math.round(((mrp - price) / mrp) * 100) : 0,
         ratingValue: normalizeRating(content.quality?.rating?.value || 0),
         ratingCount: content.quality?.rating?.count,
         processingTime:
@@ -560,7 +572,7 @@ export const getTopicPageContents = async ({
           url: (content.media.primary as ImageDocument).url
         },
         price: price,
-        discount: Math.round(((mrp - price) / mrp) * 100),
+        discount: mrp > price && mrp > 0 ? Math.round(((mrp - price) / mrp) * 100) : 0,
         ratingValue: normalizeRating(content.quality?.rating?.value || 0),
         ratingCount: content.quality?.rating?.count,
         processingTime:

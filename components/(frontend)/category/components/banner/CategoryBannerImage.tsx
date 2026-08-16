@@ -29,47 +29,45 @@ function CategoryBannerImage({
     [bannerImage]
   );
 
+  const content = (
+    <div className="relative w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden">
+      {/* Mobile Banner */}
+      <div className="sm:hidden w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden">
+        <NextImage
+          className="object-cover object-center h-full w-full rounded-2xl sm:rounded-3xl"
+          src={mobile?.url || ""}
+          alt={mobile?.alt || mobile?.defaultAlt || "Banner Image"}
+          width={480}
+          height={240}
+          quality={75}
+          sizes="(max-width: 640px) 100vw, 480px"
+        />
+      </div>
+      {/* Desktop Banner */}
+      <div className="max-sm:hidden w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden">
+        <NextImage
+          className="object-cover object-center h-full w-full rounded-2xl sm:rounded-3xl"
+          src={desktop?.url || ""}
+          alt={desktop?.alt || desktop?.defaultAlt || "Banner Image"}
+          width={1200}
+          height={400}
+          quality={75}
+          sizes="(min-width: 640px) 100vw, 1200px"
+        />
+      </div>
+    </div>
+  );
+
   return bannerImage.path ? (
     <Link
       href={bannerImage.path}
       prefetch={false}
+      className="block w-full h-full"
     >
-      <NextImage
-        className={`sm:hidden object-cover object-center h-full w-full rounded-2xl sm:rounded-3xl`}
-        src={mobile.url || ""}
-        alt={mobile.alt || mobile.defaultAlt || "Banner Image"}
-        width={480}
-        height={240}
-        quality={75}
-      />
-      <NextImage
-        className={`max-sm:hidden object-cover object-center h-full w-full rounded-2xl sm:rounded-3xl`}
-        src={desktop.url || ""}
-        alt={desktop.alt || desktop.defaultAlt || "Banner Image"}
-        width={1200}
-        height={400}
-        quality={75}
-      />
+      {content}
     </Link>
   ) : (
-    <>
-      <NextImage
-        className={`sm:hidden object-cover object-center h-full w-full rounded-2xl sm:rounded-3xl`}
-        src={mobile.url || ""}
-        alt={mobile.alt || mobile.defaultAlt || "Banner Image"}
-        width={480}
-        height={240}
-        quality={25}
-      />
-      <NextImage
-        className={`max-sm:hidden object-cover object-center h-full w-full rounded-2xl sm:rounded-3xl`}
-        src={desktop.url || ""}
-        alt={desktop.alt || desktop.defaultAlt || "Banner Image"}
-        width={1200}
-        height={400}
-        quality={50}
-      />
-    </>
+    content
   );
 }
 

@@ -24,7 +24,7 @@ export const GET = async (
       `content_category_redirects`
     );
 
-    if (!cachedRedirects || cachedRedirects == " ") {
+    if (!cachedRedirects ) {
       const redirects = await getContentCategoryRedirects();
 
       await redisClient.set(

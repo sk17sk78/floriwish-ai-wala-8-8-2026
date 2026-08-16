@@ -28,7 +28,7 @@ export function AdminSidebarContent({ isMobile }: { isMobile?: boolean }) {
 
   return (
     <div
-      className={`group ${isLocked ? "w-[300px]" : "w-[68px]"} hover:w-[300px] transition-all duration-300 min-w-[calc(100dvw_-_28px)] sm:min-w-[68px] sm:px-3 sm:pb-2 sm:border-r-[1.5px] sm:border-ash flex flex-col justify-between gap-0 overflow-x-hidden *:flex *:flex-col *:items-start sm:*:gap-1`}
+      className={`group ${isLocked ? "w-[300px]" : "w-[68px]"} hover:w-[300px] transition-all duration-300 min-w-[calc(100dvw_-_28px)] sm:min-w-[68px] sm:px-3 sm:pb-2 sm:border-r-[1.5px] sm:border-zinc-200 dark:sm:border-zinc-800 bg-white dark:bg-[#121214] text-zinc-900 dark:text-zinc-100 flex flex-col justify-between gap-0 overflow-x-hidden *:flex *:flex-col *:items-start sm:*:gap-1`}
     >
       <div className="sm:pt-2 pb-4 justify-start overflow-y-scroll scrollbar-hide">
         <AdminSidebarHeader

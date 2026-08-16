@@ -12,26 +12,25 @@ import { Banners } from "@/components/(frontend)/global/_Templates/BannerCarouse
 import UpdatedCategoryTiles from "@/components/(frontend)/global/_Templates/Tiles/CategoryTiles/UpdatedCategoryTiles";
 import dynamic from "next/dynamic";
 
-// Dynamically import below-the-fold components
+// Below-fold components — lazy load (TBT reduce)
 const CollageTiles = dynamic(
   () => import("@/components/(frontend)/global/_Templates/Tiles/CollageTiles/CollageTiles"),
 );
 
-// Dynamically import below-the-fold components
 const FAQs = dynamic(
   () => import("@/components/(frontend)/global/_Templates/FAQs/FAQs"),
 );
+
 const QuickLinks = dynamic(
-  () =>
-    import("@/components/(frontend)/global/_Templates/QuickLinks/QuickLinks"),
+  () => import("@/components/(frontend)/global/_Templates/QuickLinks/QuickLinks"),
 );
+
 const FrontendProductTiles = dynamic(
-  () =>
-    import("@/components/(frontend)/global/_Templates/Tiles/ProductTiles/FrontendProductTiles"),
+  () => import("@/components/(frontend)/global/_Templates/Tiles/ProductTiles/FrontendProductTiles"),
 );
+
 const CustomTypedContent = dynamic(
-  () =>
-    import("@/components/(frontend)/global/_Templates/CustomTypedContent/CustomTypedContent"),
+  () => import("@/components/(frontend)/global/_Templates/CustomTypedContent/CustomTypedContent"),
 );
 
 export const RenderHomepageLayout = ({
@@ -117,20 +116,15 @@ export const RenderHomepageLayout = ({
                 }))
             : [];
 
-        const isWeddingDecor = list.some((i) => i.label === "Car Decor");
-        const isBalloonDecor = list.some((i) => i.label === "Anniversary" || i.label === "Baby Shower");
-        const optimizedLayout = isWeddingDecor || isBalloonDecor;
-
         const isTopCategory = isFirstCategory;
 
         return (
           <UpdatedCategoryTiles
             categoryList={list}
             columns={categories.columns || 2}
-            shape={categories.shape}
-            scrollable={categories.scrollable || list.length > 6 || (!isTopCategory && optimizedLayout)}
-            asCard={!isTopCategory && (optimizedLayout || categories.shape === "square")}
-            mobileItemsPerView={optimizedLayout ? 3 : undefined}
+            shape={categories.shape || "circle"}
+            scrollable={Boolean(categories.scrollable)}
+            asCard={!isTopCategory && categories.shape === "square"}
             isTopCategory={isTopCategory}
           />
         );
@@ -193,8 +187,6 @@ export const RenderHomepageLayout = ({
           <FAQs
             faqData={faqData}
             title={faqTitle}
-            questionClassName="sm:text-lg"
-            answerClassName="sm:text-lg"
           />
         );
       } else break;

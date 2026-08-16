@@ -3,4 +3,7 @@ export type ContentReviewData = {
   location: string;
   totalRating: number;
   review: string;
+  photos?: string[];
+  date?: string;
+  verified?: boolean;
 };

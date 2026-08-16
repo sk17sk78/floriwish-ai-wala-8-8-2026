@@ -50,7 +50,8 @@ export default function ReviewCarousel({
       </span>
       <div
         id={carouselId}
-        className="relative mb-5 flex items-center justify-start gap-9 max-w-device md:max-w-1200 overflow-x-scroll  scrollbar-hide "
+        className="relative mb-5 flex items-center justify-start gap-9 max-w-device md:max-w-1200 overflow-x-auto scrollbar-hide scroll-smooth touch-pan-x"
+        style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x pan-y" }}
       >
         <div className="z-30 text-transparent sticky self-stretch min-w-10 bg-gradient-to-r from-white to-transparent left-0">
           s

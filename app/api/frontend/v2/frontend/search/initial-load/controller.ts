@@ -102,18 +102,32 @@ export const getTrendingSearchKeywords = async (): Promise<
   }
 };
 
-export const getInitialSearchData = async () => {
-  const [aiTags, categories, trendingKeywords] = await Promise.all([
-    getAITags(),
-    getContentCategories(),
-    getTrendingSearchKeywords(),
-  ]);
+// libraries
+import { get as getFromRedis, set as setToRedis } from "@/db/redis/methods";
 
-  return JSON.parse(
-    JSON.stringify({
-      aiTags: aiTags || [],
-      categories: categories || [],
-      trendingKeywords: trendingKeywords || [],
-    })
-  );
+export const getInitialSearchData = async () => {
+  const cacheKey = "search_initial_load";
+  try {
+    const cached = await getFromRedis<any>({ key: cacheKey });
+    if (cached) return cached;
+
+    const [aiTags, categories, trendingKeywords] = await Promise.all([
+      getAITags(),
+      getContentCategories(),
+      getTrendingSearchKeywords(),
+    ]);
+
+    const result = JSON.parse(
+      JSON.stringify({
+        aiTags: aiTags || [],
+        categories: categories || [],
+        trendingKeywords: trendingKeywords || [],
+      })
+    );
+
+    await setToRedis({ key: cacheKey, value: result });
+    return result;
+  } catch (error) {
+    return { aiTags: [], categories: [], trendingKeywords: [] };
+  }
 };

@@ -26,7 +26,11 @@ import QAs from "@/components/custom/inputs/qas/QAs";
 import QuickLinks from "@/components/custom/inputs/quickLinks/QuickLinks";
 import RedirectList from "@/components/custom/inputs/redirectList/RedirectList";
 import RelatedContentCategories from "@/components/custom/inputs/relatedContentCategories/RelatedContentCategories";
-import RichTextEditor from "@/lib/Forms/RichTextEditor/temp/RichTextEditor";
+import dynamic from "next/dynamic";
+const RichTextEditor = dynamic(
+  () => import("@/lib/Forms/RichTextEditor/temp/RichTextEditor"),
+  { ssr: false }
+);
 import SelectContent from "@/components/custom/inputs/selectContent/SelectContent";
 import SEOMeta from "@/components/custom/inputs/seoMeta/SEOMeta";
 import Toggle from "@/lib/Forms/Toggle/Toggle";
@@ -107,7 +111,8 @@ export default function TableFormFields({
     (initialDocument?.subTopic as string) || ""
   );
   const [name, setName] = useState<string>(initialDocument?.name || "");
-  const [slugPlaceholder, setSlugPlaceholder] = useState<string>("");
+  const [slug, setSlug] = useState<string>(initialDocument?.slug || "");
+  const isEditing = Boolean(initialDocument?._id || initialDocument?.slug);
   const [includeRelatedCategories, setIncludeRelatedCategories] =
     useState<boolean>(
       // Boolean(initialDocument?.relatedCategories?.categories?.length) || false
@@ -177,7 +182,8 @@ export default function TableFormFields({
       setCategory(initialDocument?.category as string);
       setTopic(initialDocument?.topic as string);
       setSubTopic(initialDocument?.subTopic as string);
-      setName(initialDocument?.name);
+      setName(initialDocument?.name || "");
+      setSlug(initialDocument?.slug || "");
       setIncludeRelatedCategories(
         Boolean(initialDocument?.relatedCategories?.categories?.length) || false
       );
@@ -191,9 +197,12 @@ export default function TableFormFields({
     }
   }, [initialDocument]);
 
+  // Only auto-generate slug for new subSubSubTopic creation if slug not manually set
   useEffect(() => {
-    setSlugPlaceholder(toKebabCase(name));
-  }, [name]);
+    if (!isEditing && !initialDocument?.slug) {
+      setSlug(toKebabCase(name));
+    }
+  }, [name, isEditing, initialDocument]);
 
   return (
     <section className="grid grid-cols-1 gap-4 w-[70vw] max-h-[calc(100dvh_-_200px)] px-2 overflow-y-scroll scrollbar-hide pb-20">
@@ -285,21 +294,18 @@ export default function TableFormFields({
         errorCheck={false}
         validCheck={false}
       />
-      <input
-        className="hidden"
-        type="text"
-        name="slugPlaceholder"
-        value={slugPlaceholder}
-        onChange={() => { }}
-      />
       <Input
         type="text"
         name="slug"
         isRequired={false}
         labelConfig={{
-          label: "URL"
+          label: "URL (Slug)"
         }}
-        placeholder={slugPlaceholder}
+        customValue={{
+          value: slug,
+          setValue: setSlug
+        }}
+        placeholder={toKebabCase(name)}
         errorCheck={false}
         validCheck={false}
       />

@@ -88,13 +88,25 @@ const POPULATE = {
   ]
 };
 
+// libraries
+import { get as getFromRedis, set as setToRedis } from "@/db/redis/methods";
+import { CONTENT_CATEGORY_PAGE_CONTENTS_CACHE_KEY } from "@/common/constants/cacheKeys";
+
+// In-memory L1 cache for slugs
+let inMemorySlugsCache: { data: ContentCategoryDocument[]; timestamp: number } | null = null;
+const SLUGS_L1_TTL_MS = 300 * 1000; // 5 minutes
+
 // controllers
 export const getMeta = async ({
   slug
 }: {
   slug: string;
 }): Promise<ContentCategoryDocument | null> => {
+  const cacheKey = `content_category_page_meta_${slug}`;
   try {
+    const cached = await getFromRedis<ContentCategoryDocument>({ key: cacheKey });
+    if (cached) return cached;
+
     await connectDB();
 
     const document = await ContentCategories.findOne({
@@ -123,7 +135,9 @@ export const getMeta = async ({
       return null;
     }
 
-    return document;
+    const parsed = JSON.parse(JSON.stringify(document));
+    await setToRedis({ key: cacheKey, value: parsed });
+    return parsed;
   } catch (error: any) {
     console.error('[ERR getMeta]', slug, error);
     return null;
@@ -133,22 +147,43 @@ export const getMeta = async ({
 export const getContentCategoryPageSlugs = async (): Promise<
   ContentCategoryDocument[] | null
 > => {
+  const SLUG_CACHE_KEY = "content_category_slugs_all";
   try {
-    await connectDB();
+    const now = Date.now();
 
-    const documents = await ContentCategories.find({
-      isActive: true
-    })
-      .select(["slug"])
-      .sort({
-        slug: 1
-      });
-
-    if (!documents) {
-      return null;
+    // 1. In-Memory L1 Cache
+    if (inMemorySlugsCache && now - inMemorySlugsCache.timestamp < SLUGS_L1_TTL_MS) {
+      return inMemorySlugsCache.data;
     }
 
-    return documents;
+    // 2. Redis L2 Cache
+    try {
+      const cached = await getFromRedis<ContentCategoryDocument[]>({ key: SLUG_CACHE_KEY });
+      if (cached && cached.length > 0) {
+        inMemorySlugsCache = { data: cached, timestamp: now };
+        return cached;
+      }
+    } catch {}
+
+    // 3. MongoDB
+    await connectDB();
+
+    const documents = await ContentCategories.find({ isActive: true })
+      .select(["slug"])
+      .sort({ slug: 1 })
+      .lean()
+      .exec();
+
+    if (!documents) return null;
+
+    const result = documents as unknown as ContentCategoryDocument[];
+    inMemorySlugsCache = { data: result, timestamp: now };
+
+    try {
+      await setToRedis({ key: SLUG_CACHE_KEY, value: result });
+    } catch {}
+
+    return result;
   } catch (error: any) {
     console.error('[ERR getSlugs]', error);
     return null;
@@ -215,13 +250,12 @@ export const getContentCategoryPageDetailsI = async ({
           strictPopulate: false
         }
       ])
-      .exec(); // Don't use .lean() here because we need .toObject() later
+      .lean()
+      .exec();
 
-    if (!document) {
-      return null;
-    }
+    if (!document) return null;
 
-    return document;
+    return document as unknown as ContentCategoryDocument;
   } catch (error: any) {
     console.error('[ERR DetailsI]', slug, error);
     return null;
@@ -329,11 +363,14 @@ export const getContentCategoryPageDetailsII = async ({
           url: (content.media.primary as ImageDocument)?.url
         },
         price: content.price!.base.price,
-        discount: Math.round(
-          ((content.price!.base.mrp - content.price!.base.price) /
-            content.price!.base.mrp) *
-            100
-        ),
+        discount:
+          content.price?.base?.mrp && content.price.base.mrp > content.price.base.price
+            ? Math.round(
+                ((content.price.base.mrp - content.price.base.price) /
+                  content.price.base.mrp) *
+                  100
+              )
+            : 0,
         ratingValue: normalizeRating(content.quality?.rating?.value || 0),
         ratingCount: content.quality?.rating?.count,
         processingTime:
@@ -427,7 +464,14 @@ export const getContentCategoryContents = async ({
 }: {
   slug: string;
 }): Promise<ContentDocument[] | null> => {
+  const cacheKey = `${CONTENT_CATEGORY_PAGE_CONTENTS_CACHE_KEY}_${slug}`;
   try {
+    // Check Redis cache first
+    try {
+      const cached = await getFromRedis<ContentDocument[]>({ key: cacheKey });
+      if (cached && cached.length > 0) return cached;
+    } catch {}
+
     await connectDB();
 
     const document = await ContentCategories.findOne({
@@ -454,9 +498,7 @@ export const getContentCategoryContents = async ({
         .populate(POPULATE.content)
     ]);
 
-    if (!(primaryContents && relatedContents)) {
-      return null;
-    }
+    if (!(primaryContents && relatedContents)) return null;
 
     const contents = [...primaryContents, ...relatedContents].sort(
       (a, b) =>
@@ -504,11 +546,14 @@ export const getContentCategoryContents = async ({
           url: (content.media.primary as ImageDocument)?.url
         },
         price: content.price!.base.price,
-        discount: Math.round(
-          ((content.price!.base.mrp - content.price!.base.price) /
-            content.price!.base.mrp) *
-            100
-        ),
+        discount:
+          content.price?.base?.mrp && content.price.base.mrp > content.price.base.price
+            ? Math.round(
+                ((content.price.base.mrp - content.price.base.price) /
+                  content.price.base.mrp) *
+                  100
+              )
+            : 0,
         ratingValue: normalizeRating(content.quality?.rating?.value || 0),
         ratingCount: content.quality?.rating?.count,
         processingTime:
@@ -556,6 +601,11 @@ export const getContentCategoryContents = async ({
       // @ts-ignore
       content.createdAt = undefined;
     }
+
+    // Cache results in Redis
+    try {
+      await setToRedis({ key: cacheKey, value: contents as unknown as ContentDocument[] });
+    } catch {}
 
     return contents;
   } catch (error: any) {

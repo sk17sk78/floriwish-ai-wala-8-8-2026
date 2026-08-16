@@ -251,8 +251,8 @@ export default function AdminBlogsForm(
       setPreventUpdates((prev) => true);
 
       const thisAuthor: SelectOption = authorOptions.find(
-        ({ value }) => value === props.data.author
-      ) as SelectOption;
+        ({ value }) => value === props.data.author || value === String((props.data.author as any)?._id || "")
+      ) as SelectOption || (props.data.author ? { label: (props.data.author as any)?.name || String(props.data.author), value: String((props.data.author as any)?._id || props.data.author) } : undefined);
       const thisCategories: SelectOption[] = props.data.categories.map(
         (val) =>
           categoryOptions.find(({ value }) => value === val) as SelectOption

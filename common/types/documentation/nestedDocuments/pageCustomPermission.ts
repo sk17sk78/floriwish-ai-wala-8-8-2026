@@ -10,4 +10,6 @@ export interface PageCustomPermissionDocument extends Document {
   dynamicPage?: PermissionDocument;
   topicPage?: PermissionDocument;
   subTopicPage?: PermissionDocument;
+  notifications?: PermissionDocument;
+  categoryBanners?: PermissionDocument;
 }

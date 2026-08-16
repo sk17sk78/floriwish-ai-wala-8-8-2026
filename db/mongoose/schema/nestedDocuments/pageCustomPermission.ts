@@ -34,6 +34,14 @@ export const pageCustomPermissionSchema =
       subTopicPage: {
         type: permissionSchema,
         required: false
+      },
+      notifications: {
+        type: permissionSchema,
+        required: false
+      },
+      categoryBanners: {
+        type: permissionSchema,
+        required: false
       }
     },
     { timestamps: true }

@@ -19,12 +19,14 @@ function ContentGalleryImage({
   activeIndex,
   images,
   tag,
+  categoryUrl,
   onChangeActiveIndex,
   onClickViewSimilar
 }: {
   activeIndex: number;
   images: ImageDocument[];
   tag?: { label: string; color: string };
+  categoryUrl?: string;
   onChangeActiveIndex: (activeIndex: number) => void;
   onClickViewSimilar?: () => void;
 }) {
@@ -33,14 +35,17 @@ function ContentGalleryImage({
 
   return (
     <section className="flex flex-col justify-start relative">
-      <div className="relative grid aspect-[1/1.06] overflow-hidden rounded-none border border-[#efe7ea] bg-[#fbf5f7] shadow-[0_24px_60px_rgba(17,24,39,0.07)] max-sm:row-start-1 sm:rounded-[30px]">
+      <div className="relative aspect-[1/1.06] overflow-hidden rounded-none border border-[#efe7ea] bg-[#fbf5f7] shadow-[0_24px_60px_rgba(17,24,39,0.07)] max-sm:row-start-1 sm:rounded-[30px]">
         <ContentGalleryCarousel
           images={images}
           activeIndex={activeIndex}
           onChangeActiveIndex={onChangeActiveIndex}
         />
-        {onClickViewSimilar && (
-          <ContentGalleryViewSimilar onClick={onClickViewSimilar} />
+        {(onClickViewSimilar || categoryUrl) && (
+          <ContentGalleryViewSimilar
+            onClick={onClickViewSimilar}
+            categoryUrl={categoryUrl}
+          />
         )}
         {tag && (
           <ContentGalleryTag

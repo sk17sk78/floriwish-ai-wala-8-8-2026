@@ -43,10 +43,12 @@ export default function AdminRolePermission(
     } as PermissionDocument);
   };
 
+  const isCreateOnly = Boolean(c && r && !u && !d);
+
   return (
     <>
       <span
-        className={`grid place-items-center  ${isSection ? "py-2.5 bg-rose-100 border border-r-0 border-rose-200 rounded-l-lg cursor-pointer" : position === "top" ? "pt-2 pb-1" : position === "bottom" ? "pt-1 pb-2" : "py-1"}`}
+        className={`grid place-items-center ${isSection ? "py-2.5 bg-rose-100 border border-r-0 border-rose-200 rounded-l-lg cursor-pointer" : position === "top" ? "pt-2 pb-1" : position === "bottom" ? "pt-1 pb-2" : "py-1"}`}
       >
         <input
           type="checkbox"
@@ -62,10 +64,35 @@ export default function AdminRolePermission(
         />
       </span>
       <span
-        className={`${isSection ? "py-2.5 bg-rose-100 border border-x-0 border-rose-200 text-lg font-medium cursor-pointer" : position === "top" ? "pt-2 pb-1" : position === "bottom" ? "pt-1 pb-2" : "py-1"}`}
-        onClick={isSection ? props.toggleShowSectionItems : undefined}
+        className={`flex items-center justify-between pr-2 ${isSection ? "py-2.5 bg-rose-100 border border-x-0 border-rose-200 text-lg font-medium cursor-pointer" : position === "top" ? "pt-2 pb-1" : position === "bottom" ? "pt-1 pb-2" : "py-1"}`}
       >
-        {camelToTitleCase(permissionKey)}
+        <span
+          className="truncate"
+          onClick={isSection ? props.toggleShowSectionItems : undefined}
+        >
+          {camelToTitleCase(permissionKey)}
+        </span>
+        {isSection && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (isCreateOnly) {
+                handleChangePermission(false, false, false, false);
+              } else {
+                handleChangePermission(true, true, false, false);
+              }
+            }}
+            className={`text-[11px] font-semibold px-2 py-0.5 rounded-full transition-all border cursor-pointer ${
+              isCreateOnly
+                ? "bg-emerald-600 text-white border-emerald-600 shadow-2xs"
+                : "bg-white text-emerald-700 border-emerald-300 hover:bg-emerald-50"
+            }`}
+            title="Set Only Create (can create items, cannot edit or delete)"
+          >
+            {isCreateOnly ? "✓ Only Create" : "+ Only Create"}
+          </button>
+        )}
       </span>
       <span
         className={` grid place-items-center  ${isSection ? "py-2.5 bg-rose-100 border border-x-0 border-rose-200 cursor-pointer" : position === "top" ? "pt-2 pb-1" : position === "bottom" ? "pt-1 pb-2" : "py-1"}`}

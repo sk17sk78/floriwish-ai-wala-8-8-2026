@@ -22,7 +22,8 @@ export default function ContentTableFormFields({
 }) {
   // states
   const [name, setName] = useState<string>(initialDocument?.name || "");
-  const [slug, setSlug] = useState<string>("");
+  const [slug, setSlug] = useState<string>(initialDocument?.slug || "");
+  const isEditing = Boolean(initialDocument?._id || initialDocument?.slug);
   const [redirectFrom, setRedirectFrom] = useState<string>(
     initialDocument?.redirectFrom || ""
   );
@@ -30,16 +31,20 @@ export default function ContentTableFormFields({
   // effects
   useEffect(() => {
     if (initialDocument) {
-      setName(initialDocument?.name);
+      setName(initialDocument?.name || "");
+      setSlug(initialDocument?.slug || "");
       if (initialDocument?.redirectFrom) {
         setRedirectFrom(initialDocument?.redirectFrom);
       }
     }
   }, [initialDocument]);
 
+  // Only auto-generate slug for new product creation if slug not manually set
   useEffect(() => {
-    setSlug(toKebabCase(name));
-  }, [name]);
+    if (!isEditing && !initialDocument?.slug) {
+      setSlug(toKebabCase(name));
+    }
+  }, [name, isEditing, initialDocument]);
 
   return (
     <section className="grid grid-cols-1 gap-4 w-[80vw] max-h-[calc(100dvh_-_200px)] overflow-y-scroll scrollbar-hide p-2 pb-20">
@@ -57,12 +62,20 @@ export default function ContentTableFormFields({
         errorCheck={false}
         validCheck={false}
       />
-      <input
-        className="hidden"
+      <Input
         type="text"
         name="slug"
-        value={slug}
-        onChange={() => { }}
+        isRequired={false}
+        labelConfig={{
+          label: "URL (Slug)"
+        }}
+        customValue={{
+          value: slug,
+          setValue: setSlug
+        }}
+        placeholder={toKebabCase(name)}
+        errorCheck={false}
+        validCheck={false}
       />
       <ContentClassification
         name="category"

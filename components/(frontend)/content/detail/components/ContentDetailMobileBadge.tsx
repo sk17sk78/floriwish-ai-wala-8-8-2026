@@ -29,7 +29,7 @@ function ContentDetailMobileBadge({
   const isTomorrow = date && new Date(date).toDateString() === new Date(new Date().setDate(new Date().getDate() + 1)).toDateString();
 
   return (
-    <ContentHorizontalSpacing className={`lg:hidden mb-2 items-center flex ${className || ""}`}>
+    <ContentHorizontalSpacing className={`xl:hidden mb-2 items-center flex ${className || ""}`}>
       <div className="bg-moss/10 text-moss px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-moss/20 shadow-sm transition-all duration-300">
         <Zap
           width={12}

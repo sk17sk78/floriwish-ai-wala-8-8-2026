@@ -71,7 +71,8 @@ export default function FrontendCategoryListQuickLinks({
       <>
         <div
           id={QUICK_LINKS_ID}
-          className={`${isSticky ? "z-[800] sticky -top-[87px] sm:-top-[140px] " : ""} bg-ivory-1 flex items-center justify-start px-2 1200:px-0 gap-3 sm:gap-0 overflow-x-scroll scrollbar-hide ${showBanner ? "py-2 mt-6 mb-4" : "pt-1 pb-1"}`}
+          className={`${isSticky ? "z-[800] sticky -top-[87px] sm:-top-[140px] " : ""} bg-ivory-1 flex items-center justify-start px-2 1200:px-0 gap-3 sm:gap-0 overflow-x-auto scrollbar-hide scroll-smooth touch-pan-x ${showBanner ? "py-2 mt-6 mb-4" : "pt-1 pb-1"}`}
+          style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x pan-y" }}
         >
           {links.map(({ label, link, image }, index) => (
             <Link
@@ -101,7 +102,8 @@ export default function FrontendCategoryListQuickLinks({
   // ---- NORMAL QUICK LINKS ------------------------------------------------------------
   return (
     <div
-      className={`z-[800] sticky top-0 bg-ivory-1 flex items-center justify-start px-2 1200:px-0 gap-2 sm:gap-2.5 overflow-x-scroll scrollbar-hide ${showBanner ? "py-2" : "pt-1 pb-2"}`}
+      className={`z-[800] sticky top-0 bg-ivory-1 flex items-center justify-start px-2 1200:px-0 gap-2 sm:gap-2.5 overflow-x-auto scrollbar-hide scroll-smooth touch-pan-x ${showBanner ? "py-2" : "pt-1 pb-2"}`}
+      style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x pan-y" }}
     >
       {links.map(({ label, link }, index) => (
         <Link

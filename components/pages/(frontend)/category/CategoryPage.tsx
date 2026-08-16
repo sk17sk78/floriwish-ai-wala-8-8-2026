@@ -145,7 +145,6 @@ function CategoryPage({
         extraPadding={category.media && category.media.banner ? true : false}
         count={category._page?.contentCount}
       />
-      <CategoryTopContentSection topContent={category?.info?.topContent} />
       <CategoryRelatedCategorySection
         relatedCategories={category.relatedCategories}
       />
@@ -153,6 +152,7 @@ function CategoryPage({
         quickLinks={category.media?.quickLinks}
         scrollable={category.media?.scrollableQuickLinks}
       />
+      <CategoryTopContentSection topContent={category?.info?.topContent} />
       <CategoryContentCountSort
         count={category._page?.contentCount}
         sortBy={sortBy}

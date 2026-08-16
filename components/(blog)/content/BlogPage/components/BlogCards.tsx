@@ -25,12 +25,26 @@ export default async function BlogCards({
     return <></>;
   }
 
-  const cards: BlogCardType[] = blogs.map(({ heading, slug, layouts, author }) => ({
-    title: heading,
-    path: `/blog/${slug}`,
-    coverImage: extractBlogCoverImage(layouts),
-    authorName: (author as BlogAuthorDocument)?.name || "Anonymous"
-  }));
+  const cards: BlogCardType[] = blogs.map(({ heading, slug, layouts, author, createdAt }) => {
+    const authorName = (() => {
+      if (!author) return "Floriwish Team";
+      if (typeof author === "string") {
+        return /^[0-9a-fA-F]{24}$/.test(author) ? "Floriwish Team" : author;
+      }
+      return (author as any).name || (author as any).title || (author as any).userName || "Floriwish Team";
+    })();
+
+    const photo = (author as any)?.photo?.url || (author as any)?.avatar;
+
+    return {
+      title: heading,
+      path: `/blog/${slug}`,
+      coverImage: extractBlogCoverImage(layouts),
+      authorName,
+      authorPhoto: photo,
+      createdAt: createdAt ? String(createdAt) : undefined
+    };
+  });
 
   return (
     <section

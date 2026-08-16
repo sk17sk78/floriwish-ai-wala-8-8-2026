@@ -13,21 +13,55 @@ export const reviewSchema = new Schema<ReviewDocument, ReviewModel>(
     customer: {
       type: Schema.Types.ObjectId,
       ref: "Customer",
-      required: true
+      required: false
+    },
+    customerName: {
+      type: String,
+      required: false,
+      trim: true
+    },
+    customerCity: {
+      type: String,
+      required: false,
+      trim: true
     },
     content: {
       type: Schema.Types.ObjectId,
       ref: "Content",
       required: true
     },
+    contentName: {
+      type: String,
+      required: false,
+      trim: true
+    },
+    contentSlug: {
+      type: String,
+      required: false,
+      trim: true
+    },
+    contentType: {
+      type: String,
+      enum: ["product", "service"],
+      default: "product"
+    },
     rating: {
       type: Number,
-      required: true
+      required: true,
+      min: 1,
+      max: 5
     },
     review: {
       type: String,
-      required: false
+      required: false,
+      trim: true
     },
+    photos: [
+      {
+        type: String,
+        required: false
+      }
+    ],
     images: [
       {
         type: Schema.Types.ObjectId,
@@ -35,10 +69,19 @@ export const reviewSchema = new Schema<ReviewDocument, ReviewModel>(
         required: false
       }
     ],
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending"
+    },
+    isVerified: {
+      type: Boolean,
+      default: true
+    },
     isActive: {
       type: Boolean,
       required: false,
-      default: false
+      default: true
     },
     isDeleted: {
       type: Boolean,
@@ -54,11 +97,19 @@ export const reviewSchema = new Schema<ReviewDocument, ReviewModel>(
       required: false
     }
   },
-  { timestamps: true }
+  { timestamps: true, strict: false }
 );
 
 // search index
 reviewSchema.index({
-  createdBy: "text",
-  updatedBy: "text"
+  content: 1,
+  status: 1,
+  createdAt: -1
+});
+
+reviewSchema.index({
+  customerName: "text",
+  customerCity: "text",
+  review: "text",
+  contentName: "text"
 });

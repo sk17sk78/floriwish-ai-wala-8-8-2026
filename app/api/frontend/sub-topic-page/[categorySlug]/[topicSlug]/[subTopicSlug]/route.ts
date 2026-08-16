@@ -26,6 +26,10 @@ import { type APIResponseType } from "@/common/types/apiTypes";
 import { type NextRequest } from "next/server";
 import { type SubTopicDocument } from "@/common/types/documentation/pages/subTopic";
 
+// In-memory L1 cache
+const inMemorySubTopicCache = new Map<string, { data: SubTopicDocument; timestamp: number }>();
+const L1_TTL_MS = 60 * 1000; // 60 seconds
+
 export const GET = async (
   req: NextRequest,
   {
@@ -35,6 +39,13 @@ export const GET = async (
   }
 ): Promise<APIResponseType<SubTopicDocument>> => {
   try {
+    const cacheKey = `${categorySlug}_${topicSlug}_${subTopicSlug}`;
+    const now = Date.now();
+    const l1 = inMemorySubTopicCache.get(cacheKey);
+    if (l1 && (now - l1.timestamp) < L1_TTL_MS) {
+      return Response(successData(l1.data));
+    }
+
     const cachedDocument = await getFromRedis<SubTopicDocument>({
       key: `${SUB_TOPIC_PAGE_CACHE_KEY}_${categorySlug}_${topicSlug}_${subTopicSlug}`
     });
@@ -49,9 +60,11 @@ export const GET = async (
         return Response<SubTopicDocument>(notFoundErrorResponse);
       }
 
-      const document = i.toObject() as SubTopicDocument;
+      const document = (typeof (i as any).toObject === "function" ? (i as any).toObject() : { ...i }) as SubTopicDocument;
 
       document._page = ii._page;
+
+      inMemorySubTopicCache.set(cacheKey, { data: document, timestamp: now });
 
       await setToRedis({
         key: `${SUB_TOPIC_PAGE_CACHE_KEY}_${categorySlug}_${topicSlug}_${subTopicSlug}`,
@@ -60,6 +73,7 @@ export const GET = async (
 
       return Response(successData(document));
     } else {
+      inMemorySubTopicCache.set(cacheKey, { data: cachedDocument, timestamp: now });
       return Response(successData(cachedDocument));
     }
   } catch (error: any) {

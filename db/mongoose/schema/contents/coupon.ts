@@ -51,6 +51,21 @@ export const couponSchema = new Schema<CouponDocument, CouponModel>(
         required: false
       }
     ],
+    isPublic: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+    maxTotalUses: {
+      type: Number,
+      required: false,
+      default: 0 // 0 = unlimited, 1 = single-use, N = N-times use
+    },
+    usedCount: {
+      type: Number,
+      required: false,
+      default: 0
+    },
     isActive: {
       type: Boolean,
       required: false,

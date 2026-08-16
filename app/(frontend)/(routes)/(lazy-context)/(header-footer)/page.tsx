@@ -1,6 +1,5 @@
 // app/page.tsx
-
-// ISR with revalidation (avoids force-static SSR stack overflow on large HTML)
+// Homepage SSR — admin se content change hota rehta hai, har request pe fresh chahiye
 export const dynamic = "force-dynamic";
 
 // requests
@@ -23,6 +22,7 @@ import { WEBSITE_NAME } from "@/common/constants/environmentVariables";
 
 // types
 import { HomepageLayoutDocument } from "@/common/types/documentation/pages/homepageLayout";
+import { convertToCloudFrontUrl } from "@/common/utils/convertToCloudFrontUrl";
 
 /* ---------------- META ---------------- */
 export const metadata = {
@@ -68,8 +68,8 @@ export default async function Home() {
   // Find the first banner for LCP Discovery
   const firstBanner = homepageLayouts.find((l) => l.type === "banner");
   const firstImage = firstBanner?.layout?.banner?.images?.[0];
-  const desktopLcpUrl = (firstImage?.desktop as any)?.url;
-  const mobileLcpUrl = (firstImage?.mobile as any)?.url;
+  const desktopLcpUrl = convertToCloudFrontUrl((firstImage?.desktop as any)?.url);
+  const mobileLcpUrl = convertToCloudFrontUrl((firstImage?.mobile as any)?.url);
 
   return (
     <BodyWrapper fullWidth>

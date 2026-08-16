@@ -1,1 +1,1 @@
-export const RENDERING_STRATEGY: "SSR" | "ISR" = "SSR";
+export const RENDERING_STRATEGY: "SSR" | "ISR" = "ISR";

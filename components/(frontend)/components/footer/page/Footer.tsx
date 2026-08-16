@@ -1,7 +1,3 @@
-// config
-import { RENDERING_STRATEGY } from "@/config/renderingStrategy";
-
-
 // utils
 import { memo } from "react";
 
@@ -12,9 +8,7 @@ import FooterClient from "./components/FooterClient";
 import { type FooterSectionDocument, type FooterSectionLinkDocument } from "./types";
 import { FRONTEND_LINKS } from "@/common/routes/frontend/staticLinks";
 
-
 async function Footer() {
-  // const footerSections = await getFooterSections();
   const footerSections: FooterSectionDocument[] = [
     {
       heading: "Company",
@@ -28,7 +22,7 @@ async function Footer() {
     },
     {
       heading: "Terms & Policy",
-      order: 1,
+      order: 2,
       links: [
         { label: "Privacy Policy", path: FRONTEND_LINKS.DYNAMIC_PAGE + "/privacy-policy" },
         { label: "Refund Policy", path: FRONTEND_LINKS.DYNAMIC_PAGE + "/refund-policy" },
@@ -37,17 +31,6 @@ async function Footer() {
         { label: "Terms & Conditions", path: FRONTEND_LINKS.DYNAMIC_PAGE + "/term-condition" },
       ] as FooterSectionLinkDocument[]
     },
-     {
-      heading: "Top Categories",
-      order: 1,
-      links: [
-        { label: "Wedding", path: "/wedding-decoration-services" },
-        { label: "Flowers", path: "/flower" },
-        { label: "Cakes", path: "/cakes" },
-        { label: "Balloons", path: "/balloons-decorations" },
-        { label: "Gifts", path: "/flowers/india" },
-      ] as FooterSectionLinkDocument[]
-    }, 
   ] as FooterSectionDocument[];
 
   return <FooterClient footerSections={footerSections} />;

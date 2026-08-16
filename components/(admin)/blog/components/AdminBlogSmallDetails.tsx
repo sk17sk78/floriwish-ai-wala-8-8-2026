@@ -56,26 +56,30 @@ export default function AdminBlogSmallDetails({
         />
 
         {/* AUTHOR ]============================================= */}
-        {/* <Input
-          type="dropdown"
-          isRequired={true}
-          errorCheck={false}
-          validCheck={false}
-          name="author"
-          labelConfig={{ label: "Author", layoutStyle: "flex-col" }}
-          options={allAuthors}
-          nullOption
-          customValue={{
-            value: author ? author.value : "",
-            setValue: (newVal: string) => {
-              const selectedOption: SelectOption = allAuthors.find(
-                ({ value }) => value === newVal
-              ) as SelectOption;
-              updateAuthor(selectedOption);
-            }
-          }}
-          customStyle="cursor-pointer bg-transparent border-b border-charcoal-3/60 transition-all duration-300 hover:border-rose-600 focus:border-rose-800 py-3 w-full outline-none"
-        /> */}
+        <div className="flex flex-col justify-start gap-1">
+          <span className="font-medium">
+            Author <span className="text-red-400">*</span>
+          </span>
+          <Input
+            type="dropdown"
+            isRequired={false}
+            errorCheck={false}
+            validCheck={false}
+            name="author"
+            options={allAuthors}
+            nullOption
+            customValue={{
+              value: author ? author.value : "",
+              setValue: (newVal: string) => {
+                const selectedOption: SelectOption = allAuthors.find(
+                  ({ value }) => value === newVal
+                ) || { label: newVal, value: newVal };
+                updateAuthor(selectedOption);
+              }
+            }}
+            customStyle="cursor-pointer bg-transparent border-b border-charcoal-3/60 transition-all duration-300 hover:border-rose-600 focus:border-rose-800 py-2 w-full outline-none"
+          />
+        </div>
 
         {/* CATEGORIES ]============================================= */}
         <div className="flex flex-col justify-start gap-3">

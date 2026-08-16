@@ -42,7 +42,7 @@ export default function BentoHomepageTitleSpacing(
         className="max-sm:px-3.5"
       >
         <h2
-          className={`${leftAlign ? "text-left" : "text-center"} font-medium text-charcoal-3 tracking-tight text-[28px] sm:text-[24px] `}
+          className={`${leftAlign ? "text-left" : "text-center"} font-semibold text-charcoal-3 tracking-tight text-[18px] sm:text-[22px] lg:text-[24px]`}
         >
           {title}
         </h2>

@@ -7,7 +7,7 @@ import CategoryTextContent from "./CategoryTextContent";
 function CategoryTopContent({ topContent }: { topContent: string }) {
   return (
     <div className={`px-3 1200:px-0 bg-ivory-1 max-sm:px-4`}>
-      <CategoryTextContent text={topContent} />
+      <CategoryTextContent text={topContent} showReadMore={false} />
     </div>
   );
 }

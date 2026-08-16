@@ -171,7 +171,6 @@ function TopicPage({
         ratingCount={topic._page?.ratingCount || 0}
         extraPadding={topic.media && topic.media.banner ? true : false}
       />
-      <CategoryTopContentSection topContent={topic?.info?.topContent} />
       <CategoryRelatedCategorySection
         relatedCategories={topic.relatedCategories}
       />
@@ -179,6 +178,7 @@ function TopicPage({
         quickLinks={topic.media?.quickLinks}
         scrollable={topic.media?.scrollableQuickLinks}
       />
+      <CategoryTopContentSection topContent={topic?.info?.topContent} />
       <div
         className={`bg-transparent mt-6 p-0 sm:p-3 overflow-hidden`}
       >

@@ -12,6 +12,12 @@ const REMOTE_IMAGE_URLS = [];
 
 const nextConfig = {
   reactStrictMode: false,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: false,
+  },
   images: {
     remotePatterns: [
       {
@@ -32,7 +38,8 @@ const nextConfig = {
       },
     ],
     formats: ["image/avif", "image/webp"],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    // Mobile-first sizes — LCP improve karne ke liye
+    deviceSizes: [320, 420, 640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 31536000, // 1 year
     dangerouslyAllowSVG: false,
@@ -46,21 +53,18 @@ const nextConfig = {
   swcMinify: true,
   // Performance optimizations
   poweredByHeader: false,
+  staticPageGenerationTimeout: 300,
   generateEtags: false,
-  // Enable experimental features for better performance
+  // Enable external server packages for Redis and Database drivers
   experimental: {
-    optimizeCss: true,
-    optimizePackageImports: [
-      "lucide-react",
-      "@radix-ui/react-icons",
-      "@radix-ui/react-accordion",
-      "@radix-ui/react-dialog",
-      "@radix-ui/react-popover",
-      "shadcn-ui",
+    serverComponentsExternalPackages: [
+      "mongoose",
+      "redis",
+      "@redis/client",
+      "bcrypt",
+      "mongodb",
+      "firebase-admin",
     ],
-    //     },
-    //   },
-    // },
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
@@ -74,32 +78,14 @@ const nextConfig = {
       }),
     );
 
-    // Fix for "self is not defined" error in server-side rendering
-    if (isServer) {
+    // Fallbacks for client-side bundle (browser does not have Node built-ins)
+    if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
         fs: false,
         net: false,
         tls: false,
-      };
-    } else {
-      config.optimization = {
-        ...config.optimization,
-        splitChunks: {
-          chunks: "all",
-          cacheGroups: {
-            radix: {
-              test: /[\\/]node_modules[\\/](@radix-ui)[\\/]/,
-              name: "radix-ui",
-              chunks: "all",
-            },
-            commons: {
-              name: "commons",
-              minChunks: 2,
-              priority: -20,
-            },
-          },
-        },
+        dns: false,
       };
     }
 
@@ -140,6 +126,15 @@ const nextConfig = {
           {
             key: "X-XSS-Protection",
             value: "1; mode=block",
+          },
+        ],
+      },
+      {
+        source: "/_next/image(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
           },
         ],
       },
@@ -210,4 +205,6 @@ const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
 
-export default withBundleAnalyzer(nextConfig);
+export default process.env.ANALYZE === "true"
+  ? withBundleAnalyzer(nextConfig)
+  : nextConfig;

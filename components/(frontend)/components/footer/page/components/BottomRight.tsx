@@ -1,11 +1,12 @@
 import { memo } from "react";
-import { WEBSITE_NAME } from "@/common/constants/environmentVariables";
 
 function FooterBottomRight() {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <section className="sm:w-fit text-charcoal-3 text-xs items-end max-sm:text-center">
-      &copy; {new Date().getFullYear()} Floriwish.com.All rights reserved.
-    </section>
+    <div className="text-xs sm:text-sm text-charcoal-3/75 font-normal text-center sm:text-left">
+      &copy; {currentYear} Floriwish.com. All rights reserved.
+    </div>
   );
 }
 

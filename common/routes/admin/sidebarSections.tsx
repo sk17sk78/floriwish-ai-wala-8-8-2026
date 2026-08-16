@@ -9,6 +9,7 @@ import RevalidateCache from "@/components/(admin)/routes/cache/revalidate/ReVali
 import AddonCategoryTable from "@/components/(admin)/routes/category/addon/AddonCategoryTable";
 import CatalogueCategoryTable from "@/components/(admin)/routes/category/catalogue/CatalogueCategoryTable";
 import ContentCategoryTable from "@/components/(admin)/routes/category/content/ContentCategoryTable";
+import CategoryBannerManagement from "@/components/(admin)/routes/category/banner/CategoryBannerManagement";
 import AddonTable from "@/components/(admin)/routes/content/addon/AddonTable";
 import CouponTable from "@/components/(admin)/routes/content/coupon/CouponTable";
 import ProductTable from "@/components/(admin)/routes/content/product/ProductTable";
@@ -18,6 +19,7 @@ import IdentificationImageManagement from "@/components/(admin)/routes/media/ide
 import ContentImageManagement from "@/components/(admin)/routes/media/image/ContentImageManagement";
 import IssueImageManagement from "@/components/(admin)/routes/media/issueImage/IssueImageManagement";
 import ReviewImageManagement from "@/components/(admin)/routes/media/reviewImage/ReviewImageManagement";
+import CustomerReviewManagement from "@/components/(admin)/routes/customerReviews/CustomerReviewManagement";
 import CancelledOrderTable from "@/components/(admin)/routes/order/orderCancelled/CancelledOrderTable";
 import DeliveredOrderTable from "@/components/(admin)/routes/order/orderDelivered/DeliveredOrderTable";
 import FailedOrderTable from "@/components/(admin)/routes/order/orderFailed/FailedOrderTable";
@@ -25,6 +27,7 @@ import OrderInProgressTable from "@/components/(admin)/routes/order/orderInProgr
 import NewOrderTable from "@/components/(admin)/routes/order/orderNew/NewOrderTable";
 import DynamicPageTable from "@/components/(admin)/routes/page/dynamic-page/DynamicPageTable";
 import HomepageManagement from "@/components/(admin)/routes/page/homepage/HomepageManagement";
+import HomepageStudio from "@/components/(admin)/routes/page/homepage/HomepageStudio";
 import SubTopicTable from "@/components/(admin)/routes/page/subTopic/SubTopicTable";
 import TopicTable from "@/components/(admin)/routes/page/topic/TopicTable";
 import AdvancePaymentTable from "@/components/(admin)/routes/preset/advancePayment/AdvancePaymentTable";
@@ -51,7 +54,9 @@ import VendorRegistrations from "@/components/(admin)/routes/registrations/Vendo
 import FranchiseEnquiries from "@/components/(admin)/routes/registrations/FranchiseEnquiries";
 import SupportMessages from "@/components/(admin)/routes/registrations/SupportMessages";
 import SupportMessageLabel from "@/components/(admin)/sidebar/support/SupportMessageLabel";
-import { AlignVerticalJustifyEnd, Box, ClipboardList, Cog, Combine, Grip, Images, IndianRupee, Proportions, Settings, Settings2, Shapes, ShieldCheck, ShoppingBasket, Type } from "lucide-react";
+import PushNotificationManagement from "@/components/(admin)/routes/notification/PushNotificationManagement";
+import SystemHealthMonitor from "@/components/(admin)/routes/systemHealth/SystemHealthMonitor";
+import { Activity, AlignVerticalJustifyEnd, Bell, Box, ClipboardList, Cog, Combine, Grip, Images, IndianRupee, Proportions, Settings, Settings2, Shapes, ShieldCheck, ShoppingBasket, Type } from "lucide-react";
 
 // labels
 import CustomerLabel from "@/components/(admin)/sidebar/customer/CustomerLabel";
@@ -263,6 +268,12 @@ export const SIDEBAR_SECTIONS: AdminPanelSection[] = [
         component: <ProductTable />
       },
       {
+        sectionName: "customerReviews",
+        sectionLabel: "Customer Reviews",
+        icon: <></>,
+        component: <CustomerReviewManagement />
+      },
+      {
         sectionName: "addon",
         sectionLabel: "Addons",
         icon: <></>,
@@ -288,6 +299,12 @@ export const SIDEBAR_SECTIONS: AdminPanelSection[] = [
       />
     ),
     subSections: [
+      {
+        sectionName: "categoryBanners",
+        sectionLabel: "Category Banners",
+        icon: <></>,
+        component: <CategoryBannerManagement />
+      },
       {
         sectionName: "category1",
         sectionLabel: "Category 1",
@@ -344,6 +361,12 @@ export const SIDEBAR_SECTIONS: AdminPanelSection[] = [
         sectionLabel: "Home Page",
         icon: <></>,
         component: <HomepageManagement />
+      },
+      {
+        sectionName: "homepageManagement",
+        sectionLabel: "Homepage Settings",
+        icon: <></>,
+        component: <HomepageStudio />
       },
       {
         sectionName: "smallPages",
@@ -483,7 +506,7 @@ export const SIDEBAR_SECTIONS: AdminPanelSection[] = [
         sectionName: "health",
         sectionLabel: "System Health",
         icon: <></>,
-        component: <SystemHealth />
+        component: <SystemHealthMonitor />
       },
       {
         sectionName: "reset",
@@ -570,5 +593,18 @@ export const SIDEBAR_SECTIONS: AdminPanelSection[] = [
         component: <FranchiseEnquiries />
       }
     ]
+  }),
+
+  // Push Notifications ---------------------------
+  getSection({
+    sectionName: "notifications",
+    sectionLabel: "Push Notifications",
+    icon: (
+      <Bell
+        strokeWidth={1.5}
+        width={20}
+      />
+    ),
+    component: <PushNotificationManagement />
   }),
 ];

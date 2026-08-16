@@ -53,6 +53,28 @@ import { labelSchema } from "@/db/mongoose/schema/presets/label";
 import { franchiseEnquirySchema } from "@/db/mongoose/schema/actions/franchiseEnquiry";
 import { leadSchema } from "@/db/mongoose/schema/actions/lead";
 import { noteGroupSchema } from "@/db/mongoose/schema/presets/noteGroup";
+import { notificationTokenSchema } from "@/db/mongoose/schema/notifications/notificationToken";
+import { pushNotificationLogSchema } from "@/db/mongoose/schema/notifications/pushNotificationLog";
+import {
+  globalCategoryBannerSchema,
+  type IGlobalCategoryBannerDocument,
+  type IGlobalCategoryBannerModel
+} from "@/db/mongoose/schema/banners/globalCategoryBanner";
+import {
+  categoryBannerAuditLogSchema,
+  type ICategoryBannerAuditLogDocument,
+  type ICategoryBannerAuditLogModel
+} from "@/db/mongoose/schema/banners/categoryBannerAuditLog";
+import {
+  categoryBannerJobSchema,
+  type ICategoryBannerJobDocument,
+  type ICategoryBannerJobModel
+} from "@/db/mongoose/schema/banners/categoryBannerJob";
+import {
+  redisCacheAuditLogSchema,
+  type IRedisCacheAuditLogDocument,
+  type IRedisCacheAuditLogModel
+} from "@/db/mongoose/schema/cache/redisCacheAuditLog";
 import { occasionSchema } from "@/db/mongoose/schema/presets/occasion";
 import { orderSchema } from "@/db/mongoose/schema/dynamic/order";
 import { paymentCycleSchema } from "@/db/mongoose/schema/presets/paymentCycle";
@@ -285,6 +307,14 @@ import {
   type NoteGroupModel
 } from "@/common/types/documentation/presets/noteGroup";
 import {
+  type NotificationTokenDocument,
+  type NotificationTokenModel
+} from "@/common/types/documentation/notifications/notificationToken";
+import {
+  type PushNotificationLogDocument,
+  type PushNotificationLogModel
+} from "@/common/types/documentation/notifications/pushNotificationLog";
+import {
   type OccasionDocument,
   type OccasionModel
 } from "@/common/types/documentation/presets/occasion";
@@ -446,6 +476,12 @@ interface Models {
   SupportMessages: SupportMessageModel;
   Leads: LeadModel;
   NoteGroups: NoteGroupModel;
+  NotificationTokens: NotificationTokenModel;
+  PushNotificationLogs: PushNotificationLogModel;
+  GlobalCategoryBanners: IGlobalCategoryBannerModel;
+  CategoryBannerAuditLogs: ICategoryBannerAuditLogModel;
+  CategoryBannerJobs: ICategoryBannerJobModel;
+  RedisCacheAuditLogs: IRedisCacheAuditLogModel;
   Occasions: OccasionModel;
   Orders: OrderModel;
   PaymentCycles: PaymentCycleModel;
@@ -718,6 +754,42 @@ const models: Models = {
     mongooseModel<NoteGroupDocument, NoteGroupModel>(
       "NoteGroup",
       noteGroupSchema
+    ),
+  NotificationTokens:
+    mongooseModels.NotificationToken ||
+    mongooseModel<NotificationTokenDocument, NotificationTokenModel>(
+      "NotificationToken",
+      notificationTokenSchema
+    ),
+  PushNotificationLogs:
+    mongooseModels.PushNotificationLog ||
+    mongooseModel<PushNotificationLogDocument, PushNotificationLogModel>(
+      "PushNotificationLog",
+      pushNotificationLogSchema
+    ),
+  GlobalCategoryBanners:
+    mongooseModels.GlobalCategoryBanner ||
+    mongooseModel<IGlobalCategoryBannerDocument, IGlobalCategoryBannerModel>(
+      "GlobalCategoryBanner",
+      globalCategoryBannerSchema
+    ),
+  CategoryBannerAuditLogs:
+    mongooseModels.CategoryBannerAuditLog ||
+    mongooseModel<ICategoryBannerAuditLogDocument, ICategoryBannerAuditLogModel>(
+      "CategoryBannerAuditLog",
+      categoryBannerAuditLogSchema
+    ),
+  CategoryBannerJobs:
+    mongooseModels.CategoryBannerJob ||
+    mongooseModel<ICategoryBannerJobDocument, ICategoryBannerJobModel>(
+      "CategoryBannerJob",
+      categoryBannerJobSchema
+    ),
+  RedisCacheAuditLogs:
+    mongooseModels.RedisCacheAuditLog ||
+    mongooseModel<IRedisCacheAuditLogDocument, IRedisCacheAuditLogModel>(
+      "RedisCacheAuditLog",
+      redisCacheAuditLogSchema
     ),
   Occasions:
     mongooseModels.Occasion ||

@@ -6,20 +6,25 @@ import connectDB from "@/db/mongoose/connection";
 
 // models
 import MODELS from "@/db/mongoose/models";
-const { Customers, Carts, Orders } = MODELS;
+const { Customers, Carts, Orders, Coupons } = MODELS;
 
 // types
 import { type OrderDocument } from "@/common/types/documentation/dynamic/order";
 import { type OrderPaymentGatewayDocument } from "@/common/types/documentation/nestedDocuments/orderPaymentGateway";
 
-const generateOrderId = (): string => `FW${moment().format("YYMMDDHHmmss")}`;
+// Generates a unique order ID: FW + full timestamp (ms) + 4-char random hex
+// Collision probability: ~1 in 65536 per millisecond — effectively zero in practice
+const generateOrderId = (): string => {
+  const ts = moment().format("YYYYMMDDHHmmssSSS"); // Full year + milliseconds
+  const rand = Math.floor(Math.random() * 0xffff).toString(16).padStart(4, "0");
+  return `FW${ts}${rand}`;
+};
 
 export const generateOrder = async (
   orderData: Partial<OrderDocument>
 ): Promise<boolean> => {
-  // create new session
-  // await connectDB();
-  // const session = await (await connectDB()).startSession();
+  // Ensure DB is connected before any queries run (was accidentally commented out)
+  await connectDB();
 
   let isOrderGenerated = false;
   let attemptCount = 1;
@@ -27,6 +32,10 @@ export const generateOrder = async (
   const { payment, cart: cartId, createdBy, updatedBy } = orderData;
 
   while (isOrderGenerated === false && attemptCount <= 10) {
+    // Exponential backoff: wait before retry to avoid hammering DB and causing duplicate writes
+    if (attemptCount > 1) {
+      await new Promise((resolve) => setTimeout(resolve, 50 * attemptCount));
+    }
     try {
       // DB query
       // await session.withTransaction(async () => {
@@ -72,6 +81,27 @@ export const generateOrder = async (
       );
 
       // await session.commitTransaction();
+
+      // Increment coupon usage & check auto-expiry
+      if (cart?.coupon) {
+        try {
+          const couponId = typeof cart.coupon === "object" && cart.coupon !== null ? (cart.coupon as any)._id || cart.coupon : cart.coupon;
+          if (couponId && Coupons) {
+            const couponDoc = await Coupons.findById(couponId);
+            if (couponDoc) {
+              const newUsedCount = (couponDoc.usedCount || 0) + 1;
+              const maxUses = couponDoc.maxTotalUses || 0;
+              const isLimitReached = maxUses > 0 && newUsedCount >= maxUses;
+              await Coupons.findByIdAndUpdate(couponId, {
+                $inc: { usedCount: 1 },
+                ...(isLimitReached ? { isActive: false } : {})
+              });
+            }
+          }
+        } catch (couponErr) {
+          console.error("Coupon usage update error:", couponErr);
+        }
+      }
 
       isOrderGenerated = true;
       // });

@@ -22,7 +22,7 @@ export default function HomePageTitleSpacing(
   return (
     <div
       id={id}
-      className={`${leftAlign ? "text-left" : "text-center"} ${showActions ? "relative" : ""} text-sienna tracking-tight text-[28px] sm:text-[30px] font-light sm:text-4xl pb-8 pt-7`}
+      className={`${leftAlign ? "text-left" : "text-center"} ${showActions ? "relative" : ""} text-sienna tracking-tight text-[18px] sm:text-[22px] lg:text-[24px] font-semibold py-3 sm:py-4`}
     >
       {title}
 

@@ -29,7 +29,7 @@ interface FormFields extends HTMLFormControlsCollection {
 const getDocumentsFromFormFieldsGenerator = () => (elements: FormFields) => ({
   category: elements.category.value,
   name: elements.name.value,
-  slug: elements.slug.value || elements.slugPlaceholder.value,
+  slug: elements.slug.value || elements.slugPlaceholder?.value || "",
   // ...(elements.redirectFrom.value
   //   ? {
   //       redirectFrom: JSON.parse(elements.redirectFrom.value) as string[]

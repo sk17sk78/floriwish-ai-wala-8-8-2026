@@ -5,6 +5,7 @@ import { store } from "@/store/store";
 
 // providers
 import { Provider } from "react-redux";
+import { AdminThemeProvider } from "@/hooks/useAdminTheme";
 
 // hooks
 import { useAdminAuth } from "@/hooks/auth/useAdminAuth";
@@ -13,9 +14,7 @@ import { useRouter } from "next/navigation";
 
 // layouts
 import AdminSidebar from "@/layouts/admin/sidebar/AdminSidebar";
-
-// icons
-import { LoaderCircle } from "lucide-react";
+import { AdminThemeToggle } from "@/components/(admin)/theme/AdminThemeToggle";
 
 // types
 import { type Children } from "@/common/types/reactTypes";
@@ -47,7 +46,7 @@ export default function AdminRoot({ children }: { children: Children }) {
   // return
   if (status === "initial" || !isAuthenticated) {
     return (
-      <div className="h-device w-device flex items-center justify-center text-charcoal-3/70 text-3xl">
+      <div className="h-device w-device flex items-center justify-center text-charcoal-3/70 text-3xl bg-[#fafafc] dark:bg-[#0d0d0f]">
         Loading
       </div>
     );
@@ -55,12 +54,19 @@ export default function AdminRoot({ children }: { children: Children }) {
 
   return (
     <Provider store={store}>
-      <div className="h-device w-device grid grid-cols-1 sm:grid-cols-[auto_1fr] overflow-y-hidden overflow-x-hidden">
-        <AdminSidebar />
-        <main className="sm:px-6 sm:pt-4 relative max-h-device">
-          {children}
-        </main>
-      </div>
+      <AdminThemeProvider>
+        <div className="h-device w-device grid grid-cols-1 sm:grid-cols-[auto_1fr] overflow-y-hidden overflow-x-hidden transition-colors duration-200">
+          <AdminSidebar />
+          <main className="sm:px-6 sm:py-6 relative h-screen max-h-screen overflow-y-auto overflow-x-auto scrollbar-thin transition-colors duration-200">
+            {/* Top Right Floating Quick Theme Toggle */}
+            <div className="fixed top-4 right-5 z-40 hidden sm:block">
+              <AdminThemeToggle variant="pill" />
+            </div>
+
+            {children}
+          </main>
+        </div>
+      </AdminThemeProvider>
     </Provider>
   );
 }

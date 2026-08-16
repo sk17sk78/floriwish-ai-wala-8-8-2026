@@ -35,8 +35,8 @@ export async function generateStaticParams() {
     try {
       let slugs: {
         categorySlug: string;
-        pageSlug: string;
-        subPageSlug: string;
+        topicSlug: string;
+        subTopicSlug: string;
       }[] = [];
 
       const response = await fetchSubTopicPageSlugs(RENDERING_STRATEGY);
@@ -48,8 +48,8 @@ export async function generateStaticParams() {
         .slice(0, QUICK_BUILD ? 1 : subTopics.length)
         .map(({ slug, category, topic }) => ({
           categorySlug: (category as ContentCategoryDocument).slug,
-          pageSlug: (topic as TopicDocument).slug,
-          subPageSlug: slug
+          topicSlug: (topic as TopicDocument).slug,
+          subTopicSlug: slug
         }));
 
       return slugs;

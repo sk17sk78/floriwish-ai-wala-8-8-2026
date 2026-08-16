@@ -3,7 +3,6 @@ import NextImage from "@/components/custom/NextImage";
 import { LocationProvider } from "@/hooks/useLocation/useLocation";
 import VendorRegisterForm from "./VendorRegisterForm";
 import WhyChooseUsSection from "@/components/(frontend)/global/_Templates/WhyChooseUs/WhyChooseUsSection";
-import PopularSearchesSection from "@/components/(frontend)/global/_Templates/PopularSearches/PopularSearchesSection";
 
 export const metadata: Metadata = {
   title: "Vendor Registration | Floriwish",
@@ -226,7 +225,6 @@ export default function VendorRegisterPage() {
       </section>
 
       <WhyChooseUsSection />
-      <PopularSearchesSection />
     </div>
   );
 }

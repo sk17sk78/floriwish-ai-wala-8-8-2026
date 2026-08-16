@@ -50,7 +50,9 @@ export async function generateStaticParams() {
       const blogs = response.data || 0;
       const pages = QUICK_BUILD ? 1 : Math.ceil(blogs / BLOG_ARTICLE_PER_PAGE);
 
-      return Array.from({ length: pages }).map((num) => ({ id: num }));
+      return Array.from({ length: pages }).map((_, index) => ({
+        page: String(index + 1)
+      }));
     } catch (error) {
       return [];
     }

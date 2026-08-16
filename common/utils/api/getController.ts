@@ -74,19 +74,20 @@ const getController = <
       await connectDB();
 
       const [count, documents] = await Promise.all([
-        await Model.find(filter).countDocuments(),
-        await Model.find(filter)
+        Model.find(filter).countDocuments(),
+        Model.find(filter)
           .skip(offset)
           .limit(limit)
           .sort(sort)
           .select(select as any)
           .populate(populate)
+          .lean()
       ]);
 
       const responseDocuments = responseDataMiddleware
         ? isAsync(responseDataMiddleware)
-          ? await responseDataMiddleware(documents)
-          : (responseDataMiddleware(documents) as DocumentT[])
+          ? await responseDataMiddleware(documents as DocumentT[])
+          : (responseDataMiddleware(documents as DocumentT[]) as DocumentT[])
         : documents;
 
       return successData<DocumentT[]>(responseDocuments as DocumentT[], count);

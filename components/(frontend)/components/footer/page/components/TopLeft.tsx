@@ -1,57 +1,52 @@
-// icons
-import FooterLogo from "@/components/(_common)/Logo/FooterLogo";
-import { HeadsetIcon, Phone } from "lucide-react";
-import { WhatsappSVG } from "@/common/svgs/svg";
+"use client";
 
-// utils
-import { memo } from "react";
-import { mobileContact, whatsappContact } from "@/common/utils/_contactDetails";
-
-// components
+import React, { memo } from "react";
 import Link from "next/link";
 import HeaderLogo from "@/components/(_common)/Logo/HeaderLogo";
 import {
   COMPANY_NUMBER,
   COMPANY_WHATSAPP,
 } from "@/common/constants/companyDetails";
+import { MessageCircle, Phone } from "lucide-react";
+import { mobileContact, whatsappContact } from "@/common/utils/_contactDetails";
 
 function FooterTopLeft() {
   return (
-    <section className="flex flex-col text-[13px] sm:text-[10px] md:text-[12px] lg:text-sm gap-1 mt-3 items-center sm:items-start justify-start pb-6 sm:mr-0">
-      <HeaderLogo atFooter />
-      {/* <span className="text-charcoal/70 text-sm mt-5 sm:mt-8 max-sm:hidden">
-        Reach out to us
-      </span> */}
-      <Link
-        target="_blank"
-        href={whatsappContact()}
-        prefetch={false}
-        aria-label="Contact us on WhatsApp"
-        className="hidden sm:flex mt-4 items-center justify-start gap-1.5 text-charcoal-2/95 mb-0.5 transition-all duration-300 hover:text-sienna hover:brightness-75 hover:underline hover:underline-offset-4"
-      >
-        <span>{COMPANY_WHATSAPP}</span>
-        <WhatsappSVG
-          strokeWidth={1}
-          dimensions={20}
-          className="min-w-[20px] sm:min-w-[16px] md:min-w-[18px] lg:min-w-[23px] grid place-items-center"
-        />
-      </Link>
-      <Link
-        target="_blank"
-        href={mobileContact()}
-        prefetch={false}
-        aria-label="Call us"
-        className="hidden sm:flex items-center justify-start gap-1.5 text-charcoal-2/95 my-0.5 transition-all duration-300 hover:text-sienna hover:brightness-75 hover:underline hover:underline-offset-4"
-      >
-        <span>{COMPANY_NUMBER}</span>
-        <Phone
-          strokeWidth={1.6}
-          height={16}
-          width={16}
-          className="min-w-[20px] sm:min-w-[16px] md:min-w-[18px] lg:min-w-[25px] grid place-items-center"
-        />
-      </Link>
-    </section>
+    <div className="flex flex-col items-start text-left gap-3.5 w-full">
+      <div className="origin-left">
+        <HeaderLogo atFooter />
+      </div>
+
+      <p className="text-xs sm:text-[13px] text-charcoal-3/80 leading-relaxed font-normal max-w-sm">
+        India’s premier online gifting platform for fresh flowers, handcrafted cakes, and celebration decor.
+      </p>
+      
+      <div className="flex flex-row sm:flex-col items-center sm:items-start gap-2.5 pt-1 text-xs sm:text-sm md:text-base flex-wrap w-full">
+        <Link
+          target="_blank"
+          rel="noopener noreferrer"
+          href={whatsappContact()}
+          prefetch={false}
+          aria-label="Contact us on WhatsApp"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 text-emerald-800 text-xs font-semibold shadow-2xs transition-all active:scale-95 no-underline"
+        >
+          <MessageCircle className="w-3.5 h-3.5 text-emerald-600 fill-emerald-600 shrink-0" />
+          <span>{COMPANY_WHATSAPP}</span>
+        </Link>
+
+        <Link
+          target="_blank"
+          rel="noopener noreferrer"
+          href={mobileContact()}
+          prefetch={false}
+          aria-label="Call us"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-zinc-50 border border-charcoal-3/20 text-charcoal-3 text-xs font-semibold shadow-2xs transition-all active:scale-95 no-underline"
+        >
+          <Phone className="w-3.5 h-3.5 text-charcoal-3/80 shrink-0" />
+          <span>{COMPANY_NUMBER}</span>
+        </Link>
+      </div>
+    </div>
   );
 }
 

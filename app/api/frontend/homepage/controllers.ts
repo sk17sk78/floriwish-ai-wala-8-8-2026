@@ -5,6 +5,12 @@ import connectDB from "@/db/mongoose/connection";
 import models from "@/db/mongoose/models";
 const { HomepageLayouts } = models;
 
+// libraries
+import { get as getFromRedis, set as setToRedis } from "@/db/redis/methods";
+
+// constants
+import { HOMEPAGE_CACHE_KEY } from "@/common/constants/cacheKeys";
+
 // utils
 import { handleError } from "@/common/utils/api/error";
 
@@ -56,8 +62,12 @@ const POPULATE = {
   ],
 };
 
+// In-memory L1 cache
+let inMemoryHomepageCache: { data: HomepageLayoutDocument[]; timestamp: number } | null = null;
+const L1_TTL_MS = 60 * 1000; // 60 seconds
+
 // controllers
-export const getHomepageLayouts = async (): Promise<
+export const getHomepageLayoutsFromDB = async (): Promise<
   HomepageLayoutDocument[] | null
 > => {
   try {
@@ -107,14 +117,57 @@ export const getHomepageLayouts = async (): Promise<
       ])
       .sort({
         order: 1,
-      });
+      })
+      .lean()
+      .exec();
 
-    if (!documents) {
+    if (!documents || documents.length === 0) {
       return null;
     }
 
-    return JSON.parse(JSON.stringify(documents));
+    return documents as unknown as HomepageLayoutDocument[];
   } catch (error: any) {
     return null;
   }
 };
+
+export const getHomepageLayouts = async (): Promise<
+  HomepageLayoutDocument[] | null
+> => {
+  try {
+    // 1. In-Memory L1 Cache (ultra-fast <1ms response)
+    const now = Date.now();
+    if (inMemoryHomepageCache && (now - inMemoryHomepageCache.timestamp) < L1_TTL_MS) {
+      return inMemoryHomepageCache.data;
+    }
+
+    // 2. Try Redis cache (L2)
+    const cachedDocuments = await getFromRedis<HomepageLayoutDocument[]>({
+      key: HOMEPAGE_CACHE_KEY,
+    });
+
+    if (cachedDocuments && Array.isArray(cachedDocuments) && cachedDocuments.length > 0) {
+      inMemoryHomepageCache = { data: cachedDocuments, timestamp: now };
+      return cachedDocuments;
+    }
+
+    // 3. Fetch from MongoDB on cache miss
+    const parsedDocuments = await getHomepageLayoutsFromDB();
+    if (!parsedDocuments) {
+      return null;
+    }
+
+    // 4. Cache into Redis and Memory L1
+    inMemoryHomepageCache = { data: parsedDocuments, timestamp: now };
+    await setToRedis({
+      key: HOMEPAGE_CACHE_KEY,
+      value: parsedDocuments,
+    });
+
+    return parsedDocuments;
+  } catch (error: any) {
+    return null;
+  }
+};
+
+

@@ -3,8 +3,8 @@ import { BadgeIndianRupee, DoorOpen, Users } from "lucide-react";
 
 export default function ContentDetailAssurance({ isMobile }: { isMobile?: true }) {
   return (
-    <div className={`${isMobile ? "lg:hidden" : "max-lg:hidden mt-3"}`}>
-      <div className={` grid grid-cols-3 grid-rows-[auto_auto] gap-2 gap-y-3 p-6 px-3 text-charcoal-3 items-start justify-center text-center text-sm my-4 *:cursor-default bg-sienna-3/15 ${isMobile ? "lg:hidden" : "rounded-xl"}`}>
+    <div className={`${isMobile ? "xl:hidden" : "max-xl:hidden mt-3"}`}>
+      <div className={` grid grid-cols-3 grid-rows-[auto_auto] gap-2 gap-y-3 p-6 px-3 text-charcoal-3 items-start justify-center text-center text-sm my-4 *:cursor-default bg-sienna-3/15 ${isMobile ? "xl:hidden" : "rounded-xl"}`}>
         <div className="flex items-center justify-center">
           <BadgeIndianRupee
             strokeWidth="1.5"

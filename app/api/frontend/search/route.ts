@@ -35,7 +35,7 @@ export const GET = async (
     await connectRedis();
 
     let cachedData = await redisClient.get("search");
-    if (!cachedData || cachedData == null) {
+    if (!cachedData) {
       const [aiTags, categories, contents] = await Promise.all([
         getAITags(),
         getContentCategories(),

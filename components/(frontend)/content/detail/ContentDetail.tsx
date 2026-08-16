@@ -28,6 +28,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAppStates } from "@/hooks/useAppState/useAppState";
 import { useRouter } from "next/navigation";
 import {
+  ArrowRight,
   BadgePercent,
   Check,
   ChevronRight,
@@ -100,12 +101,14 @@ import { type ProcessingTimeDocument } from "@/common/types/documentation/preset
 
 function ContentDetail({
   content,
+  categoryUrl,
   showViewSimilarButton,
   onClickViewSimilar,
   onChangeCustomVariant,
   onChangeReferenceVariant,
 }: {
   content: ContentDocument;
+  categoryUrl?: string;
   showViewSimilarButton?: boolean;
   onClickViewSimilar?: () => void;
   onChangeCustomVariant: (
@@ -567,9 +570,9 @@ function ContentDetail({
 
   return (
     <>
-      <section className="relative z-[10] flex h-full flex-col justify-start pt-2 pb-4 max-lg:bg-white">
-        <div className="relative flex h-full flex-col justify-start gap-3 lg:pl-5 lg:pr-3">
-          <div className="flex flex-col gap-2.5 order-2 lg:order-none">
+      <section className="relative z-[10] flex h-full flex-col justify-start pt-2 pb-4 max-xl:bg-white">
+        <div className="relative flex h-full flex-col justify-start gap-3 xl:pl-5 xl:pr-3">
+          <div className="flex flex-col gap-2.5 order-2 xl:order-none">
             <div className="space-y-2">
               <ContentDetailTitleSection
                 name={name}
@@ -596,9 +599,10 @@ function ContentDetail({
                 showSameDay={hasSameDayDelivery}
                 showViewSimilar={showViewSimilarButton}
                 onClickViewSimilar={onClickViewSimilar}
+                categoryUrl={categoryUrl}
               />
             ) : hasSameDayDelivery ||
-              (showViewSimilarButton && onClickViewSimilar) ? (
+              (showViewSimilarButton && (onClickViewSimilar || categoryUrl)) ? (
               <ContentHorizontalSpacing>
                 <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-charcoal-3">
                   {hasSameDayDelivery ? (
@@ -607,21 +611,32 @@ function ContentDetail({
                       <span>Same Day</span>
                     </div>
                   ) : null}
-                  {showViewSimilarButton && onClickViewSimilar ? (
-                    <button
-                      type="button"
-                      onClick={onClickViewSimilar}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-[#ebebeb] bg-[#f8f8f8] px-2.5 py-1 text-zinc-600 text-[11px] transition-all duration-300 hover:border-[#ddd] hover:text-charcoal-3 font-poppins"
-                    >
-                      <span>More like this</span>
-                    </button>
+                  {showViewSimilarButton && (onClickViewSimilar || categoryUrl) ? (
+                    onClickViewSimilar ? (
+                      <button
+                        type="button"
+                        onClick={onClickViewSimilar}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-zinc-300/80 bg-zinc-100 hover:bg-zinc-200 px-2.5 py-1 text-zinc-900 text-[11px] font-semibold transition-all duration-300 hover:border-zinc-400 hover:text-black font-poppins shadow-2xs cursor-pointer"
+                      >
+                        <span>More like this</span>
+                        <ArrowRight width={12} className="stroke-[2.5]" />
+                      </button>
+                    ) : (
+                      <Link
+                        href={categoryUrl || "/"}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-zinc-300/80 bg-zinc-100 hover:bg-zinc-200 px-2.5 py-1 text-zinc-900 text-[11px] font-semibold transition-all duration-300 hover:border-zinc-400 hover:text-black font-poppins shadow-2xs cursor-pointer"
+                      >
+                        <span>More like this</span>
+                        <ArrowRight width={12} className="stroke-[2.5]" />
+                      </Link>
+                    )
                   ) : null}
                 </div>
               </ContentHorizontalSpacing>
             ) : null}
           </div>
 
-          <ContentHorizontalSpacing className="lg:pl-5 order-3 lg:order-none">
+          <ContentHorizontalSpacing className="xl:pl-5 order-3 xl:order-none">
             <div className="overflow-hidden rounded-2xl border border-zinc-100 bg-white shadow-sm">
               <div className="flex items-center justify-between border-b border-zinc-100 px-3.5 py-2.5">
                 <h3 className="text-[13px] font-bold text-zinc-800">
@@ -692,7 +707,7 @@ function ContentDetail({
             </div>
           </ContentHorizontalSpacing>
 
-          <ContentHorizontalSpacing className="order-4 lg:order-none">
+          <ContentHorizontalSpacing className="order-4 xl:order-none">
             <div className="flex flex-col justify-start gap-2 max-sm:bg-white">
               {variantCategories && Boolean(variantCategories?.length) && (
                 <ContentDetailVariantSections
@@ -788,11 +803,11 @@ function ContentDetail({
             </div>
           </ContentHorizontalSpacing>
 
-          <ContentHorizontalSpacing className="order-5 lg:order-none lg:pl-5">
+          <ContentHorizontalSpacing className="order-5 xl:order-none xl:pl-5">
             <ContentDetailCityCard isAvailable={isAvailable} />
           </ContentHorizontalSpacing>
 
-          <ContentHorizontalSpacing className="order-6 lg:order-none lg:pl-5">
+          <ContentHorizontalSpacing className="order-6 xl:order-none xl:pl-5">
             <Link
               href={whatsappContact(whatsappMessage)}
               target="_blank"
@@ -813,7 +828,7 @@ function ContentDetail({
             </Link>
           </ContentHorizontalSpacing>
 
-          <ContentHorizontalSpacing className="lg:hidden sticky bottom-2 z-[100] order-7">
+          <ContentHorizontalSpacing className="xl:hidden sticky bottom-2 z-[100] order-7">
             <div className="overflow-hidden rounded-2xl border border-zinc-100 bg-white shadow-sm">
               <MobileStickyFooter
                 pricePerUnit={pricePerUnit}
@@ -830,7 +845,7 @@ function ContentDetail({
             </div>
           </ContentHorizontalSpacing>
 
-          <div className="hidden lg:block overflow-hidden rounded-[20px] bg-white border border-[#efe7ea] shadow-sm lg:top-28 z-50">
+          <div className="hidden xl:block overflow-hidden rounded-[20px] bg-white border border-[#efe7ea] shadow-sm xl:top-28 z-50">
             {deliveryDate && (
               <div className="flex items-center justify-center gap-2 bg-[#fff2f6] py-2 border-b border-[#feebf1] h-6">
                 <span className="flex items-center gap-2 text-xs font-semibold text-moss antialiased">
@@ -890,7 +905,7 @@ function ContentDetail({
             </div>
           </div>
 
-          <ContentHorizontalSpacing className="lg:pl-5 mt-2 order-8 lg:order-none">
+          <ContentHorizontalSpacing className="xl:pl-5 mt-2 order-8 xl:order-none">
             <div className="flex items-center overflow-hidden rounded-2xl border border-zinc-100 bg-white shadow-sm">
               <div className="flex flex-1 items-center gap-2 px-3 py-2.5 text-center max-sm:flex-col sm:text-left">
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
@@ -936,7 +951,7 @@ function ContentDetail({
             </div>
           </ContentHorizontalSpacing>
 
-          <div className="order-6 lg:order-none">
+          <div className="order-6 xl:order-none">
             <ContentDetailInfo info={info} />
           </div>
         </div>

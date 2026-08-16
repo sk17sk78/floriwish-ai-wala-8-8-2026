@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
+  // Intercept Chrome DevTools and .well-known probes to prevent 404 terminal logs
+  if (
+    request.nextUrl.pathname.includes(".well-known") ||
+    request.nextUrl.pathname.includes("com.chrome.devtools")
+  ) {
+    return NextResponse.json({}, { status: 200 });
+  }
+
   const apiKey = request.headers.get("x-api-key");
   const VALID_API_KEY = process.env.NEXT_PUBLIC_X_API_KEY || "1tNMPQvO5jA8EgR2sJLI2MGoPKYqgo";
 

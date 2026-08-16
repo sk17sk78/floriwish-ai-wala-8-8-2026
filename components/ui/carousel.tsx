@@ -60,6 +60,9 @@ const Carousel = React.forwardRef<
   ) => {
     const [carouselRef, api] = useEmblaCarousel(
       {
+        dragFree: false,
+        containScroll: "trimSnaps",
+        watchDrag: true,
         ...opts,
         axis: orientation === "horizontal" ? "x" : "y"
       },
@@ -137,9 +140,12 @@ const Carousel = React.forwardRef<
         <div
           ref={ref}
           onKeyDownCapture={handleKeyDown}
-          className={cn("relative", className)}
+          className={cn("relative select-none", className)}
           role="region"
           aria-roledescription="carousel"
+          style={{
+            touchAction: orientation === "horizontal" ? "pan-y pinch-zoom" : "pan-x pinch-zoom"
+          }}
           {...props}
         >
           {children}
@@ -159,7 +165,11 @@ const CarouselContent = React.forwardRef<
   return (
     <div
       ref={carouselRef}
-      className="overflow-hidden h-full"
+      className="overflow-hidden h-full select-none"
+      style={{
+        WebkitOverflowScrolling: "touch",
+        touchAction: orientation === "horizontal" ? "pan-y pinch-zoom" : "pan-x pinch-zoom"
+      }}
     >
       <div
         ref={ref}
@@ -168,6 +178,11 @@ const CarouselContent = React.forwardRef<
           orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
           className
         )}
+        style={{
+          transform: "translate3d(0, 0, 0)",
+          WebkitBackfaceVisibility: "hidden",
+          backfaceVisibility: "hidden"
+        }}
         {...props}
       />
     </div>
@@ -187,10 +202,15 @@ const CarouselItem = React.forwardRef<
       role="group"
       aria-roledescription="slide"
       className={cn(
-        "min-w-0 shrink-0 grow-0 basis-full",
+        "min-w-0 shrink-0 grow-0 basis-full select-none",
         orientation === "horizontal" ? "pl-4" : "pt-4",
         className
       )}
+      style={{
+        transform: "translate3d(0, 0, 0)",
+        WebkitBackfaceVisibility: "hidden",
+        backfaceVisibility: "hidden"
+      }}
       {...props}
     />
   );

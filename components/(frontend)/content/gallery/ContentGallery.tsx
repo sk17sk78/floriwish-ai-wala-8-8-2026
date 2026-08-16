@@ -21,6 +21,12 @@ function ContentGallery({
   showSimilarContentDrawer,
   similarContents,
   tag,
+  categoryId,
+  productSlug,
+  categoryName,
+  categoryUrl,
+  tags,
+  isProduct,
   onClickViewSimilar,
   onChangeShowSimilarContentDrawer
 }: {
@@ -29,6 +35,12 @@ function ContentGallery({
   showSimilarContentDrawer: boolean;
   similarContents: ContentDocument[];
   tag?: { label: string; color: string };
+  categoryId?: string;
+  productSlug?: string;
+  categoryName?: string;
+  categoryUrl?: string;
+  tags?: string[];
+  isProduct?: boolean;
   onClickViewSimilar?: () => void;
   onChangeShowSimilarContentDrawer: (showSimilarContentDrawer: boolean) => void;
 }) {
@@ -48,7 +60,7 @@ function ContentGallery({
 
   return (
     <>
-      <section className="grid grid-cols-1 items-start gap-3 lg:sticky lg:top-6 lg:grid-cols-[92px_minmax(0,1fr)] lg:gap-5">
+      <section className="grid grid-cols-1 items-start gap-3 xl:sticky xl:top-6 xl:grid-cols-[92px_minmax(0,1fr)] xl:gap-5">
         <ContentGalleryPreviews
           activeIndex={activeIndex}
           images={finalImages}
@@ -58,6 +70,7 @@ function ContentGallery({
           activeIndex={activeIndex}
           images={finalImages}
           tag={tag}
+          categoryUrl={categoryUrl}
           onChangeActiveIndex={setActiveIndex}
           onClickViewSimilar={onClickViewSimilar}
         />
@@ -65,6 +78,12 @@ function ContentGallery({
       <ContentGallerySimilarContentDrawer
         showDrawer={showSimilarContentDrawer}
         contents={similarContents}
+        categoryId={categoryId}
+        productSlug={productSlug}
+        categoryName={categoryName}
+        categoryUrl={categoryUrl}
+        tags={tags}
+        isProduct={isProduct}
         onChangeShowDrawer={onChangeShowSimilarContentDrawer}
       />
     </>

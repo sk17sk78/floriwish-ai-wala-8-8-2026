@@ -43,10 +43,13 @@ export function AdminAuthProvider({ children }: { children: Children }) {
   // Dynamically calculate authorized sections
   const authorizedSections = SIDEBAR_SECTIONS.map((section) => {
     if (isSuperAdmin) return section;
-    if (!permission) return null;
 
-    // Use camelCase section name as key matcher for permissions
     const sectionNameStr = section.sectionName?.toLowerCase() || "";
+
+    // Staff Management (staff) is strictly EXCLUSIVE to Super Admin
+    if (sectionNameStr === "staff") return null;
+
+    if (!permission) return null;
     if (!sectionNameStr) return null;
 
     // Special case for dashboard which is globally available to admins
@@ -59,7 +62,7 @@ export function AdminAuthProvider({ children }: { children: Children }) {
       sectionKey: sectionNameStr,
     });
 
-    if (!permissionData?.read) return null;
+    if (!permissionData?.read && !permissionData?.create) return null;
 
     if ("subSections" in section) {
       const authorizedSubSections = section.subSections.filter((subSection) => {
@@ -70,7 +73,7 @@ export function AdminAuthProvider({ children }: { children: Children }) {
           subSectionKey: subSection.sectionName as string,
         });
 
-        return !!subPermissionData?.read;
+        return !!(subPermissionData?.read || subPermissionData?.create);
       });
 
       if (authorizedSubSections.length === 0) return null;

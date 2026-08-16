@@ -97,8 +97,9 @@ export default function FrontendProductTilesUI({
       className={
         isList
           ? `grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 items-start`
-          : `relative flex items-start justify-start gap-3 sm:gap-4 overflow-x-scroll scrollbar-hide`
+          : `relative flex items-start justify-start gap-3 sm:gap-4 overflow-x-auto scrollbar-hide scroll-smooth snap-x touch-pan-x`
       }
+      style={!isList ? { WebkitOverflowScrolling: "touch", touchAction: "pan-x pan-y" } : undefined}
     >
       {products.slice(0, limit || products.length).map((content, index) => {
         const {
@@ -169,9 +170,10 @@ export default function FrontendProductTilesUI({
             href={`${contentType === "product" ? FRONTEND_LINKS.PRODUCT_PAGE : FRONTEND_LINKS.SERVICE_PAGE}/${slug}`}
             key={index}
             onClick={() => setLoadingSlug(slug)}
-            className={`group flex flex-col shrink-0 bg-white rounded-xl overflow-hidden border border-zinc-100 hover:border-zinc-200 hover:shadow-md transition-all duration-300 ${
+            className={`group flex flex-col shrink-0 snap-start bg-white rounded-xl overflow-hidden border border-zinc-100 hover:border-zinc-200 hover:shadow-md transition-all duration-300 ${
               isScrollable ? "min-w-[44vw] sm:min-w-[200px] max-w-[44vw] sm:max-w-[200px]" : "w-full"
             } ${isThisLoading ? "opacity-60 pointer-events-none" : ""}`}
+            style={{ WebkitTransform: "translateZ(0)", transform: "translateZ(0)" }}
           >
             {/* ── IMAGE ── */}
             <div className="relative aspect-square w-full overflow-hidden bg-zinc-50">
@@ -183,10 +185,10 @@ export default function FrontendProductTilesUI({
                   name
                 }
                 fill
-                quality={80}
+                quality={70}
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 className="absolute inset-0"
-                imageClassName="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                imageClassName="object-cover object-center scale-100"
               />
 
               {/* Veg/Non-veg symbol */}

@@ -66,6 +66,8 @@ export default function FrontendHomePage(
               />
             );
 
+          const isBanner = tag === "banner";
+
           return (
             <HomePageContentSpacing
               key={index}
@@ -79,6 +81,8 @@ export default function FrontendHomePage(
               onClickDelete={useIds ? props.onClickDelete : () => {}}
               layoutNumber={index + 1}
               categoryShape={layout.category?.shape}
+              excludeBox={isBanner}
+              noPadding={isBanner}
             >
               <RenderHomepageLayout
                 layout={layout}

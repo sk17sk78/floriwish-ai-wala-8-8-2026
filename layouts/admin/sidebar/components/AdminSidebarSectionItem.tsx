@@ -66,7 +66,7 @@ export default function AdminSidebarSectionItem({
           }
         ></span>
         <span
-          className={`${isLocked || isMobile ? "" : "opacity-0 group-hover:opacity-100 transition-opacity duration-100 group-hover:duration-300"} ${isSubSection ? `text-sm ${isActive ? "text-rose-600 font-bold" : "text-charcoal-3"}` : ""}`}
+          className={`${isLocked || isMobile ? "" : "opacity-0 group-hover:opacity-100 transition-opacity duration-100 group-hover:duration-300"} ${isSubSection ? `text-sm truncate whitespace-nowrap ${isActive ? "text-rose-600 font-bold" : "text-charcoal-3"}` : ""}`}
         >
           {section.sectionLabel}
         </span>

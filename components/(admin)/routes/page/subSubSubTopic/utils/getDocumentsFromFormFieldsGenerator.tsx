@@ -34,7 +34,7 @@ const getDocumentsFromFormFieldsGenerator = () => (elements: FormFields) => ({
   subTopic: elements.subTopic.value,
   subSubTopic: elements.subSubTopic.value,
   name: elements.name.value,
-  slug: elements.slug.value || elements.slugPlaceholder.value,
+  slug: elements.slug.value || elements.slugPlaceholder?.value || "",
   // ...(elements.redirectFrom.value
   //   ? {
   //       redirectFrom: JSON.parse(elements.redirectFrom.value) as string[]

@@ -76,29 +76,29 @@ function SearchDesktop({
   return (
     <>
       <div
-        className="z-20 max-lg:hidden absolute top-0.5 left-1/2 -translate-x-1/2"
+        className="z-20 hidden lg:flex flex-1 min-w-[200px] max-w-[320px] xl:max-w-[440px] 2xl:max-w-[500px] mx-2 lg:mx-3 xl:mx-6 cursor-pointer shrink"
         onClick={() => {
           setIsFocused(true);
         }}
       >
         <section
-          className={`z-[999] absolute max-lg:hidden lg:min-w-[380px] xl:min-w-[480px] -translate-x-1/2 outline-none text-charcoal-3/90 backdrop-blur-md bg-white/90 rounded-full w-fit py-2 px-5 text-base border border-charcoal-3/15 shadow-sm transition-all duration-300 hover:border-charcoal-3/25`}
+          className="w-full outline-none text-charcoal-3/90 backdrop-blur-md bg-white/90 rounded-full py-2 px-3.5 xl:px-5 text-base border border-charcoal-3/15 shadow-sm transition-all duration-300 hover:border-charcoal-3/25"
         >
-          <section className="flex items-center justify-start lg:justify-between gap-3 text-charcoal-3/80 bg-transparent transition-all duration-300">
+          <div className="flex items-center justify-between gap-2 xl:gap-3 text-charcoal-3/80 bg-transparent transition-all duration-300">
             <Search
-              width={18}
-              height={18}
+              width={17}
+              height={17}
               strokeWidth={2}
-              className="text-charcoal-3/80"
+              className="text-charcoal-3/80 shrink-0"
             />
-            <div className="flex-1 ml-1 text-sm text-charcoal-3/70 select-none overflow-hidden whitespace-nowrap">
+            <div className="flex-1 min-w-0 ml-1 text-xs xl:text-sm text-charcoal-3/70 select-none overflow-hidden whitespace-nowrap text-ellipsis">
               <span>{animatedPlaceholder}</span>
               <span className="inline-block w-[1.5px] h-[13px] bg-charcoal-3/50 ml-[1px] align-middle animate-blink" />
             </div>
-            <div className="hidden lg:flex items-center justify-center border border-charcoal-3/20 rounded-md px-1.5 py-0.5 bg-ash-1/10 text-[10px] font-bold text-charcoal-3/75 shadow-sm ml-2">
+            <div className="hidden xl:flex items-center justify-center border border-charcoal-3/20 rounded-md px-1.5 py-0.5 bg-ash-1/10 text-[10px] font-bold text-charcoal-3/75 shadow-sm ml-1 shrink-0">
               ⌘K
             </div>
-          </section>
+          </div>
         </section>
       </div>
       <SearchContentDialog

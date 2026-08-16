@@ -18,6 +18,9 @@ export interface CouponDocument extends Document {
   valid: CouponValidityDocument;
   discount?: CouponDiscountDocument;
   applicableCategories: string[] | ObjectId[] | ContentCategoryDocument[];
+  isPublic?: boolean;
+  maxTotalUses?: number;
+  usedCount?: number;
 }
 
 // model

@@ -2373,13 +2373,8 @@ export default function EditLayoutSlide({
                   <UpdatedCategoryTiles
                     asPreview
                     columns={layout.layout.category?.columns || 4}
-                    shape={layout.layout.category?.shape || "square"}
-                    scrollable={
-                      layout.layout.category?.scrollable ||
-                      (layout.layout.category?.images as QuickLinkDocument[])
-                        .map(({ image }) => image)
-                        .filter((x) => x !== undefined && x !== "").length > 6
-                    }
+                    shape={layout.layout.category?.shape || "circle"}
+                    scrollable={Boolean(layout.layout.category?.scrollable)}
                     categoryList={(
                       layout.layout.category?.images as QuickLinkDocument[]
                     ).map(({ _id, label, path, image }) => ({

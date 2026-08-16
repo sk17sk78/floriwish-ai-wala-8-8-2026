@@ -525,7 +525,7 @@ export const getSubSubSubTopicPageDetailsII = async ({
           url: (content.media.primary as ImageDocument).url
         },
         price: price,
-        discount: Math.round(((mrp - price) / mrp) * 100),
+        discount: mrp > price && mrp > 0 ? Math.round(((mrp - price) / mrp) * 100) : 0,
         ratingValue: normalizeRating(content.quality?.rating?.value || 0),
         ratingCount: content.quality?.rating?.count,
         processingTime:
@@ -746,7 +746,7 @@ export const getSubSubSubTopicPageContents = async ({
           url: (content.media.primary as ImageDocument).url
         },
         price: price,
-        discount: Math.round(((mrp - price) / mrp) * 100),
+        discount: mrp > price && mrp > 0 ? Math.round(((mrp - price) / mrp) * 100) : 0,
         ratingValue: normalizeRating(content.quality?.rating?.value || 0),
         ratingCount: content.quality?.rating?.count,
         processingTime:

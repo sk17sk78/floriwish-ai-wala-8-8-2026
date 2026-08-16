@@ -1,20 +1,21 @@
+/* eslint-disable @next/next/no-img-element */
+"use client";
+
 // libraries
 import moment from "moment";
+import { Calendar } from "lucide-react";
 
 // constants
 import { DOMAIN } from "@/common/constants/environmentVariables";
 
-// utils
-
 // components
 import { SchemaOrgScripts } from "@/common/utils/schema/SchemaOrgScripts";
 import BlogCategories from "@/components/(frontend)/blog/BlogCategories";
-import BlogShare from "@/components/(frontend)/blog/BlogShare";
 import BlogLayout from "@/components/(frontend)/blog/layout/BlogLayout";
+import BlogShareCard from "@/components/(blog)/content/BlogPage/components/BlogShareCard";
 
 // types
 import { type BlogArticleDocument } from "@/common/types/documentation/blog/blogArticle";
-import { type BlogAuthorDocument } from "@/common/types/documentation/blog/blogAuthor";
 import { type BlogCategoryDocument } from "@/common/types/documentation/blog/blogCategory";
 import { type BlogTagDocument } from "@/common/types/documentation/blog/blogTag";
 import { type ImageDocument } from "@/common/types/documentation/media/image";
@@ -28,9 +29,21 @@ function BlogArticlePage({
   const { heading, slug, layouts: unsortedLayouts, meta, createdAt } = article;
 
   const url = `${DOMAIN}/blog/${slug}`;
-  const author = article.author as BlogAuthorDocument | null;
-  const categories = article.categories as BlogCategoryDocument[];
-  const tags = article.tags as BlogTagDocument[];
+  const rawAuthor = article.author;
+  
+  const displayAuthorName = (() => {
+    if (!rawAuthor) return "Floriwish Team";
+    if (typeof rawAuthor === "string") {
+      return /^[0-9a-fA-F]{24}$/.test(rawAuthor) ? "Floriwish Team" : rawAuthor;
+    }
+    return (rawAuthor as any).name || (rawAuthor as any).title || (rawAuthor as any).userName || "Floriwish Team";
+  })();
+
+  const authorPhoto = (rawAuthor as any)?.photo?.url || (rawAuthor as any)?.avatar;
+  const formattedDate = createdAt ? moment.utc(createdAt).format("D MMMM YYYY") : "";
+
+  const categories = (article.categories || []) as BlogCategoryDocument[];
+  const tags = (article.tags || []) as BlogTagDocument[];
   const layouts = [...unsortedLayouts].sort((a, b) => a.order - b.order);
 
   const schemaData: SchemaDataType = {
@@ -47,10 +60,10 @@ function BlogArticlePage({
       },
       blogPosting: {
         url,
-        authorName: author?.name || "Anonymous",
+        authorName: displayAuthorName,
         description: meta?.description || "",
         headline: heading,
-        publishedOn: moment(createdAt).format("DD MMMM YYYY"),
+        publishedOn: formattedDate,
         body:
           layouts
             .find(({ type }) => type === "text")
@@ -63,7 +76,7 @@ function BlogArticlePage({
             layouts.find(({ type }) => type === "image")?.layout?.image
               ?.images as ImageDocument[] | undefined
           )?.[0]?.url || "",
-        keywords: meta.tags,
+        keywords: meta?.tags,
         wordCount: layouts
           .filter(({ type }) => type === "text")
           .map(({ layout }) => layout.text?.length || 0)
@@ -72,28 +85,6 @@ function BlogArticlePage({
     }
   };
 
-  // const latestBlogs: BlogCardType[] =
-  //   (article?._suggestions?.latest as BlogArticleDocument[])
-  //     ?.filter(({ slug }) => slug !== article.slug)
-  //     ?.slice(0, 5)
-  //     ?.map(({ heading, slug, layouts, author }) => ({
-  //       title: heading,
-  //       path: `/blog/${slug}`,
-  //       coverImage: extractBlogCoverImage(layouts),
-  //       authorName: (author as BlogAuthorDocument).name
-  //     })) || [];
-
-  // const relatedBlogs: BlogCardType[] =
-  //   (article?._suggestions?.related as BlogArticleDocument[])
-  //     ?.filter(({ slug }) => slug !== article.slug)
-  //     ?.slice(0, 5)
-  //     ?.map(({ heading, slug, layouts, author }) => ({
-  //       title: heading,
-  //       path: `/blog/${slug}`,
-  //       coverImage: extractBlogCoverImage(layouts),
-  //       authorName: (author as BlogAuthorDocument).name
-  //     })) || [];
-
   return (
     <>
       <SchemaOrgScripts
@@ -101,55 +92,60 @@ function BlogArticlePage({
         pageType="BlogArticle"
         url=""
       />
-      <article className="relative grid grid-cols-1 overflow-x-hidden auto-rows-min sm:px-32 sm:border-x border-charcoal-3/20 max-1200:px-3 pt-2 pb-10 sm:pt-10 sm:pb-20">
-        <section className="flex flex-col justify-start pb-10">
-          <div className="mt-8 sm:mt-4 pb-3.5 flex flex-col sm:flex-row items-start sm:items-center gap-y-2.5 justify-between gap-x-4">
-            <h1 className="text-2xl sm:text-3xl font-medium">{heading}</h1>
-            <BlogShare url={url} />
+      <article className="relative grid grid-cols-1 overflow-x-hidden auto-rows-min sm:px-32 sm:border-x border-charcoal-3/20 max-1200:px-3 pt-2 pb-10 sm:pt-8 sm:pb-20">
+        <section className="flex flex-col justify-start pb-4 border-b border-zinc-100">
+          <div className="mt-4 sm:mt-2 pb-2">
+            <h1 className="text-2xl sm:text-4xl font-bold text-zinc-900 leading-tight">{heading}</h1>
           </div>
-          {categories.length && <BlogCategories categories={categories} />}
+          
+          {categories.length > 0 && (
+            <div className="my-2">
+              <BlogCategories categories={categories} />
+            </div>
+          )}
+
+          {/* Photo 1 Design: Soft Pink Initial Badge + Author Name + Calendar Date */}
+          <div 
+            suppressHydrationWarning
+            className="flex items-center gap-2.5 text-sm sm:text-base text-zinc-600 mt-3 flex-wrap"
+          >
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-[#fde8ee] text-[#801435] flex items-center justify-center font-bold text-base sm:text-lg shrink-0 border border-[#fbcfe8]/40 shadow-2xs">
+              {authorPhoto ? (
+                <img
+                  src={authorPhoto}
+                  alt={displayAuthorName}
+                  className="h-full w-full object-cover rounded-full"
+                />
+              ) : (
+                displayAuthorName.charAt(0).toUpperCase()
+              )}
+            </div>
+            <span className="font-bold text-zinc-800 text-base sm:text-lg">
+              {displayAuthorName}
+            </span>
+            <span className="text-zinc-300 font-bold text-base select-none">.</span>
+            <div className="flex items-center gap-1.5 text-zinc-400 font-normal text-sm sm:text-base">
+              <Calendar className="h-4 w-4 sm:h-4.5 sm:w-4.5 text-zinc-400 stroke-[1.75]" />
+              <span suppressHydrationWarning>{formattedDate}</span>
+            </div>
+          </div>
         </section>
-        {/* <span className="row-span-2 flex flex-col justify-start gap-y-5 max-sm:hidden border-l border-charcoal-3/15 pl-7 pr-2.5">
-          {Boolean(relatedBlogs.length) && (
-            <>
-              <div className="text-charcoal-3 font-medium text-lg text-center pt-3.5">
-                Related Blogs
-              </div>
-              {relatedBlogs.map((card) => (
-                <BlogCard
-                  key={uuid()}
-                  card={card}
-                />
-              ))}
-            </>
-          )}
-          {Boolean(latestBlogs.length) && (
-            <>
-              <div className="text-charcoal-3 font-medium text-lg text-center pt-3.5">
-                Latest Blogs
-              </div>
-              {latestBlogs.map((card) => (
-                <BlogCard
-                  key={uuid()}
-                  card={card}
-                />
-              ))}
-            </>
-          )}
-        </span> */}
+
         <div />
-        <section className="flex flex-col justify-start gap-y-3.5">
+        
+        <section className="flex flex-col justify-start gap-y-3.5 pt-6">
           {layouts.map((layout) => (
             <BlogLayout
               key={String(layout._id)}
               layout={layout}
             />
           ))}
-          {/* <section className="pt-8 grid grid-cols-1 sm:grid-cols-[125px_1fr]  gap-x-1.5 gap-y-2 sm:gap-y-4">
-            <BlogAuthor name={author.name} />
-            {categories.length && <BlogCategories categories={categories} />}
-            {tags.length && <BlogTags tags={tags} />}
-          </section> */}
+
+          {/* Photo 2 Design: Responsive Share Card Box */}
+          <BlogShareCard
+            url={url}
+            title={heading}
+          />
         </section>
       </article>
     </>

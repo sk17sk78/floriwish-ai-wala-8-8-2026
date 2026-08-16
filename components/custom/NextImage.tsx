@@ -1,3 +1,5 @@
+"use client";
+
 // config
 import { OPTIMIZE_IMAGE } from "@/config/image";
 
@@ -7,6 +9,9 @@ import { MOBILE_BREAKPOINT } from "@/common/constants/breakPoints";
 // components
 import Image from "next/image";
 import { convertToCloudFrontUrl } from "@/common/utils/convertToCloudFrontUrl";
+import { useState } from "react";
+
+const DEFAULT_FALLBACK_IMAGE = "https://d22rebqllszdz8.cloudfront.net/c738cc2b-aab2-472f-925d-c673915cfacc/a35c7f6964a04132.webp";
 
 export default function NextImage({
   src,
@@ -19,7 +24,7 @@ export default function NextImage({
   unoptimized,
   quality,
   eager,
-  async,
+  async = true,
   className,
   priority,
   fill,
@@ -51,25 +56,24 @@ export default function NextImage({
   onError?: (event: React.SyntheticEvent<HTMLImageElement, Event>) => void;
   style?: React.CSSProperties;
 }) {
-  // Safety check - return null if no src
-  if (!src) {
-    return null;
+  const [imgSrc, setImgSrc] = useState<string>(src || DEFAULT_FALLBACK_IMAGE);
+  const [hasFailed, setHasFailed] = useState<boolean>(false);
+
+  // Sync state if src prop changes
+  if (src && src !== imgSrc && !hasFailed) {
+    setImgSrc(src);
   }
 
   // Convert to CloudFront URL if applicable
-  const optimizedSrc = convertToCloudFrontUrl(src);
+  const currentSrc = hasFailed ? DEFAULT_FALLBACK_IMAGE : (imgSrc || DEFAULT_FALLBACK_IMAGE);
+  const optimizedSrc = convertToCloudFrontUrl(currentSrc);
 
-  // BYPASS PROXY FOR CLOUDFRONT: If it's a CloudFront URL, we MUST bypass
-  // the slow Next.js image optimization proxy.
+  // Direct AWS CloudFront CDN Edge delivery for sub-30ms instant parallel load without Node.js proxy delay
   const isCloudFront = optimizedSrc?.includes("cloudfront.net");
+  const bypassProxy = unoptimized !== undefined ? unoptimized : (isCloudFront || !OPTIMIZE_IMAGE);
 
-  // Determine loading strategy
+  // Determine loading strategy: instant eager load without browser lazy-pause
   const shouldPrioritize = priority || eager;
-  const loadingStrategy = shouldPrioritize ? "eager" : "lazy";
-
-  // If we should bypass proxy, we set unoptimized=true
-  // This will make next/image render a standard <img> tag with direct src
-  const bypassProxy = isCloudFront || unoptimized || !OPTIMIZE_IMAGE;
 
   return (
     <Image
@@ -80,21 +84,29 @@ export default function NextImage({
       fill={fill}
       draggable={draggable || false}
       unoptimized={bypassProxy}
-      quality={quality || 85}
-      loading={loadingStrategy}
-      decoding={shouldPrioritize ? "sync" : async ? "async" : "auto"}
+      quality={quality || 80}
+      loading={shouldPrioritize ? "eager" : "lazy"}
+      decoding="async"
       priority={shouldPrioritize}
-      fetchPriority={shouldPrioritize ? "high" : "auto"}
+      fetchPriority={shouldPrioritize ? "high" : "low"}
       sizes={
         sizes ||
         (mobileWidth && desktopWidth
           ? `(max-width: ${MOBILE_BREAKPOINT}px) ${mobileWidth}px, ${desktopWidth}px`
-          : `(max-width: 640px) 100vw, (max-width: 1024px) 50vw, ${width}px`)
+          : width
+          ? `(max-width: 640px) ${Math.min(width, 360)}px, (max-width: 1024px) ${Math.min(width, 480)}px, ${width}px`
+          : `(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw`)
       }
       placeholder={placeholder}
       blurDataURL={blurDataURL}
       onLoad={onLoad}
-      onError={onError}
+      onError={(e) => {
+        if (!hasFailed) {
+          setHasFailed(true);
+          setImgSrc(DEFAULT_FALLBACK_IMAGE);
+        }
+        if (onError) onError(e);
+      }}
       style={style}
       className={className}
     />

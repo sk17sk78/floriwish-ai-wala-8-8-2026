@@ -48,7 +48,7 @@ export default function ProductImages({
                 alt={alt || "Content Image"}
                 width={100}
                 height={100}
-                quality={50}
+                quality={100}
                 unoptimized={!OPTIMIZE_IMAGE}
                 priority
                 draggable={false}

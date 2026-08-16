@@ -94,13 +94,20 @@ const SORT: { [key: string]: { [key: string]: SortOrder } } = {
   }
 };
 
+// libraries
+import { get as getFromRedis, set as setToRedis } from "@/db/redis/methods";
+
 // controllers
 export const getMeta = async ({
   slug
 }: {
   slug: string;
 }): Promise<BlogArticleDocument | null> => {
+  const cacheKey = `blog_meta_${slug}`;
   try {
+    const cached = await getFromRedis<BlogArticleDocument>({ key: cacheKey });
+    if (cached) return cached;
+
     await connectDB();
 
     const document = await BlogArticles.findOne({
@@ -120,7 +127,9 @@ export const getMeta = async ({
       return null;
     }
 
-    return document;
+    const parsed = JSON.parse(JSON.stringify(document));
+    await setToRedis({ key: cacheKey, value: parsed });
+    return parsed;
   } catch (error: any) {
     return null;
   }
@@ -129,7 +138,11 @@ export const getMeta = async ({
 export const getBlogCategories = async (): Promise<
   BlogCategoryDocument[] | null
 > => {
+  const cacheKey = "blog_categories_all";
   try {
+    const cached = await getFromRedis<BlogCategoryDocument[]>({ key: cacheKey });
+    if (cached) return cached;
+
     await connectDB();
 
     const documents = await BlogCategories.find({
@@ -142,7 +155,9 @@ export const getBlogCategories = async (): Promise<
       return documents;
     }
 
-    return documents;
+    const parsed = JSON.parse(JSON.stringify(documents));
+    await setToRedis({ key: cacheKey, value: parsed });
+    return parsed;
   } catch (error: any) {
     return null;
   }
@@ -169,7 +184,11 @@ export const getBlogArticlesCount = async (): Promise<number | null> => {
 export const getBlogArticles = async (): Promise<
   BlogArticleDocument[] | null
 > => {
+  const cacheKey = "blogs_active_all";
   try {
+    const cached = await getFromRedis<BlogArticleDocument[]>({ key: cacheKey });
+    if (cached) return cached;
+
     await connectDB();
 
     const documents = await BlogArticles.find({
@@ -180,7 +199,9 @@ export const getBlogArticles = async (): Promise<
       return null;
     }
 
-    return documents;
+    const parsed = JSON.parse(JSON.stringify(documents));
+    await setToRedis({ key: cacheKey, value: parsed });
+    return parsed;
   } catch (error: any) {
     return null;
   }
@@ -290,7 +311,11 @@ export const getBlogPageArticles = async ({
 }: {
   page: number;
 }): Promise<{ count: number; articles: BlogArticleDocument[] } | null> => {
+  const cacheKey = `blog_page_${page}`;
   try {
+    const cached = await getFromRedis<{ count: number; articles: BlogArticleDocument[] }>({ key: cacheKey });
+    if (cached) return cached;
+
     await connectDB();
 
     const [count, documents] = await Promise.all([
@@ -309,7 +334,9 @@ export const getBlogPageArticles = async ({
       return null;
     }
 
-    return { count, articles: documents };
+    const result = { count, articles: JSON.parse(JSON.stringify(documents)) };
+    await setToRedis({ key: cacheKey, value: result });
+    return result;
   } catch (error: any) {
     return null;
   }
@@ -323,7 +350,14 @@ export const getBlogCategoryArticles = async ({
   category: BlogCategoryDocument;
   articles: BlogArticleDocument[];
 } | null> => {
+  const cacheKey = `blog_category_${id}`;
   try {
+    const cached = await getFromRedis<{
+      category: BlogCategoryDocument;
+      articles: BlogArticleDocument[];
+    }>({ key: cacheKey });
+    if (cached) return cached;
+
     await connectDB();
 
     const [category, documents] = await Promise.all([
@@ -341,7 +375,12 @@ export const getBlogCategoryArticles = async ({
       return null;
     }
 
-    return { category, articles: documents };
+    const result = {
+      category: JSON.parse(JSON.stringify(category)),
+      articles: JSON.parse(JSON.stringify(documents))
+    };
+    await setToRedis({ key: cacheKey, value: result });
+    return result;
   } catch (error: any) {
     return null;
   }

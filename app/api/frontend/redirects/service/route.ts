@@ -23,7 +23,7 @@ export const GET = async (
     const cachedRedirects: string | null =
       await redisClient.get(`service_redirects`);
 
-    if (!cachedRedirects || cachedRedirects == " ") {
+    if (!cachedRedirects ) {
       const redirects = await getServiceRedirects();
 
       await redisClient.set(`service_redirects`, JSON.stringify(redirects));

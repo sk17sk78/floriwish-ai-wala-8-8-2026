@@ -42,7 +42,12 @@ const getTableContentGenerator =
         sortable: false
       },
       {
-        label: "Type",
+        label: "Visibility",
+        span: 2,
+        sortable: false
+      },
+      {
+        label: "Usage Limit",
         span: 2,
         sortable: false
       },
@@ -52,8 +57,8 @@ const getTableContentGenerator =
         sortable: false
       },
       {
-        label: "Applicable On",
-        span: 2,
+        label: "Min Order",
+        span: 1,
         sortable: false
       },
       {
@@ -76,6 +81,9 @@ const getTableContentGenerator =
         minimumOrderAmount,
         valid,
         discount,
+        isPublic,
+        maxTotalUses,
+        usedCount = 0,
         isActive,
         createdBy,
         createdAt,
@@ -93,7 +101,7 @@ const getTableContentGenerator =
           },
           {
             value: {
-              label: type,
+              label: isPublic === false ? "🔒 Private" : "🌐 Public",
               type: "text",
               align: "center"
             },
@@ -101,7 +109,17 @@ const getTableContentGenerator =
           },
           {
             value: {
-              label: `${moment(valid.from).format("DD/MM/YY")} to ${moment(valid.till).format("DD/MM/YY")}`,
+              label: maxTotalUses && maxTotalUses > 0 
+                ? `${usedCount} / ${maxTotalUses} ${usedCount >= maxTotalUses ? "(Expired)" : ""}`
+                : `${usedCount} (Unlimited)`,
+              type: "text",
+              align: "center"
+            },
+            action: { action: () => {}, type: "none" }
+          },
+          {
+            value: {
+              label: `${moment(valid?.from).format("DD/MM/YY")} to ${moment(valid?.till).format("DD/MM/YY")}`,
               type: "text",
               align: "center"
             },
@@ -123,7 +141,7 @@ const getTableContentGenerator =
           },
           {
             value: {
-              label: `${discount && discount.type === "percentage" ? `${discount.percentage}% upto` : "Flat"} ₹${minimumOrderAmount}`,
+              label: `${discount && discount.type === "percentage" ? `${discount.percentage}%` : `Flat ₹${discount?.limit || minimumOrderAmount}`}`,
               type: "text",
               align: "center"
             },

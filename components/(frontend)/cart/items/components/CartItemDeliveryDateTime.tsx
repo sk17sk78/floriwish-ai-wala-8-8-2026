@@ -144,7 +144,10 @@ export default function CartItemDeliveryDateTime({
         </div>
 
         {/* Date Cards Slider (Always Visible) */}
-        <div className="flex items-center gap-1.5 sm:gap-2 md:gap-2.5 overflow-x-auto pb-2 scrollbar-hide w-full max-w-full snap-x snap-mandatory pr-2 sm:pr-4">
+        <div
+          className="flex items-center gap-1.5 sm:gap-2 md:gap-2.5 overflow-x-auto pb-2 scrollbar-hide w-full max-w-full snap-x snap-proximity scroll-smooth touch-pan-x pr-2 sm:pr-4"
+          style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x pan-y" }}
+        >
           {(() => {
             const baseList = dates.slice(0, 5).map((d) => new Date(d));
             let cardList = baseList;

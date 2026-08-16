@@ -26,7 +26,7 @@ const GENERIC_S3_PATH_PATTERN = /s3\.[a-z0-9-]+\.amazonaws\.com\/[a-z0-9.-]+/gi;
  * Check if we should use CloudFront
  */
 const shouldUseCloudFront = (): boolean => {
-  return USE_CLOUDFRONT;
+  return process.env.USE_CLOUDFRONT_FOR_IMAGES !== "false" && process.env.NEXT_PUBLIC_USE_CLOUDFRONT !== "false";
 };
 
 /**

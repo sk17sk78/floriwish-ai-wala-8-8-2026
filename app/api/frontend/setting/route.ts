@@ -16,7 +16,7 @@ import { successData } from "@/common/utils/api/data";
 
 // types
 import { type APIResponseType } from "@/common/types/apiTypes";
-import { type NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { type SettingDocument } from "@/common/types/documentation/settings/setting";
 
 export const GET = async (
@@ -29,8 +29,12 @@ export const GET = async (
       return Response<SettingDocument>(notFoundErrorResponse);
     }
 
-    return Response(successData(document));
+    const res = Response(successData(document));
+    // Setting data changes rarely — cache aggressively at CDN + browser level
+    (res as any).headers?.set("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
+    return res;
   } catch (error: any) {
     return Response<null>(serverErrorResponse);
   }
 };
+

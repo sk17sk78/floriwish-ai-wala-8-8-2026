@@ -10,14 +10,28 @@ import { type ContentCategoryDocument } from "@/common/types/documentation/categ
 import { type ResponseDataType } from "@/common/types/apiTypes";
 import { XApiKey } from "@/common/constants/apiKey";
 
+type SearchDataPayload = ResponseDataType<{
+  aiTags: AITagDocument[];
+  categories: ContentCategoryDocument[];
+  contents: ContentDocument[];
+}>;
+
+// In-memory client cache to prevent redundant duplicate API calls
+let cachedSearchData: SearchDataPayload | null = null;
+let searchDataPromise: Promise<SearchDataPayload> | null = null;
+
 export const fetchSearchData = (renderingStrategy?: "SSR" | "ISR") => {
-  return new Promise<
-    ResponseDataType<{
-      aiTags: AITagDocument[];
-      categories: ContentCategoryDocument[];
-      contents: ContentDocument[];
-    }>
-  >(async (resolve, reject) => {
+  // Return cached result immediately on client side
+  if (typeof window !== "undefined" && cachedSearchData) {
+    return Promise.resolve(cachedSearchData);
+  }
+
+  // Deduplicate concurrent in-flight requests
+  if (typeof window !== "undefined" && searchDataPromise) {
+    return searchDataPromise;
+  }
+
+  const promise = new Promise<SearchDataPayload>(async (resolve, reject) => {
     try {
       const renderingStrategyData = renderingStrategy
         ? renderingStrategy === "SSR"
@@ -45,13 +59,12 @@ export const fetchSearchData = (renderingStrategy?: "SSR" | "ISR") => {
             }
           : {})
       });
-      const responseData: ResponseDataType<{
-        aiTags: AITagDocument[];
-        categories: ContentCategoryDocument[];
-        contents: ContentDocument[];
-      }> = await response.json();
+      const responseData: SearchDataPayload = await response.json();
 
       if (response.ok) {
+        if (typeof window !== "undefined") {
+          cachedSearchData = responseData;
+        }
         resolve(responseData);
       } else {
         reject(responseData);
@@ -66,6 +79,16 @@ export const fetchSearchData = (renderingStrategy?: "SSR" | "ISR") => {
           }
         ]
       });
+    } finally {
+      if (typeof window !== "undefined") {
+        searchDataPromise = null;
+      }
     }
   });
+
+  if (typeof window !== "undefined") {
+    searchDataPromise = promise;
+  }
+
+  return promise;
 };

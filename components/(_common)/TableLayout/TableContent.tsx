@@ -283,10 +283,11 @@ function Tuple({
     <span
       onClick={onClick}
       key={String(index2) + String(index)}
+      title={typeof item.value.label === "string" ? item.value.label : undefined}
       className={
         index2 === 0
-          ? ` text-[14px] flex items-center ${item.value.align === "left" ? "justify-start" : item.value.align === "center" ? "justify-center" : item.value.align === "right" ? "justify-end" : "justify-start"}`
-          : `flex items-center text-[14px] ${item.value.align === "left" ? "justify-start" : item.value.align === "center" ? "justify-center" : item.value.align === "right" ? "justify-end" : "justify-center"}`
+          ? `text-[14px] min-w-0 overflow-hidden text-ellipsis whitespace-nowrap flex items-center ${item.value.align === "left" ? "justify-start" : item.value.align === "center" ? "justify-center" : item.value.align === "right" ? "justify-end" : "justify-start"}`
+          : `flex items-center min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[14px] ${item.value.align === "left" ? "justify-start" : item.value.align === "center" ? "justify-center" : item.value.align === "right" ? "justify-end" : "justify-center"}`
       }
     >
       {item.value.label}

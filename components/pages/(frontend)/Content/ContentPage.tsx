@@ -10,6 +10,7 @@ import { scrollToSection } from "@/common/helpers/scrollToSection";
 
 // hooks
 import { useCallback, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAppStates } from "@/hooks/useAppState/useAppState";
 
 // components
@@ -217,18 +218,52 @@ function ContentPage({
     [referenceVariant]
   );
 
-  const similarContents = useMemo(
-    () =>
+  const similarContents = useMemo(() => {
+    const aiTagsList = (
       referenceVariant && referenceVariant._suggestions?.aiTag?.length
-        ? (referenceVariant._suggestions.aiTag as ContentDocument[])
+        ? referenceVariant._suggestions.aiTag
         : content._suggestions?.aiTag?.length
-          ? (content._suggestions?.aiTag as ContentDocument[])
+          ? content._suggestions.aiTag
           : lazySuggestions?.aiTag?.length
-            ? (lazySuggestions.aiTag as ContentDocument[])
-            : [],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [referenceVariant, lazySuggestions]
-  );
+            ? lazySuggestions.aiTag
+            : []
+    ) as ContentDocument[];
+
+    const relatedAITagList = (
+      referenceVariant && referenceVariant._suggestions?.relatedAITag?.length
+        ? referenceVariant._suggestions.relatedAITag
+        : content._suggestions?.relatedAITag?.length
+          ? content._suggestions.relatedAITag
+          : lazySuggestions?.relatedAITag?.length
+            ? lazySuggestions.relatedAITag
+            : []
+    ) as ContentDocument[];
+
+    const categoryList = (
+      referenceVariant && referenceVariant._suggestions?.category?.length
+        ? referenceVariant._suggestions.category
+        : content._suggestions?.category?.length
+          ? content._suggestions.category
+          : lazySuggestions?.category?.length
+            ? lazySuggestions.category
+            : []
+    ) as ContentDocument[];
+
+    const merged: ContentDocument[] = [];
+    const seenIds = new Set<string>();
+
+    [...aiTagsList, ...relatedAITagList, ...categoryList].forEach((item) => {
+      if (item && typeof item === "object" && item.slug) {
+        const id = String((item as any)._id || item.slug);
+        if (!seenIds.has(id)) {
+          seenIds.add(id);
+          merged.push(item);
+        }
+      }
+    });
+
+    return merged;
+  }, [referenceVariant, content._suggestions, lazySuggestions]);
 
   const rating = useMemo(
     () =>
@@ -266,16 +301,52 @@ function ContentPage({
     [referenceVariant, lazySuggestions]
   );
 
+  // router
+  const router = useRouter();
+
+  // category id, name & url
+  const categoryId = useMemo(() => {
+    const primary = content.category?.primary as any;
+    if (primary && typeof primary === "object" && primary._id) {
+      return String(primary._id);
+    }
+    if (typeof primary === "string") {
+      return primary;
+    }
+    return "";
+  }, [content.category]);
+
+  const categoryName = useMemo(() => {
+    const primaryCategory = content.category?.primary as ContentCategoryDocument | undefined;
+    return primaryCategory?.name || "Category";
+  }, [content.category]);
+
+  const categoryUrl = useMemo(() => {
+    const primaryCategory = content.category?.primary as ContentCategoryDocument | undefined;
+    if (primaryCategory?.slug) return `/${primaryCategory.slug}`;
+    if (typeof content.category?.primary === "string") return `/${content.category.primary}`;
+    return "";
+  }, [content.category]);
+
+  const tags = useMemo(() => {
+    const set = new Set<string>();
+    if (content.tag?.aiTags) {
+      content.tag.aiTags.forEach((x) => {
+        if (typeof x === "string" && x.trim()) set.add(x.trim());
+      });
+    }
+    if (content.tag?.relatedAITags) {
+      content.tag.relatedAITags.forEach((x) => {
+        if (typeof x === "string" && x.trim()) set.add(x.trim());
+      });
+    }
+    return Array.from(set);
+  }, [content.tag]);
+
   // event handlers
   const handleClickViewSimilar = useCallback(() => {
-    const targetId = handpickedSuggestionId;
-    scrollToSection({
-      targetId,
-      behavior: "smooth",
-      align: "start",
-      afterScroll: () => {}
-    });
-  }, [handpickedSuggestionId]);
+    setShowSimilarContentDrawer(true);
+  }, []);
 
   return (
     <>
@@ -286,12 +357,19 @@ function ContentPage({
           showSimilarContentDrawer={showSimilarContentDrawer}
           similarContents={similarContents}
           tag={tag}
+          categoryId={categoryId}
+          productSlug={slug}
+          categoryName={categoryName}
+          categoryUrl={categoryUrl}
+          tags={tags}
+          isProduct={isProduct}
           onClickViewSimilar={handleClickViewSimilar}
           onChangeShowSimilarContentDrawer={setShowSimilarContentDrawer}
         />
         <ContentDetail
           content={content}
-          showViewSimilarButton={Boolean(similarContents.length || (suggestions?.category?.length || 0) > 0)}
+          categoryUrl={categoryUrl}
+          showViewSimilarButton={Boolean(categoryUrl || similarContents.length || (suggestions?.category?.length || 0) > 0)}
           onClickViewSimilar={handleClickViewSimilar}
           onChangeCustomVariant={setCustomVariant}
           onChangeReferenceVariant={setReferenceVariant}
@@ -303,7 +381,8 @@ function ContentPage({
           title="All Reviews"
           review={review}
           images={reviewImages}
-          totalRatings={review?.count}
+          rating={rating}
+          totalRatings={rating?.count || review?.count}
           applyBoxTheme
         />
       )}

@@ -26,11 +26,21 @@ import { type APIResponseType } from "@/common/types/apiTypes";
 import { type ContentCategoryDocument } from "@/common/types/documentation/categories/contentCategory";
 import { type NextRequest } from "next/server";
 
+// In-memory L1 cache
+const inMemoryCategoryCache = new Map<string, { data: ContentCategoryDocument; timestamp: number }>();
+const L1_TTL_MS = 60 * 1000; // 60 seconds
+
 export const GET = async (
   req: NextRequest,
   { params: { slug } }: { params: { slug: string } }
 ): Promise<APIResponseType<ContentCategoryDocument>> => {
   try {
+    const now = Date.now();
+    const l1 = inMemoryCategoryCache.get(slug);
+    if (l1 && (now - l1.timestamp) < L1_TTL_MS) {
+      return Response(successData(l1.data));
+    }
+
     const cachedDocument = await getFromRedis<ContentCategoryDocument>({
       key: `${CONTENT_CATEGORY_PAGE_CACHE_KEY}_${slug}`
     });
@@ -49,6 +59,8 @@ export const GET = async (
 
       document._page = ii._page;
 
+      inMemoryCategoryCache.set(slug, { data: document, timestamp: now });
+
       await setToRedis({
         key: `${CONTENT_CATEGORY_PAGE_CACHE_KEY}_${slug}`,
         value: document
@@ -56,6 +68,7 @@ export const GET = async (
 
       return Response(successData(document));
     } else {
+      inMemoryCategoryCache.set(slug, { data: cachedDocument, timestamp: now });
       return Response(successData(cachedDocument));
     }
   } catch (error: any) {

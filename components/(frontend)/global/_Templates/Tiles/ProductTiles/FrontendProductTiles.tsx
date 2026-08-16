@@ -211,7 +211,7 @@ export default function FrontendProductTilesUI({
                   height={500}
                   width={500}
                   quality={25}
-                  className={`${extraCurved ? "max-sm:rounded-xl" : "max-sm:rounded-md"} w-full h-full object-cover object-center scale-105 group-hover:scale-100 transition-all duration-500`}
+                  className={`${extraCurved ? "max-sm:rounded-xl" : "max-sm:rounded-md"} w-full h-full object-cover object-center scale-100`}
                 />
                 <span className="absolute bottom-1 left-1 sm:left-1">
                   {showVeganType ? (

@@ -9,12 +9,16 @@ import { type PermissionDocument } from "@/common/types/documentation/nestedDocu
 
 export default function AdminRoleSection({
   sectionKey,
-  initialSectionPermission: {
-    isCustomized: initialIsCustomized,
-    all: initialAll,
-    custom: initialCustom
+  initialSectionPermission = {
+    isCustomized: false,
+    all: { create: false, read: false, update: false, delete: false } as PermissionDocument,
+    custom: {}
   },
-  sectionPermission: { isCustomized, all, custom },
+  sectionPermission = {
+    isCustomized: false,
+    all: { create: false, read: false, update: false, delete: false } as PermissionDocument,
+    custom: {}
+  },
   onChangeSectionPermission
 }: {
   sectionKey: string;
@@ -34,6 +38,18 @@ export default function AdminRoleSection({
     custom?: Record<string, PermissionDocument>;
   }) => void;
 }) {
+  const {
+    isCustomized: initialIsCustomized = false,
+    all: initialAll = { create: false, read: false, update: false, delete: false } as PermissionDocument,
+    custom: initialCustom = {}
+  } = initialSectionPermission || {};
+
+  const {
+    isCustomized = false,
+    all = { create: false, read: false, update: false, delete: false } as PermissionDocument,
+    custom = {}
+  } = sectionPermission || {};
+
   const [showSectionItems, setShowSectionItems] = useState<boolean>(false);
 
   return (
@@ -59,7 +75,8 @@ export default function AdminRoleSection({
         }}
       />
       {showSectionItems &&
-        Object.keys(initialCustom).map((key, i) => (
+        initialCustom &&
+        Object.keys(initialCustom || {}).map((key, i) => (
           <AdminRolePermission
             key={i}
             permissionKey={key}

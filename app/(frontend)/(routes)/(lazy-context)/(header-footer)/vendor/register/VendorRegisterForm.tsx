@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "@/hooks/useLocation/useLocation";
-import { MapPin, Search, ChevronDown } from "lucide-react";
+import { MapPin, Search, ChevronDown, CheckCircle2, ArrowRight, RefreshCcw, Building2 } from "lucide-react";
+import Link from "next/link";
 
 export default function VendorRegisterForm() {
   const { cities, onSearch } = useLocation();
@@ -10,6 +11,10 @@ export default function VendorRegisterForm() {
     "idle" | "submitting" | "success" | "error"
   >("idle");
   const [message, setMessage] = useState<string>("");
+  const [submittedDetails, setSubmittedDetails] = useState<{
+    fullName: string;
+    businessName: string;
+  } | null>(null);
 
   // City search states
   const [citySearch, setCitySearch] = useState("");
@@ -40,10 +45,13 @@ export default function VendorRegisterForm() {
       const form = e.currentTarget;
       const fd = new FormData(form);
 
+      const fullName = String(fd.get("fullName") || "");
+      const businessName = String(fd.get("businessName") || "");
+
       const payload = {
-        fullName: String(fd.get("fullName") || ""),
+        fullName,
         email: String(fd.get("email") || ""),
-        businessName: String(fd.get("businessName") || ""),
+        businessName,
         city: String(fd.get("city") || ""),
         interestedCategory: String(fd.get("interestedCategory") || ""),
         mobile: String(fd.get("mobile") || ""),
@@ -68,6 +76,7 @@ export default function VendorRegisterForm() {
 
       form.reset();
       setCitySearch("");
+      setSubmittedDetails({ fullName, businessName });
       setStatus("success");
       setMessage("Thanks! We received your vendor application.");
     } catch (err) {
@@ -75,6 +84,60 @@ export default function VendorRegisterForm() {
       setMessage(err instanceof Error ? err.message : "Something went wrong");
     }
   };
+
+  // Render Human-Crafted Thank You Screen
+  if (status === "success") {
+    return (
+      <div className="py-12 px-8 bg-[#faf7f2] border border-[#e8ded1] rounded-2xl text-center space-y-6">
+        <div className="w-14 h-14 bg-[#b76e79] text-white rounded-full flex items-center justify-center mx-auto shadow-sm">
+          <CheckCircle2 className="w-8 h-8 stroke-[2]" />
+        </div>
+
+        <div className="space-y-2 max-w-md mx-auto">
+          <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
+            Application Received!
+          </h2>
+          <p className="text-sm text-gray-600 leading-relaxed font-normal">
+            Thank you for registering with Floriwish. We have received your vendor application details and our onboarding team will reach out to you within 24 hours.
+          </p>
+        </div>
+
+        {submittedDetails && (
+          <div className="p-4 bg-white rounded-xl border border-[#e5dcd0] max-w-sm mx-auto text-left space-y-1">
+            <p className="text-xs uppercase tracking-wider font-bold text-[#b76e79]">
+              Application Reference
+            </p>
+            <p className="text-sm font-bold text-gray-900">
+              {submittedDetails.fullName}
+            </p>
+            <p className="text-xs text-gray-500 font-medium">
+              Business: <span className="text-gray-800 font-semibold">{submittedDetails.businessName}</span>
+            </p>
+          </div>
+        )}
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <button
+            onClick={() => {
+              setStatus("idle");
+              setSubmittedDetails(null);
+            }}
+            className="px-5 py-3 text-xs font-semibold text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 rounded-xl transition-colors cursor-pointer w-full sm:w-auto"
+          >
+            Submit Another Application
+          </button>
+
+          <Link
+            href="/"
+            className="px-6 py-3 text-xs font-semibold text-white bg-[#b76e79] hover:bg-[#9a5963] rounded-xl transition-colors shadow-sm w-full sm:w-auto inline-flex items-center justify-center gap-1.5"
+          >
+            <span>Back to Floriwish Home</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const inputClass =
     "w-full px-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#b76e79]/10 focus:border-[#b76e79] transition-all duration-300 text-gray-900 placeholder-gray-400 text-sm";
@@ -333,7 +396,7 @@ export default function VendorRegisterForm() {
             />
             <button
               type="button"
-              className="shrink-0 bg-gray-900 text-white px-8 py-3.5 rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors shadow-sm"
+              className="shrink-0 bg-gray-900 text-white px-8 py-3.5 rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors shadow-sm cursor-pointer"
             >
               Add
             </button>
@@ -346,7 +409,7 @@ export default function VendorRegisterForm() {
         <button
           type="submit"
           disabled={status === "submitting"}
-          className="w-full bg-[#b76e79] disabled:opacity-70 text-white font-semibold text-lg py-4 rounded-xl shadow-lg shadow-[#b76e79]/20 hover:shadow-[#b76e79]/40 hover:-translate-y-0.5 transition-all duration-300"
+          className="w-full bg-[#b76e79] disabled:opacity-70 text-white font-semibold text-lg py-4 rounded-xl shadow-lg shadow-[#b76e79]/20 hover:shadow-[#b76e79]/40 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
         >
           {status === "submitting"
             ? "Submitting Application..."
@@ -354,14 +417,8 @@ export default function VendorRegisterForm() {
         </button>
       </div>
 
-      {message && (
-        <div
-          className={`p-4 rounded-xl text-sm font-medium ${
-            status === "success"
-              ? "bg-green-50 text-green-700 border border-green-200"
-              : "bg-rose-50 text-rose-700 border border-rose-200"
-          }`}
-        >
+      {status === "error" && message && (
+        <div className="p-4 rounded-xl text-sm font-medium bg-rose-50 text-rose-700 border border-rose-200">
           {message}
         </div>
       )}

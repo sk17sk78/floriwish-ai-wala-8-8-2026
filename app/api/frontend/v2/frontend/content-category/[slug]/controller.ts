@@ -14,6 +14,7 @@ import { CONTENT_CATEGORY_PAGE_CACHE_KEY } from "@/common/constants/cacheKeys";
 
 // utils
 import { transformProductToListItem } from "@/common/utils/product/transformProduct";
+import { resolveActiveGlobalCategoryBanner } from "@/common/utils/category/resolveCategoryBanner";
 
 export const getCategoryData = async (slug: string) => {
   const cacheKey = `${CONTENT_CATEGORY_PAGE_CACHE_KEY}_v4_${slug}`;
@@ -29,8 +30,9 @@ export const getCategoryData = async (slug: string) => {
 
   const LIMIT = 32;
 
-  // 1. FETCH CATEGORY DATA
-  const categoryRes = await ContentCategories.aggregate([
+  // 1. FETCH CATEGORY DATA & ACTIVE GLOBAL BANNER
+  const [categoryRes, globalBanner] = await Promise.all([
+    ContentCategories.aggregate([
     { $match: { isActive: true, slug: slug } },
     // Lookup all images needed for this category in one go
     {
@@ -82,6 +84,8 @@ export const getCategoryData = async (slug: string) => {
           ]
         }
       }
+    ]),
+    resolveActiveGlobalCategoryBanner(slug)
   ]);
 
   if (!categoryRes || categoryRes.length === 0) {
@@ -97,7 +101,7 @@ export const getCategoryData = async (slug: string) => {
     return allImages.find((img: any) => String(img._id) === String(id)) || null;
   };
 
-  // Build the structured category object
+  // Build the structured category object (prioritizing active global banner over original category banner)
   const categoryResult: any = {
     _id: rawCategory._id,
     name: rawCategory.name,
@@ -105,7 +109,7 @@ export const getCategoryData = async (slug: string) => {
     media: {
       ...rawCategory.media,
       icon: findImage(rawCategory.media?.icon),
-      banner: {
+      banner: globalBanner || {
         ...rawCategory.media?.banner,
         images: (Array.isArray(rawCategory.media?.banner?.images) 
             ? rawCategory.media.banner.images 

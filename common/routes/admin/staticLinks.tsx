@@ -1,6 +1,7 @@
 import { AdminPanelRoutes } from "@/common/types/types";
 import {
   AlignVerticalJustifyEnd,
+  Bell,
   Bolt,
   Combine,
   Cuboid,
@@ -305,6 +306,12 @@ export const ADMIN_PANEL_ALL_ROUTES: AdminPanelRoutes = [
     ),
     subsections: [
       {
+        sectionName: "categoryBanners",
+        sectionLabel: "Category Banners",
+        svg: <></>,
+        link: `${ROOT_ADMIN_ROUTE}/category/categoryBanners`
+      },
+      {
         sectionName: "aiTag",
         sectionLabel: "Folders",
         svg: <></>,
@@ -397,8 +404,27 @@ export const ADMIN_PANEL_ALL_ROUTES: AdminPanelRoutes = [
         sectionLabel: "Homepage SEO",
         svg: <></>,
         link: `${ROOT_ADMIN_ROUTE}/settings/homepage-seo`
+      },
+      {
+        sectionName: "reset",
+        sectionLabel: "Full Reset",
+        svg: <></>,
+        link: `${ROOT_ADMIN_ROUTE}/settings/reset`
       }
     ]
+  },
+
+  // PUSH NOTIFICATIONS ============================================
+  {
+    sectionName: "notifications",
+    sectionLabel: "Push Notifications",
+    svg: (
+      <Bell
+        strokeWidth={1.5}
+        width={20}
+      />
+    ),
+    link: `${ROOT_ADMIN_ROUTE}/notifications`
   },
 
   // ADMIN ============================================

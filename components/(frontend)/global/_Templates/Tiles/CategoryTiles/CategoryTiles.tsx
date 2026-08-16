@@ -65,8 +65,8 @@ export default function CategoryTiles({
                 </div>
                 {!theme || theme === "spade" ? (
                   <div className="z-10 relative">
-                    <div className="absolute -top-0.5 -right-0.5 scale-0 group-hover:scale-125 bg-transparent border-[1.4px] sm:border-[1.9px] border-sienna aspect-square w-7 sm:w-9 h-7 sm:h-9 transition-all duration-500" />
-                    <div className="absolute -bottom-0.5 -left-0.5 scale-0 group-hover:scale-125 bg-transparent border-[1.4px] sm:border-[1.9px] border-sienna aspect-square w-7 sm:w-9 h-7 sm:h-9 transition-all duration-500" />
+                    <div className="absolute -top-0.5 -right-0.5 scale-0 group-hover:scale-105 bg-transparent border-[1.4px] sm:border-[1.9px] border-sienna rounded-2xl aspect-square w-7 sm:w-9 h-7 sm:h-9 transition-all duration-500" />
+                    <div className="absolute -bottom-0.5 -left-0.5 scale-0 group-hover:scale-105 bg-transparent border-[1.4px] sm:border-[1.9px] border-sienna rounded-2xl aspect-square w-7 sm:w-9 h-7 sm:h-9 transition-all duration-500" />
                   </div>
                 ) : (
                   <></>

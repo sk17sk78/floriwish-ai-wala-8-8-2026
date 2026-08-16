@@ -8,6 +8,7 @@ const { ContentCategories, Topics, SubTopics } = models;
 // utils
 import { handleError } from "@/common/utils/api/error";
 import { normalizeRating } from "@/common/helpers/normalizeRating";
+import { resolveActiveGlobalCategoryBanner } from "@/common/utils/category/resolveCategoryBanner";
 
 // types
 import { type MongooseErrorType } from "@/common/types/apiTypes";
@@ -201,10 +202,13 @@ export const getSubTopicPageDetailsI = async ({
   try {
     await connectDB();
 
-    const category = await ContentCategories.findOne({
-      isActive: true,
-      slug: categorySlug
-    }).select(["_id"]);
+    const [category, globalBanner] = await Promise.all([
+      ContentCategories.findOne({
+        isActive: true,
+        slug: categorySlug
+      }).select(["_id"]).lean(),
+      resolveActiveGlobalCategoryBanner(subTopicSlug)
+    ]);
 
     if (!category) {
       return null;
@@ -214,7 +218,7 @@ export const getSubTopicPageDetailsI = async ({
       isActive: true,
       category: category._id,
       slug: topicSlug
-    }).select(["_id"]);
+    }).select(["_id"]).lean();
 
     if (!topic) {
       return null;
@@ -290,7 +294,13 @@ export const getSubTopicPageDetailsI = async ({
       return null;
     }
 
-    return document;
+    const docObj: any = document.toObject();
+    if (globalBanner) {
+      if (!docObj.media) docObj.media = {};
+      docObj.media.banner = globalBanner;
+    }
+
+    return docObj as unknown as SubTopicDocument;
   } catch (error: any) {
     return null;
   }
@@ -422,7 +432,7 @@ export const getSubTopicPageDetailsII = async ({
           url: (content.media.primary as ImageDocument).url
         },
         price: price,
-        discount: Math.round(((mrp - price) / mrp) * 100),
+        discount: mrp > price && mrp > 0 ? Math.round(((mrp - price) / mrp) * 100) : 0,
         ratingValue: normalizeRating(content.quality?.rating?.value || 0),
         ratingCount: content.quality?.rating?.count,
         processingTime:
@@ -614,7 +624,7 @@ export const getSubTopicPageContents = async ({
           url: (content.media.primary as ImageDocument).url
         },
         price: price,
-        discount: Math.round(((mrp - price) / mrp) * 100),
+        discount: mrp > price && mrp > 0 ? Math.round(((mrp - price) / mrp) * 100) : 0,
         ratingValue: normalizeRating(content.quality?.rating?.value || 0),
         ratingCount: content.quality?.rating?.count,
         processingTime:

@@ -15,58 +15,39 @@ export default function Banner({
   props: BannerCarouselElementsType;
   isPriority?: boolean;
 }) {
+  const mobileSrc = props.image.mobile.url || props.image.desktop.url || "";
+  const desktopSrc = props.image.desktop.url || props.image.mobile.url || "";
+  const alt = props.image.desktop.alt || props.image.mobile.alt || "Banner Image";
+
+  const content = (
+    <div className="relative w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden">
+      <picture className="w-full h-full block">
+        <source media="(min-width: 640px)" srcSet={desktopSrc} />
+        <source media="(max-width: 639px)" srcSet={mobileSrc} />
+        <img
+          src={mobileSrc}
+          alt={alt}
+          className="object-cover object-center h-full w-full rounded-2xl sm:rounded-3xl"
+          loading={isPriority ? "eager" : "lazy"}
+          fetchPriority={isPriority ? "high" : "low"}
+          decoding="async"
+          width={1200}
+          height={400}
+        />
+      </picture>
+    </div>
+  );
+
   return props.isLink ? (
     <Link
       href={props.link}
-      aria-label={
-        props.image.desktop.alt || props.image.mobile.alt || "Banner Link"
-      }
+      aria-label={alt || "Banner Link"}
       className="block w-full h-full"
     >
-      <NextImage
-        className={`sm:hidden object-cover object-center h-full w-full rounded-2xl sm:rounded-3xl`}
-        src={props.image.mobile.url || ""}
-        alt={props.image.mobile.alt || "Banner Image"}
-        width={480}
-        height={240}
-        priority={isPriority}
-        quality={75}
-        sizes="100vw"
-      />
-      <NextImage
-        className={`max-sm:hidden object-cover object-center h-full w-full rounded-2xl sm:rounded-3xl`}
-        src={props.image.desktop.url || ""}
-        alt={props.image.desktop.alt || "Banner Image"}
-        width={1200}
-        height={400}
-        priority={isPriority}
-        quality={75}
-        sizes="100vw"
-      />
+      {content}
     </Link>
   ) : (
-    <>
-      <NextImage
-        className={`sm:hidden object-cover object-center h-full w-full rounded-2xl sm:rounded-3xl`}
-        src={props.image.mobile.url || ""}
-        alt={props.image.mobile.alt || "Banner Image"}
-        width={480}
-        height={240}
-        priority={isPriority}
-        quality={75}
-        sizes="100vw"
-      />
-      <NextImage
-        className={`max-sm:hidden object-cover object-center h-full w-full rounded-2xl sm:rounded-3xl`}
-        src={props.image.desktop.url || ""}
-        alt={props.image.desktop.alt || "Banner Image"}
-        width={1200}
-        height={400}
-        priority={isPriority}
-        quality={75}
-        sizes="100vw"
-      />
-    </>
+    content
   );
 }
 
@@ -85,9 +66,7 @@ export function CategoryListBanner(props: BannerCarouselElementsType) {
           alt={props.image.desktop.alt || "Banner Image"}
           width={1200}
           height={480}
-          quality={75}
-          draggable={false}
-          priority={false}
+          priority={true}
           sizes="100vw"
         />
       </Link>
@@ -102,7 +81,7 @@ export function CategoryListBanner(props: BannerCarouselElementsType) {
         height={480}
         quality={75}
         draggable={false}
-        priority={false}
+        priority={true}
         sizes="100vw"
       />
     </section>

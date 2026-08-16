@@ -7,6 +7,8 @@ interface FormFields extends HTMLFormControlsCollection {
   description: HTMLTextAreaElement;
   minimumOrderAmount: HTMLInputElement;
   limitPerCustomer: HTMLInputElement;
+  visibility?: HTMLSelectElement;
+  maxTotalUses?: HTMLInputElement;
   validFrom: HTMLSelectElement;
   validTill: HTMLInputElement;
   discountType: HTMLSelectElement;
@@ -21,6 +23,8 @@ const getDocumentsFromFormFieldsGenerator = () => (elements: FormFields) => ({
   description: elements.description.value,
   minimumOrderAmount: Number(elements.minimumOrderAmount.value),
   limitPerCustomer: Number(elements.limitPerCustomer.value),
+  isPublic: elements.visibility ? elements.visibility.value === "public" : true,
+  maxTotalUses: elements.maxTotalUses ? Number(elements.maxTotalUses.value || 0) : 0,
   valid: {
     from: elements.validFrom.value,
     till: elements.validTill.value

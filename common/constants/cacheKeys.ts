@@ -38,15 +38,15 @@ export const SEARCH_AI_TAG_CACHE_KEY = "search_ai_tag";
 export const SEARCH_CONTENT_CATEGORY_CACHE_KEY = "search_content_category";
 export const SEARCH_TRENDING_KEYWORDS_CACHE_KEY = "search_trending_keyword";
 
-export const SUB_TOPIC_PAGE_CACHE_KEY = "topic_page";
+export const SUB_TOPIC_PAGE_CACHE_KEY = "sub_topic_page";
 export const SUB_TOPIC_PAGE_CONTENTS_CACHE_KEY = "sub_topic_page_contents";
 export const SUB_TOPIC_PAGE_META_CACHE_KEY = "sub_topic_page_meta";
 
-export const SUB_SUB_TOPIC_PAGE_CACHE_KEY = "topic_page";
+export const SUB_SUB_TOPIC_PAGE_CACHE_KEY = "sub_sub_topic_page";
 export const SUB_SUB_TOPIC_PAGE_CONTENTS_CACHE_KEY = "sub_sub_topic_page_contents";
 export const SUB_SUB_TOPIC_PAGE_META_CACHE_KEY = "sub_sub_topic_page_meta";
 
-export const SUB_SUB_SUB_TOPIC_PAGE_CACHE_KEY = "topic_page";
+export const SUB_SUB_SUB_TOPIC_PAGE_CACHE_KEY = "sub_sub_sub_topic_page";
 export const SUB_SUB_SUB_TOPIC_PAGE_CONTENTS_CACHE_KEY = "sub_sub_sub_topic_page_contents";
 export const SUB_SUB_SUB_TOPIC_PAGE_META_CACHE_KEY = "sub_sub_sub_topic_page_meta";
 
@@ -63,3 +63,4 @@ export const SITEMAP_PRODUCTS_CACHE_KEY = "sitemap_products";
 export const SITEMAP_SERVICES_CACHE_KEY = "sitemap_services";
 export const SITEMAP_SUB_TOPICS_CACHE_KEY = "sitemap_sub_topics";
 export const SITEMAP_TOPICS_CACHE_KEY = "sitemap_topics";
+export const SITEMAP_DYNAMIC_PAGES_CACHE_KEY = "sitemap_dynamic_pages";

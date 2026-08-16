@@ -1,9 +1,10 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 // config
 
 // icons
-import { PaintBucket, Tag, UserRound } from "lucide-react";
+import { Calendar, PaintBucket, Tag, UserRound } from "lucide-react";
 
 // components
 import { DOMAIN } from "@/common/constants/domain";
@@ -25,6 +26,7 @@ import { LocationProvider } from "@/hooks/useLocation/useLocation";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import BlogArticleContent from "./components/BlogArticleContent";
+import BlogShareCard from "./components/BlogShareCard";
 import {
   BlogH1Heading,
   BlogShareButton,
@@ -49,7 +51,7 @@ export default function BlogArticle({
 }) {
   const [previewRawString, setPreviewRawString] = useState<
     (string | ContentDocument[])[]
-  >(layouts ? getBlogArticleSections([], [], layouts) : []);
+  >(layouts ? getBlogArticleSections([], [], layouts, true) : []);
 
   const faqData = layouts
     .find(({ type }) => type === "faq")
@@ -60,14 +62,27 @@ export default function BlogArticle({
     }));
 
   useEffect(() => {
-    const sections: (string | ContentDocument[])[] = getBlogArticleSections(
-      [],
-      [],
-      layouts,
-      true
-    );
-    setPreviewRawString((prev) => sections);
+    if (layouts) {
+      const sections: (string | ContentDocument[])[] = getBlogArticleSections(
+        [],
+        [],
+        layouts,
+        true
+      );
+      setPreviewRawString(sections);
+    }
   }, [layouts]);
+
+  const displayAuthorName = (() => {
+    if (!author) return "Floriwish Team";
+    if (typeof author === "string") {
+      return /^[0-9a-fA-F]{24}$/.test(author) ? "Floriwish Team" : author;
+    }
+    return (author as any).name || (author as any).title || (author as any).userName || "Floriwish Team";
+  })();
+
+  const authorPhoto = (author as any)?.photo?.url || (author as any)?.avatar;
+  const formattedDate = createdAt ? moment.utc(createdAt).format("D MMMM YYYY") : "";
 
   const schemaData: SchemaDataType = {
     BlogArticle: {
@@ -78,15 +93,15 @@ export default function BlogArticle({
           (
             layouts.find(({ type }) => type === "image")?.layout?.image
               ?.images as ImageDocument[]
-          ).at(0)?.url || "",
+          )?.at(0)?.url || "",
         url: `${DOMAIN}/blog/${slug}`
       },
       blogPosting: {
         url: `${DOMAIN}${slug.startsWith("/") ? slug : "/" + slug}`,
-        authorName: (author as BlogAuthorDocument)?.name || "Anonymous",
-        description: meta.description || "",
+        authorName: displayAuthorName,
+        description: meta?.description || "",
         headline: heading,
-        publishedOn: moment(createdAt).format("DD MMMM YYYY"),
+        publishedOn: formattedDate,
         body:
           layouts
             .find(({ type }) => type === "text")
@@ -95,8 +110,8 @@ export default function BlogArticle({
           (
             layouts.find(({ type }) => type === "image")?.layout?.image
               ?.images as ImageDocument[]
-          ).at(0)?.url || "",
-        keywords: meta.tags,
+          )?.at(0)?.url || "",
+        keywords: meta?.tags,
         wordCount: 500
       }
     }
@@ -113,9 +128,9 @@ export default function BlogArticle({
 
       <div className="grid grid-cols-1 overflow-x-hidden auto-rows-min sm:grid-cols-[2fr_1fr] md:grid-cols-[1fr_290px] gap-x-7 max-1200:px-3 pb-4">
         {/* -------[ TOP SECTION ]--------------------------------- */}
-        <section className="flex flex-col justify-start pb-6">
+        <section className="flex flex-col justify-start pb-2 col-span-full">
           {/* title ================================================= */}
-          <div className="mt-8 sm:mt-4 pb-3.5 flex flex-col sm:flex-row items-center gap-y-2.5 *:text-center justify-center sm:justify-between gap-x-4">
+          <div className="mt-8 sm:mt-4 pb-2 flex flex-col sm:flex-row items-center gap-y-2.5 justify-center sm:justify-between gap-x-4">
             <BlogH1Heading title={heading} />
             <BlogShareButton link={`${DOMAIN}/blog/${slug}`} />
           </div>
@@ -125,7 +140,34 @@ export default function BlogArticle({
 
         {/* -------[ ARTICLE SECTION ]--------------------------------- */}
         <LocationProvider>
-          <div className="flex flex-col justify-start gap-y-3.5">
+          <div className="flex flex-col justify-start gap-y-4">
+            {/* Author Initial Badge + Name . Calendar Date (Exact Photo 1 Design) ============ */}
+            <div
+              suppressHydrationWarning
+              className="flex items-center gap-2.5 text-sm sm:text-base text-zinc-600 py-1 flex-wrap"
+            >
+              <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-[#fde8ee] text-[#801435] flex items-center justify-center font-bold text-base sm:text-lg shrink-0 border border-[#fbcfe8]/40 shadow-2xs">
+                {authorPhoto ? (
+                  <img
+                    src={authorPhoto}
+                    alt={displayAuthorName}
+                    className="h-full w-full object-cover rounded-full"
+                  />
+                ) : (
+                  displayAuthorName.charAt(0).toUpperCase()
+                )}
+              </div>
+              <span className="font-bold text-zinc-800 text-base sm:text-lg">
+                {displayAuthorName}
+              </span>
+              <span className="text-zinc-300 font-bold text-base select-none">.</span>
+              <div className="flex items-center gap-1.5 text-zinc-400 font-normal text-sm sm:text-base">
+                <Calendar className="h-4 w-4 sm:h-4.5 sm:w-4.5 text-zinc-400 stroke-[1.75]" />
+                <span suppressHydrationWarning>{formattedDate}</span>
+              </div>
+            </div>
+
+            {/* Main Article Content */}
             {previewRawString.map((subArticle, index) =>
               typeof subArticle === "string" ? (
                 <BlogArticleContent
@@ -146,9 +188,15 @@ export default function BlogArticle({
               )
             )}
 
+            {/* Responsive Share Box (Exact Photo 2 Design) */}
+            <BlogShareCard
+              url={`${DOMAIN}/blog/${slug}`}
+              title={heading}
+            />
+
             {faqData ? (
               <>
-                <div className="mt-12 max-sm:mb-5">
+                <div className="mt-8 max-sm:mb-5">
                   <span className={"text-xl font-medium mb-3 "}>
                     Frequently Asked Questions
                   </span>
@@ -159,17 +207,17 @@ export default function BlogArticle({
               <></>
             )}
 
-            <div className="pt-8 grid grid-cols-1 sm:grid-cols-[125px_1fr]  gap-x-1.5 gap-y-2 sm:gap-y-4">
+            <div className="pt-8 grid grid-cols-1 sm:grid-cols-[125px_1fr] gap-x-1.5 gap-y-2 sm:gap-y-4 border-t border-zinc-100 mt-4">
               <span className="flex items-center justify-start gap-1.5">
                 <UserRound
                   strokeWidth={1.5}
                   width={18}
-                  className="mr-1"
+                  className="mr-1 text-sienna-1"
                 />
-                <span>Author:</span>
+                <span className="font-semibold text-zinc-700">Author:</span>
               </span>
-              <span className="font-medium ml-7 sm:ml-1">
-                {(author as BlogAuthorDocument)?.name || "Anonymous"}
+              <span className="font-semibold text-zinc-900 ml-7 sm:ml-1">
+                {displayAuthorName}
               </span>
 
               {categories && categories.length ? (
@@ -223,16 +271,6 @@ export default function BlogArticle({
         <section className="grid grid-cols-1 sm:grid-cols-[28px_1fr]">
           <span className="border-l border-charcoal-3/20 max-sm:hidden" />
           <div className="flex flex-col justify-start max-sm:hidden">
-            {/* <BlogCards
-              title="Related Blogs"
-              blogs={(_relatedArticles as BlogArticleDocument[]) || []}
-              atSideSection
-            />
-            <BlogCards
-              title="Latest Blogs"
-              blogs={(_latestArticles as BlogArticleDocument[]) || []}
-              atSideSection
-            /> */}
           </div>
         </section>
       </div>

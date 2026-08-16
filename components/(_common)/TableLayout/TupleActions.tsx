@@ -124,6 +124,20 @@ export default function TupleActions(
   const isSuperAdmin = props.isSuperAdmin ?? isCurrentUserSuperAdmin;
 
   const [showDialog, setShowDialog] = useState<boolean>(false);
+  const [isRevalidating, setIsRevalidating] = useState<boolean>(false);
+
+  const handleRevalidateClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isRevalidating || !("onClickRevalidateCache" in props) || !props.onClickRevalidateCache) return;
+    try {
+      setIsRevalidating(true);
+      await Promise.resolve(props.onClickRevalidateCache());
+    } finally {
+      setTimeout(() => {
+        setIsRevalidating(false);
+      }, 600);
+    }
+  };
 
   return (
     <div className="flex items-center justify-center gap-3 *:px-1 *:cursor-pointer">
@@ -145,14 +159,18 @@ export default function TupleActions(
           {props.isActive ? (
             <Power
               strokeWidth={1.5}
+              size={18}
+              height={18}
               width={18}
-              className="text-green-700"
+              className="text-green-700 shrink-0"
             />
           ) : (
             <PowerOff
               strokeWidth={1.5}
+              size={18}
+              height={18}
               width={18}
-              className="text-red-600"
+              className="text-red-600 shrink-0"
             />
           )}
         </div>
@@ -165,7 +183,10 @@ export default function TupleActions(
         >
           <Eye
             strokeWidth={1.5}
+            size={18}
+            height={18}
             width={18}
+            className="shrink-0"
           />
         </div>
       )}
@@ -177,7 +198,10 @@ export default function TupleActions(
         >
           <PencilLine
             strokeWidth={1.5}
+            size={18}
+            height={18}
             width={18}
+            className="shrink-0"
           />
         </div>
       )}
@@ -189,7 +213,10 @@ export default function TupleActions(
         >
           <ArchiveRestore
             strokeWidth={1.5}
+            size={18}
+            height={18}
             width={18}
+            className="shrink-0"
           />
         </div>
       )}
@@ -202,13 +229,19 @@ export default function TupleActions(
             {showDrop && (
               <Trash2
                 strokeWidth={1.5}
+                size={18}
+                height={18}
                 width={18}
+                className="shrink-0"
               />
             )}
             {showDelete && (
               <X
                 strokeWidth={1.5}
+                size={18}
+                height={18}
                 width={18}
+                className="shrink-0"
               />
             )}
           </div>
@@ -275,15 +308,20 @@ export default function TupleActions(
         </Link>
       )}
       
-      {isSuperAdmin && showRevalidateCache && (
+      {showRevalidateCache && (
         <div
-          title="Refresh"
-          className={`transition-all duration-300 hover:text-blue-700 opacity-60 hover:opacity-100`}
-          onClick={props.onClickRevalidateCache}
+          title={isRevalidating ? "Refreshing cache..." : "Refresh Cache"}
+          className={`transition-all duration-300 ${
+            isRevalidating
+              ? "text-blue-600 opacity-100 cursor-not-allowed"
+              : "hover:text-blue-700 opacity-60 hover:opacity-100 cursor-pointer"
+          }`}
+          onClick={handleRevalidateClick}
         >
           <RotateCcw
             strokeWidth={1.5}
             width={18}
+            className={isRevalidating ? "animate-spin text-blue-600" : ""}
           />
         </div>
       )}

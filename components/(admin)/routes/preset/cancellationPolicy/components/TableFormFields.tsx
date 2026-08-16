@@ -1,6 +1,10 @@
 // components
 import Input from "@/lib/Forms/Input/Input";
-import RichTextEditor from "@/lib/Forms/RichTextEditor/temp/RichTextEditor";
+import dynamic from "next/dynamic";
+const RichTextEditor = dynamic(
+  () => import("@/lib/Forms/RichTextEditor/temp/RichTextEditor"),
+  { ssr: false }
+);
 
 // types
 import { type CancellationPolicyDocument } from "@/common/types/documentation/presets/cancellationPolicy";

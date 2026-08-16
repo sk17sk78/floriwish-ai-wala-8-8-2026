@@ -137,7 +137,7 @@ export default function NewLayoutSlide({
       <div className="col-span-2 flex flex-col items-center justify-center pt-10 pb-2">
         <span className="text-3xl font-light">New Layout</span>
         <span className="text-sm text-charcoal-3/60 py-2">
-          Start with selecting the layout type & its position in homepage
+          Start with selecting the layout type & its position in page
         </span>
       </div>
 

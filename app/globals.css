@@ -4,7 +4,44 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== PERFORMANCE OPTIMIZATIONS ===== */
 
+/* Prevent layout shifts (CLS=0) */
+img {
+  height: auto;
+  max-width: 100%;
+}
+
+/* Reduce layout shift */
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* TBT improve — heavy animations sirf high-end devices pe */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* TBT improve — below-fold sections browser defer karta hai */
+.below-fold-section {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 500px;
+}
+
+/* Font rendering optimization */
+* {
+  text-rendering: optimizeLegibility;
+}
+
+/* Reduce paint cost on scroll */
+.sticky-header {
+  will-change: transform;
+}
 
 @layer base {
   :root {
@@ -77,13 +114,44 @@
   color: white;
 }
 
-.scrollbar-hide, .no-scrollbar {
+/* ===== IPHONE (iOS / WebKit) SMOOTH TOUCH SCROLLING ENGINE ===== */
+.scrollbar-hide,
+.no-scrollbar,
+[class*="overflow-x-auto"],
+[class*="overflow-x-scroll"],
+.scrollable-tray,
+[data-embla-container] {
   scrollbar-width: none;
   -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-x pan-y !important;
+  overscroll-behavior-x: contain !important;
+  scroll-behavior: smooth !important;
 }
 
-.scrollbar-hide::-webkit-scrollbar, .no-scrollbar::-webkit-scrollbar {
+.scrollbar-hide::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar,
+[class*="overflow-x-auto"]::-webkit-scrollbar,
+[class*="overflow-x-scroll"]::-webkit-scrollbar {
   display: none;
+}
+
+/* Prevent horizontal scroll jitter on iOS devices */
+[class*="overflow-x-auto"] > *,
+[class*="overflow-x-scroll"] > * {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* Proximity snap for buttery-smooth mobile horizontal trays */
+.snap-x {
+  scroll-snap-type: x proximity !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.snap-start {
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -156,4 +224,120 @@
   content-visibility: auto;
   contain-intrinsic-size: 0 400px;
 }
+
+/* ========================================================================= */
+/* ADMIN PANEL COMPREHENSIVE HIGH-CONTRAST DARK MODE ENGINE */
+/* ========================================================================= */
+
+.dark body,
+.dark main {
+  background-color: #09090b !important;
+  color: #f4f4f5 !important;
+}
+
+/* Dark Mode Card & Container Backgrounds */
+.dark .bg-white {
+  background-color: #121214 !important;
+  color: #f4f4f5 !important;
+}
+
+.dark .bg-stone-50,
+.dark .bg-zinc-50,
+.dark .bg-stone-100,
+.dark .bg-zinc-100,
+.dark .bg-ivory-1,
+.dark .bg-ivory-2 {
+  background-color: #18181b !important;
+  color: #f4f4f5 !important;
+}
+
+/* Dark Mode Borders */
+.dark .border-stone-200,
+.dark .border-zinc-200,
+.dark .border-stone-100,
+.dark .border-zinc-100,
+.dark .border-ash,
+.dark [class*="border-charcoal-3"] {
+  border-color: #27272a !important;
+}
+
+/* Dark Mode Typography Visibility Fixes */
+.dark .text-stone-900,
+.dark .text-zinc-900,
+.dark .text-charcoal-1,
+.dark .text-charcoal-2,
+.dark .text-charcoal-3 {
+  color: #f4f4f5 !important;
+}
+
+.dark .text-stone-800,
+.dark .text-zinc-800,
+.dark .text-stone-700,
+.dark .text-zinc-700 {
+  color: #e4e4e7 !important;
+}
+
+.dark .text-stone-600,
+.dark .text-zinc-600,
+.dark .text-stone-500,
+.dark .text-zinc-500 {
+  color: #a1a1aa !important;
+}
+
+.dark .text-stone-400,
+.dark .text-zinc-400 {
+  color: #71717a !important;
+}
+
+/* Dark Mode Form Inputs, Textareas, Selects & Options */
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark textarea {
+  background-color: #18181b !important;
+  color: #f4f4f5 !important;
+  border-color: #3f3f46 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #71717a !important;
+}
+
+.dark select {
+  background-color: #18181b !important;
+  color: #f4f4f5 !important;
+  border-color: #3f3f46 !important;
+}
+
+.dark select option {
+  background-color: #18181b !important;
+  color: #f4f4f5 !important;
+}
+
+/* Dark Mode Tables & Rows */
+.dark table {
+  color: #f4f4f5 !important;
+}
+
+.dark table thead th {
+  background-color: #18181b !important;
+  color: #d4d4d8 !important;
+  border-bottom-color: #27272a !important;
+}
+
+.dark table tbody tr {
+  border-bottom-color: #27272a !important;
+}
+
+.dark table tbody tr:hover {
+  background-color: #27272a60 !important;
+}
+
+/* Dark Mode Modals & Dialogs */
+.dark [role="dialog"],
+.dark .dialog-content {
+  background-color: #121214 !important;
+  color: #f4f4f5 !important;
+  border-color: #27272a !important;
+}
+
 

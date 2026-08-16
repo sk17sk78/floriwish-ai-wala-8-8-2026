@@ -1,0 +1,912 @@
+{
+  "results": [
+    {
+      "name": "Homepage Feed",
+      "path": "/api/frontend/homepage",
+      "category": "Frontend",
+      "status": 200,
+      "latency": 1719,
+      "sizeBytes": 117303,
+      "sizeFormatted": "114.6 KB",
+      "error": null
+    },
+    {
+      "name": "Global Locations",
+      "path": "/api/frontend/location",
+      "category": "Frontend",
+      "status": 200,
+      "latency": 1694,
+      "sizeBytes": 114802,
+      "sizeFormatted": "112.1 KB",
+      "error": null
+    },
+    {
+      "name": "Global Website Settings",
+      "path": "/api/frontend/setting",
+      "category": "Frontend",
+      "status": 200,
+      "latency": 1684,
+      "sizeBytes": 1566,
+      "sizeFormatted": "1.5 KB",
+      "error": null
+    },
+    {
+      "name": "Search Initial Load Feed",
+      "path": "/api/frontend/v2/frontend/search/initial-load",
+      "category": "Frontend",
+      "status": 200,
+      "latency": 416,
+      "sizeBytes": 3013,
+      "sizeFormatted": "2.9 KB",
+      "error": null
+    },
+    {
+      "name": "Search Contents Query (Cake)",
+      "path": "/api/frontend/v2/frontend/search/contents?q=cake",
+      "category": "Frontend",
+      "status": 200,
+      "latency": 411,
+      "sizeBytes": 11478,
+      "sizeFormatted": "11.2 KB",
+      "error": null
+    },
+    {
+      "name": "Search Contents Query (Roses)",
+      "path": "/api/frontend/v2/frontend/search/contents?q=rose",
+      "category": "Frontend",
+      "status": 200,
+      "latency": 413,
+      "sizeBytes": 11478,
+      "sizeFormatted": "11.2 KB",
+      "error": null
+    },
+    {
+      "name": "Merchant Center XML Feed",
+      "path": "/api/frontend/merchant-center",
+      "category": "Frontend",
+      "status": 200,
+      "latency": 545,
+      "sizeBytes": 1343681,
+      "sizeFormatted": "1.3 MB",
+      "error": null
+    },
+    {
+      "name": "Blog Articles Feed",
+      "path": "/api/frontend/blog",
+      "category": "Frontend",
+      "status": 200,
+      "latency": 369,
+      "sizeBytes": 841,
+      "sizeFormatted": "841 B",
+      "error": null
+    },
+    {
+      "name": "Homepage Text Content",
+      "path": "/api/frontend/homepage/text-content",
+      "category": "Frontend",
+      "status": 200,
+      "latency": 3110,
+      "sizeBytes": 41987,
+      "sizeFormatted": "41 KB",
+      "error": null
+    },
+    {
+      "name": "Notifications Active Count",
+      "path": "/api/frontend/notifications",
+      "category": "Frontend",
+      "status": 200,
+      "latency": 312,
+      "sizeBytes": 94,
+      "sizeFormatted": "94 B",
+      "error": null
+    },
+    {
+      "name": "Category 1 (Content Category Catalog)",
+      "path": "/api/frontend/content-category-page",
+      "category": "Catalog & Pages",
+      "status": 200,
+      "latency": 1810,
+      "sizeBytes": 3417,
+      "sizeFormatted": "3.3 KB",
+      "error": null
+    },
+    {
+      "name": "Category 1 Slug (Cakes)",
+      "path": "/api/frontend/content-category-page/cakes",
+      "category": "Catalog & Pages",
+      "status": 200,
+      "latency": 813,
+      "sizeBytes": 53708,
+      "sizeFormatted": "52.4 KB",
+      "error": null
+    },
+    {
+      "name": "Category 1 Slug (Flowers)",
+      "path": "/api/frontend/content-category-page/flowers",
+      "category": "Catalog & Pages",
+      "status": 200,
+      "latency": 71,
+      "sizeBytes": 55624,
+      "sizeFormatted": "54.3 KB",
+      "error": null
+    },
+    {
+      "name": "Category 2 Topic Page (Cakes Rohtak)",
+      "path": "/api/frontend/topic-page/cakes/rohtak",
+      "category": "Catalog & Pages",
+      "status": 200,
+      "latency": 760,
+      "sizeBytes": 31314,
+      "sizeFormatted": "30.6 KB",
+      "error": null
+    },
+    {
+      "name": "Category 2 Topic Page (Flowers Delhi)",
+      "path": "/api/frontend/topic-page/flowers/delhi",
+      "category": "Catalog & Pages",
+      "status": 200,
+      "latency": 780,
+      "sizeBytes": 43260,
+      "sizeFormatted": "42.2 KB",
+      "error": null
+    },
+    {
+      "name": "Category 3 SubTopic Page (Wedding Delhi Dwarka)",
+      "path": "/api/frontend/sub-topic-page/wedding-house-decoration/delhi/dwarka",
+      "category": "Catalog & Pages",
+      "status": 200,
+      "latency": 983,
+      "sizeBytes": 57413,
+      "sizeFormatted": "56.1 KB",
+      "error": null
+    },
+    {
+      "name": "V2 Content Category (Cakes)",
+      "path": "/api/frontend/v2/frontend/content-category/cakes",
+      "category": "Catalog & Pages",
+      "status": 200,
+      "latency": 1004,
+      "sizeBytes": 51029,
+      "sizeFormatted": "49.8 KB",
+      "error": null
+    },
+    {
+      "name": "Sitemap Products Index",
+      "path": "/api/frontend/sitemap/products",
+      "category": "SEO & Sitemaps",
+      "status": 200,
+      "latency": 494,
+      "sizeBytes": 267053,
+      "sizeFormatted": "260.8 KB",
+      "error": null
+    },
+    {
+      "name": "Sitemap Dynamic Pages Index",
+      "path": "/api/frontend/sitemap/dynamic-pages",
+      "category": "SEO & Sitemaps",
+      "status": 200,
+      "latency": 311,
+      "sizeBytes": 548,
+      "sizeFormatted": "548 B",
+      "error": null
+    },
+    {
+      "name": "Admin Cities Preset",
+      "path": "/api/admin/preset/city?limit=10",
+      "category": "Admin Presets",
+      "status": 200,
+      "latency": 440,
+      "sizeBytes": 2823,
+      "sizeFormatted": "2.8 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Delivery Types",
+      "path": "/api/admin/preset/delivery-type",
+      "category": "Admin Presets",
+      "status": 200,
+      "latency": 435,
+      "sizeBytes": 5493,
+      "sizeFormatted": "5.4 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Occasions",
+      "path": "/api/admin/preset/occasion?active=true",
+      "category": "Admin Presets",
+      "status": 200,
+      "latency": 427,
+      "sizeBytes": 35,
+      "sizeFormatted": "35 B",
+      "error": null
+    },
+    {
+      "name": "Admin Cancellation Policy",
+      "path": "/api/admin/preset/cancellation-policy",
+      "category": "Admin Presets",
+      "status": 200,
+      "latency": 403,
+      "sizeBytes": 7038,
+      "sizeFormatted": "6.9 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Colors Preset",
+      "path": "/api/admin/preset/color?limit=10",
+      "category": "Admin Presets",
+      "status": 200,
+      "latency": 402,
+      "sizeBytes": 1416,
+      "sizeFormatted": "1.4 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Care Info Preset",
+      "path": "/api/admin/preset/care-info?limit=5",
+      "category": "Admin Presets",
+      "status": 200,
+      "latency": 458,
+      "sizeBytes": 4085,
+      "sizeFormatted": "4 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Advance Payment",
+      "path": "/api/admin/preset/advance-payment",
+      "category": "Admin Presets",
+      "status": 200,
+      "latency": 449,
+      "sizeBytes": 917,
+      "sizeFormatted": "917 B",
+      "error": null
+    },
+    {
+      "name": "Admin Products Stream",
+      "path": "/api/admin/content/content?type=product&limit=10",
+      "category": "Admin Catalog",
+      "status": 200,
+      "latency": 574,
+      "sizeBytes": 55923,
+      "sizeFormatted": "54.6 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Addon Products",
+      "path": "/api/admin/content/addon?limit=10",
+      "category": "Admin Catalog",
+      "status": 200,
+      "latency": 685,
+      "sizeBytes": 4763,
+      "sizeFormatted": "4.7 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Coupons & Discounts",
+      "path": "/api/admin/content/coupon?active=true",
+      "category": "Admin Catalog",
+      "status": 200,
+      "latency": 701,
+      "sizeBytes": 2219,
+      "sizeFormatted": "2.2 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Category Banners Manager",
+      "path": "/api/admin/category-banners",
+      "category": "Admin Catalog",
+      "status": 200,
+      "latency": 738,
+      "sizeBytes": 26628,
+      "sizeFormatted": "26 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Category Search (Live Index)",
+      "path": "/api/admin/category-banners/categories/search?q=&limit=10",
+      "category": "Admin Catalog",
+      "status": 200,
+      "latency": 502,
+      "sizeBytes": 8058,
+      "sizeFormatted": "7.9 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Catalogue Category Groups",
+      "path": "/api/admin/category/catalogue-category?limit=10",
+      "category": "Admin Catalog",
+      "status": 200,
+      "latency": 432,
+      "sizeBytes": 2854,
+      "sizeFormatted": "2.8 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Addon Category Groups",
+      "path": "/api/admin/category/addon-category?limit=10",
+      "category": "Admin Catalog",
+      "status": 200,
+      "latency": 452,
+      "sizeBytes": 1316,
+      "sizeFormatted": "1.3 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Content Category List",
+      "path": "/api/admin/category/content-category?limit=10",
+      "category": "Admin Catalog",
+      "status": 200,
+      "latency": 664,
+      "sizeBytes": 109429,
+      "sizeFormatted": "106.9 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Universal Search",
+      "path": "/api/admin/universal-search?q=cake",
+      "category": "Admin Search",
+      "status": 200,
+      "latency": 214,
+      "sizeBytes": 35,
+      "sizeFormatted": "35 B",
+      "error": null
+    },
+    {
+      "name": "Admin Orders Stream",
+      "path": "/api/admin/dynamic/order?limit=10",
+      "category": "Admin Orders",
+      "status": 200,
+      "latency": 403,
+      "sizeBytes": 7963,
+      "sizeFormatted": "7.8 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Active Shopping Carts",
+      "path": "/api/admin/dynamic/cart?limit=10",
+      "category": "Admin Orders",
+      "status": 200,
+      "latency": 401,
+      "sizeBytes": 7975,
+      "sizeFormatted": "7.8 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Registered Customers",
+      "path": "/api/admin/user/customer?limit=10",
+      "category": "Admin Users",
+      "status": 200,
+      "latency": 395,
+      "sizeBytes": 6377,
+      "sizeFormatted": "6.2 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Roles Table",
+      "path": "/api/admin/admin/admin-role?limit=10",
+      "category": "Admin Staff",
+      "status": 401,
+      "latency": 406,
+      "sizeBytes": 76,
+      "sizeFormatted": "76 B",
+      "error": "HTTP 401 ({\"error\":\"access from unverified source\",\"message\":\"you should not be here\"})"
+    },
+    {
+      "name": "Admin Media Library Folders",
+      "path": "/api/admin/media/folder?limit=10",
+      "category": "Admin Media",
+      "status": 200,
+      "latency": 2240,
+      "sizeBytes": 2984,
+      "sizeFormatted": "2.9 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Media Library Images",
+      "path": "/api/admin/media/image?limit=10",
+      "category": "Admin Media",
+      "status": 200,
+      "latency": 2251,
+      "sizeBytes": 5147,
+      "sizeFormatted": "5 KB",
+      "error": null
+    },
+    {
+      "name": "System Hardware & Telemetry",
+      "path": "/api/admin/system-health/system-status",
+      "category": "Infrastructure",
+      "status": 200,
+      "latency": 2294,
+      "sizeBytes": 1517,
+      "sizeFormatted": "1.5 KB",
+      "error": null
+    },
+    {
+      "name": "Homepage Studio Master Config",
+      "path": "/api/admin/homepage-management",
+      "category": "Settings",
+      "status": 200,
+      "latency": 637,
+      "sizeBytes": 10456,
+      "sizeFormatted": "10.2 KB",
+      "error": null
+    },
+    {
+      "name": "Push Notifications Stats",
+      "path": "/api/admin/notifications/stats",
+      "category": "Infrastructure",
+      "status": 200,
+      "latency": 631,
+      "sizeBytes": 93,
+      "sizeFormatted": "93 B",
+      "error": null
+    },
+    {
+      "name": "Cache Revalidation Module",
+      "path": "/api/admin/revalidate-cache/module",
+      "category": "Infrastructure",
+      "status": 200,
+      "latency": 1251,
+      "sizeBytes": 92,
+      "sizeFormatted": "92 B",
+      "error": null
+    }
+  ],
+  "fastApis": [
+    {
+      "name": "Category 1 Slug (Flowers)",
+      "path": "/api/frontend/content-category-page/flowers",
+      "category": "Catalog & Pages",
+      "status": 200,
+      "latency": 71,
+      "sizeBytes": 55624,
+      "sizeFormatted": "54.3 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Universal Search",
+      "path": "/api/admin/universal-search?q=cake",
+      "category": "Admin Search",
+      "status": 200,
+      "latency": 214,
+      "sizeBytes": 35,
+      "sizeFormatted": "35 B",
+      "error": null
+    },
+    {
+      "name": "Sitemap Dynamic Pages Index",
+      "path": "/api/frontend/sitemap/dynamic-pages",
+      "category": "SEO & Sitemaps",
+      "status": 200,
+      "latency": 311,
+      "sizeBytes": 548,
+      "sizeFormatted": "548 B",
+      "error": null
+    },
+    {
+      "name": "Notifications Active Count",
+      "path": "/api/frontend/notifications",
+      "category": "Frontend",
+      "status": 200,
+      "latency": 312,
+      "sizeBytes": 94,
+      "sizeFormatted": "94 B",
+      "error": null
+    },
+    {
+      "name": "Blog Articles Feed",
+      "path": "/api/frontend/blog",
+      "category": "Frontend",
+      "status": 200,
+      "latency": 369,
+      "sizeBytes": 841,
+      "sizeFormatted": "841 B",
+      "error": null
+    },
+    {
+      "name": "Admin Registered Customers",
+      "path": "/api/admin/user/customer?limit=10",
+      "category": "Admin Users",
+      "status": 200,
+      "latency": 395,
+      "sizeBytes": 6377,
+      "sizeFormatted": "6.2 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Active Shopping Carts",
+      "path": "/api/admin/dynamic/cart?limit=10",
+      "category": "Admin Orders",
+      "status": 200,
+      "latency": 401,
+      "sizeBytes": 7975,
+      "sizeFormatted": "7.8 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Colors Preset",
+      "path": "/api/admin/preset/color?limit=10",
+      "category": "Admin Presets",
+      "status": 200,
+      "latency": 402,
+      "sizeBytes": 1416,
+      "sizeFormatted": "1.4 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Cancellation Policy",
+      "path": "/api/admin/preset/cancellation-policy",
+      "category": "Admin Presets",
+      "status": 200,
+      "latency": 403,
+      "sizeBytes": 7038,
+      "sizeFormatted": "6.9 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Orders Stream",
+      "path": "/api/admin/dynamic/order?limit=10",
+      "category": "Admin Orders",
+      "status": 200,
+      "latency": 403,
+      "sizeBytes": 7963,
+      "sizeFormatted": "7.8 KB",
+      "error": null
+    },
+    {
+      "name": "Search Contents Query (Cake)",
+      "path": "/api/frontend/v2/frontend/search/contents?q=cake",
+      "category": "Frontend",
+      "status": 200,
+      "latency": 411,
+      "sizeBytes": 11478,
+      "sizeFormatted": "11.2 KB",
+      "error": null
+    },
+    {
+      "name": "Search Contents Query (Roses)",
+      "path": "/api/frontend/v2/frontend/search/contents?q=rose",
+      "category": "Frontend",
+      "status": 200,
+      "latency": 413,
+      "sizeBytes": 11478,
+      "sizeFormatted": "11.2 KB",
+      "error": null
+    },
+    {
+      "name": "Search Initial Load Feed",
+      "path": "/api/frontend/v2/frontend/search/initial-load",
+      "category": "Frontend",
+      "status": 200,
+      "latency": 416,
+      "sizeBytes": 3013,
+      "sizeFormatted": "2.9 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Occasions",
+      "path": "/api/admin/preset/occasion?active=true",
+      "category": "Admin Presets",
+      "status": 200,
+      "latency": 427,
+      "sizeBytes": 35,
+      "sizeFormatted": "35 B",
+      "error": null
+    },
+    {
+      "name": "Admin Catalogue Category Groups",
+      "path": "/api/admin/category/catalogue-category?limit=10",
+      "category": "Admin Catalog",
+      "status": 200,
+      "latency": 432,
+      "sizeBytes": 2854,
+      "sizeFormatted": "2.8 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Delivery Types",
+      "path": "/api/admin/preset/delivery-type",
+      "category": "Admin Presets",
+      "status": 200,
+      "latency": 435,
+      "sizeBytes": 5493,
+      "sizeFormatted": "5.4 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Cities Preset",
+      "path": "/api/admin/preset/city?limit=10",
+      "category": "Admin Presets",
+      "status": 200,
+      "latency": 440,
+      "sizeBytes": 2823,
+      "sizeFormatted": "2.8 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Advance Payment",
+      "path": "/api/admin/preset/advance-payment",
+      "category": "Admin Presets",
+      "status": 200,
+      "latency": 449,
+      "sizeBytes": 917,
+      "sizeFormatted": "917 B",
+      "error": null
+    },
+    {
+      "name": "Admin Addon Category Groups",
+      "path": "/api/admin/category/addon-category?limit=10",
+      "category": "Admin Catalog",
+      "status": 200,
+      "latency": 452,
+      "sizeBytes": 1316,
+      "sizeFormatted": "1.3 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Care Info Preset",
+      "path": "/api/admin/preset/care-info?limit=5",
+      "category": "Admin Presets",
+      "status": 200,
+      "latency": 458,
+      "sizeBytes": 4085,
+      "sizeFormatted": "4 KB",
+      "error": null
+    },
+    {
+      "name": "Sitemap Products Index",
+      "path": "/api/frontend/sitemap/products",
+      "category": "SEO & Sitemaps",
+      "status": 200,
+      "latency": 494,
+      "sizeBytes": 267053,
+      "sizeFormatted": "260.8 KB",
+      "error": null
+    }
+  ],
+  "moderateApis": [
+    {
+      "name": "Admin Category Search (Live Index)",
+      "path": "/api/admin/category-banners/categories/search?q=&limit=10",
+      "category": "Admin Catalog",
+      "status": 200,
+      "latency": 502,
+      "sizeBytes": 8058,
+      "sizeFormatted": "7.9 KB",
+      "error": null
+    },
+    {
+      "name": "Merchant Center XML Feed",
+      "path": "/api/frontend/merchant-center",
+      "category": "Frontend",
+      "status": 200,
+      "latency": 545,
+      "sizeBytes": 1343681,
+      "sizeFormatted": "1.3 MB",
+      "error": null
+    },
+    {
+      "name": "Admin Products Stream",
+      "path": "/api/admin/content/content?type=product&limit=10",
+      "category": "Admin Catalog",
+      "status": 200,
+      "latency": 574,
+      "sizeBytes": 55923,
+      "sizeFormatted": "54.6 KB",
+      "error": null
+    },
+    {
+      "name": "Push Notifications Stats",
+      "path": "/api/admin/notifications/stats",
+      "category": "Infrastructure",
+      "status": 200,
+      "latency": 631,
+      "sizeBytes": 93,
+      "sizeFormatted": "93 B",
+      "error": null
+    },
+    {
+      "name": "Homepage Studio Master Config",
+      "path": "/api/admin/homepage-management",
+      "category": "Settings",
+      "status": 200,
+      "latency": 637,
+      "sizeBytes": 10456,
+      "sizeFormatted": "10.2 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Content Category List",
+      "path": "/api/admin/category/content-category?limit=10",
+      "category": "Admin Catalog",
+      "status": 200,
+      "latency": 664,
+      "sizeBytes": 109429,
+      "sizeFormatted": "106.9 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Addon Products",
+      "path": "/api/admin/content/addon?limit=10",
+      "category": "Admin Catalog",
+      "status": 200,
+      "latency": 685,
+      "sizeBytes": 4763,
+      "sizeFormatted": "4.7 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Coupons & Discounts",
+      "path": "/api/admin/content/coupon?active=true",
+      "category": "Admin Catalog",
+      "status": 200,
+      "latency": 701,
+      "sizeBytes": 2219,
+      "sizeFormatted": "2.2 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Category Banners Manager",
+      "path": "/api/admin/category-banners",
+      "category": "Admin Catalog",
+      "status": 200,
+      "latency": 738,
+      "sizeBytes": 26628,
+      "sizeFormatted": "26 KB",
+      "error": null
+    },
+    {
+      "name": "Category 2 Topic Page (Cakes Rohtak)",
+      "path": "/api/frontend/topic-page/cakes/rohtak",
+      "category": "Catalog & Pages",
+      "status": 200,
+      "latency": 760,
+      "sizeBytes": 31314,
+      "sizeFormatted": "30.6 KB",
+      "error": null
+    },
+    {
+      "name": "Category 2 Topic Page (Flowers Delhi)",
+      "path": "/api/frontend/topic-page/flowers/delhi",
+      "category": "Catalog & Pages",
+      "status": 200,
+      "latency": 780,
+      "sizeBytes": 43260,
+      "sizeFormatted": "42.2 KB",
+      "error": null
+    },
+    {
+      "name": "Category 1 Slug (Cakes)",
+      "path": "/api/frontend/content-category-page/cakes",
+      "category": "Catalog & Pages",
+      "status": 200,
+      "latency": 813,
+      "sizeBytes": 53708,
+      "sizeFormatted": "52.4 KB",
+      "error": null
+    },
+    {
+      "name": "Category 3 SubTopic Page (Wedding Delhi Dwarka)",
+      "path": "/api/frontend/sub-topic-page/wedding-house-decoration/delhi/dwarka",
+      "category": "Catalog & Pages",
+      "status": 200,
+      "latency": 983,
+      "sizeBytes": 57413,
+      "sizeFormatted": "56.1 KB",
+      "error": null
+    },
+    {
+      "name": "V2 Content Category (Cakes)",
+      "path": "/api/frontend/v2/frontend/content-category/cakes",
+      "category": "Catalog & Pages",
+      "status": 200,
+      "latency": 1004,
+      "sizeBytes": 51029,
+      "sizeFormatted": "49.8 KB",
+      "error": null
+    }
+  ],
+  "slowApis": [
+    {
+      "name": "Homepage Text Content",
+      "path": "/api/frontend/homepage/text-content",
+      "category": "Frontend",
+      "status": 200,
+      "latency": 3110,
+      "sizeBytes": 41987,
+      "sizeFormatted": "41 KB",
+      "error": null
+    },
+    {
+      "name": "System Hardware & Telemetry",
+      "path": "/api/admin/system-health/system-status",
+      "category": "Infrastructure",
+      "status": 200,
+      "latency": 2294,
+      "sizeBytes": 1517,
+      "sizeFormatted": "1.5 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Media Library Images",
+      "path": "/api/admin/media/image?limit=10",
+      "category": "Admin Media",
+      "status": 200,
+      "latency": 2251,
+      "sizeBytes": 5147,
+      "sizeFormatted": "5 KB",
+      "error": null
+    },
+    {
+      "name": "Admin Media Library Folders",
+      "path": "/api/admin/media/folder?limit=10",
+      "category": "Admin Media",
+      "status": 200,
+      "latency": 2240,
+      "sizeBytes": 2984,
+      "sizeFormatted": "2.9 KB",
+      "error": null
+    },
+    {
+      "name": "Category 1 (Content Category Catalog)",
+      "path": "/api/frontend/content-category-page",
+      "category": "Catalog & Pages",
+      "status": 200,
+      "latency": 1810,
+      "sizeBytes": 3417,
+      "sizeFormatted": "3.3 KB",
+      "error": null
+    },
+    {
+      "name": "Homepage Feed",
+      "path": "/api/frontend/homepage",
+      "category": "Frontend",
+      "status": 200,
+      "latency": 1719,
+      "sizeBytes": 117303,
+      "sizeFormatted": "114.6 KB",
+      "error": null
+    },
+    {
+      "name": "Global Locations",
+      "path": "/api/frontend/location",
+      "category": "Frontend",
+      "status": 200,
+      "latency": 1694,
+      "sizeBytes": 114802,
+      "sizeFormatted": "112.1 KB",
+      "error": null
+    },
+    {
+      "name": "Global Website Settings",
+      "path": "/api/frontend/setting",
+      "category": "Frontend",
+      "status": 200,
+      "latency": 1684,
+      "sizeBytes": 1566,
+      "sizeFormatted": "1.5 KB",
+      "error": null
+    },
+    {
+      "name": "Cache Revalidation Module",
+      "path": "/api/admin/revalidate-cache/module",
+      "category": "Infrastructure",
+      "status": 200,
+      "latency": 1251,
+      "sizeBytes": 92,
+      "sizeFormatted": "92 B",
+      "error": null
+    }
+  ],
+  "brokenApis": [
+    {
+      "name": "Admin Roles Table",
+      "path": "/api/admin/admin/admin-role?limit=10",
+      "category": "Admin Staff",
+      "status": 401,
+      "latency": 406,
+      "sizeBytes": 76,
+      "sizeFormatted": "76 B",
+      "error": "HTTP 401 ({\"error\":\"access from unverified source\",\"message\":\"you should not be here\"})"
+    }
+  ]
+}

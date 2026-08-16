@@ -23,7 +23,8 @@ export const getSitemapData = async (): Promise<SitemapData[] | null> => {
       type: "product"
     })
       .select(["slug", "updatedAt"])
-      .sort({ updatedAt: -1 });
+      .sort({ updatedAt: -1 })
+      .lean();
 
     if (!products) {
       return null;

@@ -1,34 +1,21 @@
-// next config
 export const dynamic = "force-dynamic";
 
-// constants
-import { FOOTER_CACHE_KEY } from "@/common/constants/cacheKeys";
-import { DOMAIN, X_API_KEY } from "@/common/constants/environmentVariables";
-
-// libraries
 import { NextRequest, NextResponse } from "next/server";
-
-// controllers
-import { clearCache } from "../controllers";
+import { revalidateSingleModule } from "@/lib/redis/revalidateModule";
 
 export const GET = async (req: NextRequest): Promise<NextResponse> => {
   try {
-    const response = await clearCache({
-      redisKeys: [FOOTER_CACHE_KEY],
-      nextTags: [FOOTER_CACHE_KEY],
-      cloudfrontPath: "/*"
+    const result = await revalidateSingleModule({
+      module: "footer"
     });
 
-    if (!response) {
-      return NextResponse.json(null, { status: 400 });
-    }
-
-    fetch(`${DOMAIN}/api/frontend/footer`, {
-      headers: { "x-api-key": X_API_KEY }
-    });
-
-    return NextResponse.json(response, { status: 200 });
-  } catch (error) {
-    return NextResponse.json(null, { status: 500 });
+    return NextResponse.json({
+      redis: result.success,
+      next: true,
+      cloudfront: false,
+      message: result.message
+    }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ redis: false, next: false, cloudfront: false, error: error.message }, { status: 500 });
   }
 };

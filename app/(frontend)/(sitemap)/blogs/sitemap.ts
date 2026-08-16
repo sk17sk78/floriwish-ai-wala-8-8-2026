@@ -16,10 +16,10 @@ export default async function Sitemap(): Promise<Sitemap> {
       const sitemapBlogs = await getSitemapData() || [];
 
       const sitemap: Sitemap = sitemapBlogs.map(({ slug, updatedAt }) => ({
-        url: `${DOMAIN}/blog/${slug}`,   // ✅ FIXED
+        url: `${DOMAIN}/${slug.startsWith("blog/") ? slug : `blog/${slug}`}`,
         changeFrequency: "monthly",
         lastModified: updatedAt,
-        priority: 0.5
+        priority: 0.7
       }));
 
       return sitemap;

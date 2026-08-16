@@ -77,7 +77,8 @@ export default function CartItemAddonSuggestions({
       <span className="font-medium text-sm">Add more delights</span>
       <div
         id={trayId}
-        className="relative scrollbar-hide overflow-x-scroll overflow-y-visible pt-2.5 flex items-stretch justify-start gap-3.5"
+        className="relative scrollbar-hide overflow-x-auto overflow-y-visible pt-2.5 flex items-stretch justify-start gap-3.5 scroll-smooth touch-pan-x"
+        style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x pan-y" }}
       >
         <div
           className="max-w-7 w-7 h-7 -mr-8 sticky top-1/2 -translate-y-[calc(50%_+_12px)] aspect-square left-0 rounded-full cursor-pointer flex items-center border border-neutral-200 justify-center bg-white/50 p-[8px] text-slate-900 transition-all duration-300 hover:bg-white z-50"

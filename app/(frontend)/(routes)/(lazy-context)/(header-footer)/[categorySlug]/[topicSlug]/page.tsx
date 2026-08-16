@@ -32,7 +32,7 @@ import { type TopicDocument } from "@/common/types/documentation/pages/topic";
 export async function generateStaticParams() {
   if (RENDERING_STRATEGY === "ISR") {
     try {
-      let slugs: { categorySlug: string; pageSlug: string }[] = [];
+      let slugs: { categorySlug: string; topicSlug: string }[] = [];
 
       const response = await fetchTopicPageSlugs(RENDERING_STRATEGY);
 
@@ -43,7 +43,7 @@ export async function generateStaticParams() {
         .slice(0, QUICK_BUILD ? 1 : topics.length)
         .map(({ slug, category }) => ({
           categorySlug: (category as ContentCategoryDocument).slug,
-          pageSlug: slug
+          topicSlug: slug
         }));
 
       return slugs;

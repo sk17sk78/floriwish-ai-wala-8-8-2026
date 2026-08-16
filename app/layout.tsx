@@ -3,7 +3,7 @@ import { type Children } from "@/common/types/reactTypes";
 import { type Metadata, type Viewport } from "next";
 import { Montserrat, Roboto } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
-import { GoogleAnalytics } from "@next/third-parties/google";
+import Script from "next/script";
 import { GOOGLE_ANALYTICS_ID } from "@/common/constants/environmentVariables";
 
 const roboto = Roboto({
@@ -11,6 +11,7 @@ const roboto = Roboto({
   weight: ["400", "500", "700"],
   display: "swap",
   variable: "--font-roboto",
+  adjustFontFallback: true,
 });
 
 const montserrat = Montserrat({
@@ -18,6 +19,7 @@ const montserrat = Montserrat({
   weight: ["400", "500", "600", "700"],
   variable: "--font-montserrat",
   display: "swap",
+  adjustFontFallback: true,
 });
 
 export const viewport: Viewport = {
@@ -68,6 +70,8 @@ export default function RootLayout({ children }: { children: Children }) {
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://d22rebqllszdz8.cloudfront.net" />
         <link rel="dns-prefetch" href="https://d3lno5tuwkddps.cloudfront.net" />
+        {/* Critical resource hints */}
+        <meta name="theme-color" content="#b76e79" />
       </head>
       <body className="relative font-sans antialiased">
         <NextTopLoader
@@ -82,7 +86,19 @@ export default function RootLayout({ children }: { children: Children }) {
           shadow="0 0 10px #b76e79,0 0 5px #b76e79"
         />
         {children}
-        <GoogleAnalytics gaId={GOOGLE_ANALYTICS_ID} />
+        {/* GA deferred — page load block nahi karega */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_ID}`}
+          strategy="lazyOnload"
+        />
+        <Script id="google-analytics" strategy="lazyOnload">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GOOGLE_ANALYTICS_ID}', { send_page_view: false });
+          `}
+        </Script>
       </body>
     </html>
   );

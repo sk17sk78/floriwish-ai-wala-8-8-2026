@@ -64,11 +64,11 @@ function HeaderClient({
         className={`!z-50 pt-3 border-b border-ash-3/30 lg:pt-4.5 max-lg:sticky max-lg:top-0 bg-ivory-1 flex flex-col justify-start h-fit 1200:px-0`}
       >
         <WidthWrapper className={"max-lg:!px-1 z-30"}>
-          <div className="relative flex items-center justify-between pb-2.5 lg:pb-3 max-lg:px-2">
+          <div className="relative flex items-center justify-between pb-2.5 lg:pb-3 max-lg:px-2 gap-2">
             {/* Left side actions & Logo */}
-            <div className="flex items-center gap-3 lg:gap-4 xl:gap-8 z-10">
+            <div className="flex items-center gap-2.5 lg:gap-3 xl:gap-6 z-10 shrink-0">
               {/* Logo - Centered on tablet/mobile, default flow on desktop */}
-              <div className="lg:static absolute left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-auto">
+              <div className="lg:static absolute left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-auto shrink-0">
                 <HeaderLogo />
               </div>
 
@@ -89,7 +89,7 @@ function HeaderClient({
             <SearchDesktop searchResults={searchResults} />
 
             {/* Right-side actions */}
-            <div className="flex items-center justify-end gap-1.5 lg:gap-2 xl:gap-3.5 z-10">
+            <div className="flex items-center justify-end gap-1.5 lg:gap-2 xl:gap-3 z-10 shrink-0">
               {activeSidebar !== "menu" && (
                 <>
                   <SearchMobile searchResults={searchResults} />
@@ -97,8 +97,10 @@ function HeaderClient({
               )}
 
               {/* Desktop-only actions */}
-              <div className="hidden lg:flex items-center gap-2 xl:gap-3.5">
-                <HeaderSellWithUs />
+              <div className="hidden lg:flex items-center gap-1.5 xl:gap-3">
+                <div className="hidden xl:block">
+                  <HeaderSellWithUs />
+                </div>
                 <HeaderUserContent
                   isAuthenticated={isAuthenticated}
                   userName={userName}

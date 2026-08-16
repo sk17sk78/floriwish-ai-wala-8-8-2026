@@ -1,7 +1,9 @@
 // config
 import { RENDERING_STRATEGY } from "@/config/renderingStrategy";
 
-export const dynamic = "force-dynamic";
+// ISR: cache karo — SSR: har request pe fresh
+export const dynamic =
+  RENDERING_STRATEGY === "SSR" ? "force-dynamic" : undefined;
 
 // requests
 import { fetchContentCategoryPageData } from "@/request/categories/contentCategoryPageData";
@@ -104,10 +106,16 @@ export default async function page() {
   const categorySlug = "flower";
 
   // Check if flower category is explicitly deactivated in the database
-  await connectDB();
-  const dbCategory = await models.ContentCategories.findOne({ slug: categorySlug }).select("isActive");
-  if (dbCategory && dbCategory.isActive === false) {
-    return notFound();
+  // try-catch: build time pe SSL drop ho sakta hai, crash nahi hona chahiye
+  try {
+    await connectDB();
+    const dbCategory = await models.ContentCategories.findOne({ slug: categorySlug }).select("isActive");
+    if (dbCategory && dbCategory.isActive === false) {
+      return notFound();
+    }
+  } catch (err) {
+    // DB connection failed at build time — continue with data fetch
+    console.warn("[flower] DB isActive check failed, continuing:", err);
   }
 
   let contentCategory = await fetchContentCategory(categorySlug);

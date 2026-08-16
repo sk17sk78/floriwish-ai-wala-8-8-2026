@@ -37,7 +37,7 @@ export async function generateStaticParams() {
 
       const blogArticleSlugs = blogArticles
         .slice(0, QUICK_BUILD ? 1 : blogArticles.length)
-        .map(({ slug }) => slug);
+        .map(({ slug }) => ({ slug }));
 
       return blogArticleSlugs;
     } catch (error) {

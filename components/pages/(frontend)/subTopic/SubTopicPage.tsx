@@ -176,15 +176,9 @@ function SubTopicPage({
         ratingCount={subTopic._page?.ratingCount || 0}
         extraPadding={subTopic.media && subTopic.media.banner ? true : false}
       />
-      <CategoryTopContentSection topContent={subTopic?.info?.topContent} />
       <CategoryRelatedCategorySection
         relatedCategories={subTopic.relatedCategories}
       />
-      {/* <CategoryContentCountSort
-        count={subTopic._page?.contentCount}
-        sortBy={sortBy}
-        onChangeSortBy={handleChangeSortBy}
-      /> */}
       <div
         className={`bg-transparent mt-6 p-0 sm:p-3 overflow-hidden`}
       >
@@ -192,6 +186,7 @@ function SubTopicPage({
           quickLinks={subTopic.media?.quickLinks}
           scrollable={subTopic.media?.scrollableQuickLinks}
         />
+        <CategoryTopContentSection topContent={subTopic?.info?.topContent} />
         <SubTopicContents
           categorySlug={categorySlug}
           topicSlug={topicSlug}

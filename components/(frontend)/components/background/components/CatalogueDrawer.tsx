@@ -11,20 +11,22 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 function CatalogueDrawer({
   showDrawer,
   onOpenChange,
+  className
 }: {
   showDrawer: boolean;
   onOpenChange: (open: boolean) => void;
+  className?: string;
 }) {
   return (
     <>
-      {/* 1. Removed the showDrawer ? "hidden" : "" logic.
-        2. Added cursor-pointer so it feels like a button. 
-      */}
       <div
         onClick={() => onOpenChange(true)}
-        className="flex flex-col items-center justify-center gap-0.5 cursor-pointer"
+        className={
+          className ||
+          "flex flex-col items-center justify-center gap-0.5 cursor-pointer"
+        }
       >
-        <Shapes width={18} strokeWidth={1.5} height={18} />
+        <Shapes width={19} strokeWidth={showDrawer ? 2 : 1.5} height={19} />
         <span>Categories</span>
       </div>
 

@@ -116,9 +116,9 @@ function ContentDetailReferenceVariant({
           src={url}
           width={120}
           height={120}
-          quality={50}
+          quality={100}
           draggable={false}
-          className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+          className="h-full w-full object-cover"
         />
       </div>
 

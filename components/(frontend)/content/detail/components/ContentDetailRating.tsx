@@ -1,5 +1,6 @@
 // icons
 import { ArrowRight, Star, StarHalf, Zap } from "lucide-react";
+import Link from "next/link";
 
 // utils
 import { normalizeRating } from "@/common/helpers/normalizeRating";
@@ -16,11 +17,13 @@ export default function ContentDetailRating({
   showSameDay,
   showViewSimilar,
   onClickViewSimilar,
+  categoryUrl,
 }: {
   rating: ContentRatingDocument;
   showSameDay?: boolean;
   showViewSimilar?: boolean;
   onClickViewSimilar?: () => void;
+  categoryUrl?: string;
 }) {
   return (
     <ContentHorizontalSpacing>
@@ -69,15 +72,25 @@ export default function ContentDetailRating({
             <span>Same Day</span>
           </div>
         ) : null}
-        {showViewSimilar && onClickViewSimilar ? (
-          <button
-            type="button"
-            onClick={onClickViewSimilar}
-            className="inline-flex items-center gap-1 rounded-md border border-[#ebebeb] bg-[#f8f8f8] px-2.5 py-0.5 text-charcoal-3/65 transition-all duration-300 hover:border-[#ddd] hover:text-charcoal-3"
-          >
-            <span>More like this</span>
-            <ArrowRight width={14} />
-          </button>
+        {showViewSimilar && (onClickViewSimilar || categoryUrl) ? (
+          onClickViewSimilar ? (
+            <button
+              type="button"
+              onClick={onClickViewSimilar}
+              className="inline-flex items-center gap-1 rounded-md border border-zinc-300/80 bg-zinc-100 hover:bg-zinc-200 px-2.5 py-0.5 text-zinc-900 font-semibold transition-all duration-300 hover:border-zinc-400 hover:text-black shadow-2xs cursor-pointer"
+            >
+              <span>More like this</span>
+              <ArrowRight width={14} className="stroke-[2.5]" />
+            </button>
+          ) : (
+            <Link
+              href={categoryUrl || "/"}
+              className="inline-flex items-center gap-1 rounded-md border border-zinc-300/80 bg-zinc-100 hover:bg-zinc-200 px-2.5 py-0.5 text-zinc-900 font-semibold transition-all duration-300 hover:border-zinc-400 hover:text-black shadow-2xs cursor-pointer"
+            >
+              <span>More like this</span>
+              <ArrowRight width={14} className="stroke-[2.5]" />
+            </Link>
+          )
         ) : null}
       </div>
     </ContentHorizontalSpacing>

@@ -34,8 +34,9 @@ const DialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
     hideDefaultTitle?: boolean;
     hideDefaultDescription?: boolean;
+    hideDefaultClose?: boolean;
   }
->(({ className, children, hideDefaultTitle, hideDefaultDescription, ...props }, ref) => {
+>(({ className, children, hideDefaultTitle, hideDefaultDescription, hideDefaultClose, ...props }, ref) => {
   // Check if children already contain DialogTitle or DialogDescription
   const childrenArray = React.Children.toArray(children);
   const hasTitle = childrenArray.some(
@@ -63,10 +64,12 @@ const DialogContent = React.forwardRef<
           <DialogPrimitive.Description className="sr-only" />
         )}
         {children}
-        <DialogPrimitive.Close className="absolute right-4 sm:right-2 top-4 sm:top-2 z-[99999] w-fit rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none outline-none disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-          <Cross2Icon className="h-5 sm:h-4 w-5 sm:w-4" />
-          <span className="sr-only">Close</span>
-        </DialogPrimitive.Close>
+        {!hideDefaultClose && (
+          <DialogPrimitive.Close className="absolute right-4 sm:right-2 top-4 sm:top-2 z-[99999] w-fit rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none outline-none disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+            <Cross2Icon className="h-5 sm:h-4 w-5 sm:w-4" />
+            <span className="sr-only">Close</span>
+          </DialogPrimitive.Close>
+        )}
       </DialogPrimitive.Content>
     </DialogPortal>
   );

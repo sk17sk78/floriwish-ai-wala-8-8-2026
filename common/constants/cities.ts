@@ -1,3 +1,23 @@
+export const TIER_ONE_CITIES = [
+  "Delhi",
+  "Mumbai",
+  "Bangalore",
+  "Hyderabad",
+  "Chennai",
+  "Kolkata",
+  "Ahmedabad",
+  "Pune",
+  "Gurgaon",
+  "Noida",
+  "Ghaziabad",
+  "Faridabad",
+  "Navi Mumbai",
+  "Thane",
+  "Jaipur",
+  "Chandigarh",
+  "Lucknow",
+];
+
 export const POPULAR_CITIES = [
   "Agra",
   "Ahmedabad",

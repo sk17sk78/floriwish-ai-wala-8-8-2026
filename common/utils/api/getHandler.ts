@@ -1,11 +1,4 @@
 import { NextRequest } from "next/server";
-import { revalidateTag, revalidatePath } from "next/cache";
-
-// constants
-import {
-  ALL_CACHE_KEY,
-  HOMEPAGE_CACHE_KEY
-} from "@/common/constants/cacheKeys";
 
 // utils
 import { extractSearchParams } from "@/common/utils/api/searchParam";
@@ -13,7 +6,6 @@ import getController from "@/common/utils/api/getController";
 import { getRequestBody } from "@/common/utils/api/request";
 import { Response } from "@/common/utils/api/next";
 import { serverErrorResponse } from "@/common/utils/api/error";
-import { del, flush } from "@/db/redis/methods";
 
 // types
 import {
@@ -141,16 +133,8 @@ const getHandler = <
             args?.attempt
           );
 
-          revalidateTag("cache");
-          revalidateTag(ALL_CACHE_KEY);
-          revalidateTag(HOMEPAGE_CACHE_KEY);
-
-          revalidatePath("/");
-          revalidatePath("/", "layout");
-
-          await del({ keys: [ALL_CACHE_KEY, HOMEPAGE_CACHE_KEY] });
-          await flush();
-
+          // Note: Cache is NOT cleared automatically on save.
+          // Cache is only refreshed when the admin clicks the page Refresh icon or Full Reset button.
           return Response<DocumentT | (DocumentT | null)[]>(response);
         } catch (error: any) {
           return Response<null>(serverErrorResponse);
@@ -177,16 +161,8 @@ const getHandler = <
             args?.attempt
           );
 
-          revalidateTag("cache");
-          revalidateTag(ALL_CACHE_KEY);
-          revalidateTag(HOMEPAGE_CACHE_KEY);
-
-          revalidatePath("/");
-          revalidatePath("/", "layout");
-
-          await del({ keys: [ALL_CACHE_KEY, HOMEPAGE_CACHE_KEY] });
-          await flush();
-
+          // Note: Cache is NOT cleared automatically on save.
+          // Cache is only refreshed when the admin clicks the page Refresh icon or Full Reset button.
           return Response<DocumentT>(response);
         } catch (error: any) {
           return Response<null>(serverErrorResponse);
@@ -207,16 +183,7 @@ const getHandler = <
             args?.attempt
           );
 
-          revalidateTag("cache");
-          revalidateTag(ALL_CACHE_KEY);
-          revalidateTag(HOMEPAGE_CACHE_KEY);
-
-          revalidatePath("/");
-          revalidatePath("/", "layout");
-
-          await del({ keys: [ALL_CACHE_KEY, HOMEPAGE_CACHE_KEY] });
-          await flush();
-
+          // Note: Cache is NOT cleared automatically on save.
           return Response<boolean>(response);
         } catch (error: any) {
           return Response<null>(serverErrorResponse);
@@ -232,16 +199,7 @@ const getHandler = <
 
           const response = await swapDocumentsOrder(searchParams);
 
-          revalidateTag("cache");
-          revalidateTag(ALL_CACHE_KEY);
-          revalidateTag(HOMEPAGE_CACHE_KEY);
-
-          revalidatePath("/");
-          revalidatePath("/", "layout");
-
-          await del({ keys: [ALL_CACHE_KEY, HOMEPAGE_CACHE_KEY] });
-          await flush();
-
+          // Note: Cache is NOT cleared automatically on save.
           return Response<DocumentT[] | null>(response);
         } catch (error: any) {
           return Response<null>(serverErrorResponse);
@@ -264,16 +222,7 @@ const getHandler = <
             args?.attempt
           );
 
-          revalidateTag("cache");
-          revalidateTag(ALL_CACHE_KEY);
-          revalidateTag(HOMEPAGE_CACHE_KEY);
-
-          revalidatePath("/");
-          revalidatePath("/", "layout");
-
-          await del({ keys: [ALL_CACHE_KEY, HOMEPAGE_CACHE_KEY] });
-          await flush();
-
+          // Note: Cache is NOT cleared automatically on save.
           return Response<DocumentT>(response);
         } catch (error: any) {
           return Response<null>(serverErrorResponse);
@@ -291,16 +240,7 @@ const getHandler = <
             args?.attempt
           );
 
-          revalidateTag("cache");
-          revalidateTag(ALL_CACHE_KEY);
-          revalidateTag(HOMEPAGE_CACHE_KEY);
-
-          revalidatePath("/");
-          revalidatePath("/", "layout");
-
-          await del({ keys: [ALL_CACHE_KEY, HOMEPAGE_CACHE_KEY] });
-          await flush();
-
+          // Note: Cache is NOT cleared automatically on save.
           return Response<boolean>(response);
         } catch (error: any) {
           return Response<null>(serverErrorResponse);

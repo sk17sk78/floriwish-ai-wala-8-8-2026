@@ -1,4 +1,8 @@
-import RichTextEditor from "@/lib/Forms/RichTextEditor/temp/RichTextEditor";
+import dynamic from "next/dynamic";
+const RichTextEditor = dynamic(
+  () => import("@/lib/Forms/RichTextEditor/temp/RichTextEditor"),
+  { ssr: false }
+);
 
 export default function AdminBlogText({
   text,

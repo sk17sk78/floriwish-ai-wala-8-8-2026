@@ -27,7 +27,7 @@ export const GET = async (
     await connectRedis();
     let cachedData = await redisClient.get("trending");
 
-    if (!cachedData && cachedData == null) {
+    if (!cachedData) {
       const documents = await getTrendingSearchKeywords();
 
       if (!documents) {

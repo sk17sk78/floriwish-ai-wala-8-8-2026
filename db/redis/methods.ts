@@ -1,9 +1,12 @@
 import { connectRedis } from "./connection";
 
+// Default TTL: 10 minutes. Prevents stale data from living forever.
+const DEFAULT_TTL = 600;
+
 export const set = async <T>({
   key,
   value,
-  ttl
+  ttl = DEFAULT_TTL
 }: {
   key: string;
   value: T;
@@ -11,23 +14,11 @@ export const set = async <T>({
 }): Promise<boolean> => {
   try {
     const redisClient = await connectRedis();
-
     const stringifiedValue = JSON.stringify(value);
-    console.log(`[REDIS SET] Key: ${key}, Size: ${stringifiedValue.length} bytes, TTL: ${ttl || 'none'}`);
-
-    let response: string | null;
-    if (ttl) {
-      response = await redisClient.set(key, stringifiedValue, { EX: ttl });
-    } else {
-      response = await redisClient.set(key, stringifiedValue);
-    }
-
-    const success = response === "OK";
-    console.log(`[REDIS SET ${success ? 'SUCCESS' : 'FAILED'}] ${key}`);
-    
-    return success;
+    const response = await redisClient.set(key, stringifiedValue, { EX: ttl });
+    return response === "OK";
   } catch (error: any) {
-    console.warn("Redis set operation failed:", error?.message || error);
+    console.warn("Redis set failed:", error?.message || error);
     return false;
   }
 };
@@ -35,20 +26,11 @@ export const set = async <T>({
 export const get = async <T>({ key }: { key: string }): Promise<T | null> => {
   try {
     const redisClient = await connectRedis();
-
     const value = await redisClient.get(key);
-
-    if (!value) {
-      console.log(`[REDIS GET] Key not found: ${key}`);
-      return null;
-    }
-
-    const parsedValue = JSON.parse(value) as T;
-    console.log(`[REDIS GET] Key found: ${key} (${value.length} bytes)`);
-
-    return parsedValue;
+    if (!value) return null;
+    return JSON.parse(value) as T;
   } catch (error: any) {
-    console.warn("Redis get operation failed:", error?.message || error);
+    console.warn("Redis get failed:", error?.message || error);
     return null;
   }
 };

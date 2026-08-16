@@ -1,12 +1,14 @@
+"use client";
+
 // utils
-import { lazy, memo, Suspense } from "react";
+import { memo } from "react";
 
 // providers
 import { LocationProvider } from "@/hooks/useLocation/useLocation";
 
 // components
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
-const LazyCityPopup = lazy(() => import("./CityPopup"));
+import CityPopup from "./CityPopup";
 
 function CityDrawer({
   showDrawer,
@@ -19,13 +21,11 @@ function CityDrawer({
     <Drawer open={showDrawer} onOpenChange={onToggleShowDrawer}>
       <DrawerContent className="border-none outline-none p-0 rounded-t-3xl h-[85dvh] bg-ivory-1 z-[996]">
         <LocationProvider>
-          <Suspense fallback={<></>}>
-            <LazyCityPopup
-              closeDialog={() => {
-                onToggleShowDrawer(false);
-              }}
-            />
-          </Suspense>
+          <CityPopup
+            closeDialog={() => {
+              onToggleShowDrawer(false);
+            }}
+          />
         </LocationProvider>
       </DrawerContent>
     </Drawer>

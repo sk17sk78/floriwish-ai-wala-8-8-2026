@@ -6,4 +6,6 @@ export type BlogCard = {
   path: string;
   coverImage: ImageDocument;
   authorName: string;
+  authorPhoto?: string;
+  createdAt?: string;
 };

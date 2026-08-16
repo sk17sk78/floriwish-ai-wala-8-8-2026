@@ -310,12 +310,20 @@ export const filterRelevantCoupons = ({
   const store = new Set<string>();
   applicableCategories.forEach((id) => store.add(id));
 
-  const applicableCoupons = allCoupons.filter(({ applicableCategories }) => {
-    for (let i = 0; i < applicableCategories.length; i += 1)
-      if (store.has(applicableCategories[i] as string)) return true;
+  const applicableCoupons = allCoupons.filter(
+    ({ applicableCategories, isPublic, maxTotalUses, usedCount = 0 }) => {
+      // 1. Hide private coupons (for direct/single customer use) from public website coupon list
+      if (isPublic === false) return false;
 
-    return applicableCategories.length === 0 ? true : false;
-  });
+      // 2. Hide coupons that reached total usage limit and auto-expired
+      if (maxTotalUses && maxTotalUses > 0 && usedCount >= maxTotalUses) return false;
+
+      for (let i = 0; i < applicableCategories.length; i += 1)
+        if (store.has(applicableCategories[i] as string)) return true;
+
+      return applicableCategories.length === 0 ? true : false;
+    },
+  );
 
   return applicableCoupons;
 };

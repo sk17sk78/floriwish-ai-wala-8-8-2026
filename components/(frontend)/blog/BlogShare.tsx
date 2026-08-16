@@ -14,11 +14,18 @@ import {
 } from "@/components/ui/popover";
 
 export default function BlogShare({ url }: { url: string }) {
+  const [mounted, setMounted] = useState(false);
   const [isCopied, setIsCopied] = useState<boolean>(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleClipboardCopy = () => {
     try {
-      navigator.clipboard.writeText(url);
+      if (typeof window !== "undefined" && navigator.clipboard) {
+        navigator.clipboard.writeText(url);
+      }
     } finally {
       setIsCopied(true);
     }
@@ -33,6 +40,21 @@ export default function BlogShare({ url }: { url: string }) {
       return () => clearTimeout(timeout);
     }
   }, [isCopied]);
+
+  if (!mounted) {
+    return (
+      <button
+        title="Share"
+        className="p-4 cursor-pointer flex items-center justify-center gap-x-2"
+      >
+        <Share2
+          strokeWidth={1.5}
+          width={25}
+          className="max-sm:scale-75 text-zinc-500"
+        />
+      </button>
+    );
+  }
 
   return (
     <Popover>

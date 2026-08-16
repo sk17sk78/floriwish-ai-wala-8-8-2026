@@ -1,16 +1,18 @@
 "use client";
+
+// icons
+import { ChevronDown, HelpCircle, MessageCircleQuestion, Sparkles } from "lucide-react";
+
+// types
 import { ClassNameType } from "@/common/types/reactTypes";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+
+// utils
+import { memo, useState } from "react";
 import { usePathname } from "next/navigation";
 
 export default function FAQs({
-  faqData,
-  title,
+  faqData = [],
+  title = "Frequently Asked Questions",
   questionClassName,
   answerClassName,
   inProductPage,
@@ -25,57 +27,113 @@ export default function FAQs({
   answerClassName?: ClassNameType;
   inProductPage?: boolean;
 }) {
-  const currPath = usePathname();
-  const isNPath = (currPath || "").includes("/n/");
+  const [openIndex, setOpenIndex] = useState<number | null>(0); // First open by default
+
+  const toggleFAQ = (index: number) => {
+    setOpenIndex((prev) => (prev === index ? null : index));
+  };
+
+  if (!faqData || faqData.length === 0) return null;
 
   return (
-    <div className="w-full mx-auto">
-      {/* 3. Render the title conditionally */}
+    <div className="w-full max-w-6xl mx-auto py-2 sm:py-4">
+      {/* Header Row: Clean Editorial Title */}
       {title && (
-        <h2 className="text-2xl md:text-2xl font-semibold text-charcoal-3 mb-6 text-start font-poppins">
-          {title}
-        </h2>
+        <div className="flex flex-col mb-3 sm:mb-4">
+          <span className="text-[10px] sm:text-[11px] font-bold text-[#ad2355] tracking-widest uppercase block">
+            Common Questions
+          </span>
+          <h2 className="text-base sm:text-lg md:text-xl font-bold text-zinc-900 tracking-tight mt-0.5">
+            {title}
+          </h2>
+          <p className="text-[11px] sm:text-xs text-zinc-500 font-normal mt-0.5">
+            Everything you need to know about our products, bookings, and same-day delivery.
+          </p>
+        </div>
       )}
-      <Accordion type="single" collapsible className="space-y-3 md:space-y-4">
+
+      {/* Human-Crafted Compact Accordion List */}
+      <div className="flex flex-col gap-2 sm:gap-2.5 w-full">
         {faqData.map(({ question, answer }, index) => {
-          // Extracts the logic to keep the JSX clean
+          const isOpen = openIndex === index;
           const cleanQuestion = question.includes(".")
             ? question.substring(question.indexOf(".") + 1).trim()
             : question;
 
-          return (
-            <AccordionItem
-              value={String(index)}
-              key={index}
-              // Card styling instead of standard flat borders
-              className="border border-gray-100/80 rounded-2xl bg-white shadow-sm hover:shadow-md hover:border-gray-200 transition-all duration-300 px-4 md:px-6 data-[state=open]:border-[#b76e79]/30 data-[state=open]:bg-rose-50/10"
-            >
-              <AccordionTrigger
-                className={`
-                  ${isNPath ? "text-sm text-charcoal-3" : "text-base md:text-lg text-charcoal-3"} 
-                  py-4 md:py-5 outline-none focus:outline-none font-medium text-left 
-                  hover:no-underline hover:text-sienna transition-colors duration-200 
-                  font-poppins group ${questionClassName || ""}
-                `}
-              >
-                <h3 className="pr-4 leading-relaxed tracking-tight">
-                  {cleanQuestion}
-                </h3>
-              </AccordionTrigger>
+          const qNum = index + 1 < 10 ? `0${index + 1}` : `${index + 1}`;
 
-              <AccordionContent
-                className={`
-                  ${answerClassName || ""} 
-                  ${isNPath ? "text-xs" : "text-sm md:text-base"} 
-                  text-charcoal-3/70 pb-5 pt-1 leading-relaxed font-poppins
-                `}
+          return (
+            <div
+              key={index}
+              className={`rounded-xl sm:rounded-2xl transition-all duration-200 border overflow-hidden ${
+                isOpen
+                  ? "bg-[#fafafc] border-[#ad2355]/30 shadow-xs ring-1 ring-[#ad2355]/10"
+                  : "bg-white border-zinc-100 hover:border-zinc-200 shadow-2xs hover:shadow-xs"
+              }`}
+            >
+              {/* Question Trigger Row */}
+              <button
+                type="button"
+                onClick={() => toggleFAQ(index)}
+                className="w-full px-3.5 py-3 sm:px-4 sm:py-3.5 flex items-center justify-between gap-3 text-left cursor-pointer group select-none transition-colors"
+                aria-expanded={isOpen}
               >
-                {answer}
-              </AccordionContent>
-            </AccordionItem>
+                <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+                  {/* Small Q-Number Badge */}
+                  <span
+                    className={`w-5 h-5 sm:w-6 sm:h-6 rounded-lg text-[10px] sm:text-[11px] font-bold flex items-center justify-center shrink-0 transition-colors ${
+                      isOpen
+                        ? "bg-[#ad2355] text-white"
+                        : "bg-zinc-100 text-zinc-500 group-hover:bg-zinc-200 group-hover:text-zinc-800"
+                    }`}
+                  >
+                    {qNum}
+                  </span>
+
+                  {/* Question Text */}
+                  <span
+                    className={`text-xs sm:text-[13.5px] font-semibold leading-snug transition-colors line-clamp-2 ${
+                      isOpen
+                        ? "text-[#ad2355]"
+                        : "text-zinc-800 group-hover:text-zinc-950"
+                    } ${questionClassName || ""}`}
+                  >
+                    {cleanQuestion}
+                  </span>
+                </div>
+
+                {/* Rotating Chevron Icon Button */}
+                <div
+                  className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-200 ${
+                    isOpen
+                      ? "bg-[#ad2355]/10 text-[#ad2355] rotate-180"
+                      : "bg-zinc-100 text-zinc-400 group-hover:text-zinc-700 group-hover:bg-zinc-200/80"
+                  }`}
+                >
+                  <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
+                </div>
+              </button>
+
+              {/* Answer Content Animated */}
+              {isOpen && (
+                <div className="px-3.5 sm:px-4 pb-3 sm:pb-3.5 pt-0.5 text-left border-t border-zinc-100/60 animate-in fade-in slide-in-from-top-1 duration-200">
+                  <div
+                    className={`text-[11.5px] sm:text-xs text-zinc-600 leading-relaxed font-normal pl-7 sm:pl-9 ${
+                      answerClassName || ""
+                    }`}
+                  >
+                    {typeof answer === "string" ? (
+                      <p>{answer}</p>
+                    ) : (
+                      answer
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           );
         })}
-      </Accordion>
+      </div>
     </div>
   );
 }

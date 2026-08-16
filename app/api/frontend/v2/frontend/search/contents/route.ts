@@ -1,7 +1,7 @@
 // next config
 export const dynamic = "force-dynamic";
 
-import { connectRedis, redisClient } from "@/db/redis/redis-client";
+import { get as getFromRedis, set as setToRedis } from "@/db/redis/methods";
 import { NextRequest } from "next/server";
 import { serverErrorResponse } from "@/common/utils/api/error";
 import { Response } from "@/common/utils/api/next";
@@ -9,16 +9,14 @@ import { successData } from "@/common/utils/api/data";
 import { APIResponseType } from "@/common/types/apiTypes";
 import { getContents } from "./controller";
 
-const REDIS_KEY_CONTENTS = "search-contents";
-
-const isEmpty = (str: string | null) => (str && str.length > 0 ? false : true);
+// In-memory L1 cache
+const inMemorySearchContentsCache = new Map<string, { data: any[]; timestamp: number }>();
+const L1_TTL_MS = 60 * 1000; // 60 seconds
 
 export const GET = async (
   req: NextRequest
 ): Promise<APIResponseType<any>> => {
   try {
-    await connectRedis();
-
     const cityIdParam = req.nextUrl.searchParams.get("cityId");
     const key = req.nextUrl.searchParams.get("key");
     const limitParam = req.nextUrl.searchParams.get("limit");
@@ -29,47 +27,41 @@ export const GET = async (
         ? "base"
         : cityIdParam;
 
-    const redisKey = key
-      ? `${REDIS_KEY_CONTENTS}-${cityId}-${key.trim().toLowerCase().replace(/\s+/g, "_")}-${limit}`
-      : `${REDIS_KEY_CONTENTS}-${cityId}-${limit}`;
+    const cacheKey = key
+      ? `search_contents_${cityId}_${key.trim().toLowerCase().replace(/\s+/g, "_")}_${limit}`
+      : `search_contents_${cityId}_all_${limit}`;
 
-    let cachedContents = await redisClient.get(redisKey);
-    let contents: any[] = [];
-    let isCachedValid = false;
-
-    if (cachedContents && cachedContents !== "[]" && cachedContents !== "null") {
-      try {
-        const parsed = JSON.parse(cachedContents);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          contents = parsed;
-          isCachedValid = true;
-        }
-      } catch {
-        isCachedValid = false;
-      }
+    const now = Date.now();
+    const l1 = inMemorySearchContentsCache.get(cacheKey);
+    if (l1 && (now - l1.timestamp) < L1_TTL_MS) {
+      return Response(successData(l1.data));
     }
 
-    if (!isCachedValid) {
-      let contentsFromDb = await getContents({
-        cityId: cityId === "base" ? null : cityId,
-        key: key,
-        limit: limit
-      });
+    const cachedContents = await getFromRedis<any[]>({ key: cacheKey });
 
-      if (!contentsFromDb) contentsFromDb = [];
-      else if (contentsFromDb.length > 0) {
-        await redisClient.set(
-          redisKey,
-          JSON.stringify(contentsFromDb),
-          { EX: 1800 } // Cache non-empty for 30 mins
-        );
-      }
-
-      contents = contentsFromDb;
+    if (cachedContents && Array.isArray(cachedContents)) {
+      inMemorySearchContentsCache.set(cacheKey, { data: cachedContents, timestamp: now });
+      return Response(successData(cachedContents));
     }
+
+    const contentsFromDb = await getContents({
+      cityId: cityId === "base" ? null : cityId,
+      key: key,
+      limit: limit
+    });
+
+    const contents = contentsFromDb || [];
+
+    inMemorySearchContentsCache.set(cacheKey, { data: contents, timestamp: now });
+
+    await setToRedis({
+      key: cacheKey,
+      value: contents
+    });
 
     return Response(successData(contents));
   } catch (error: any) {
     return Response<null>(serverErrorResponse);
   }
 };
+

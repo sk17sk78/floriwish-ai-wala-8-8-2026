@@ -42,7 +42,7 @@ export function Banners(config: BannerCarouselType) {
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 640);
     checkMobile();
-    window.addEventListener("resize", checkMobile);
+    window.addEventListener("resize", checkMobile, { passive: true });
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
@@ -85,9 +85,9 @@ export function Banners(config: BannerCarouselType) {
       onMouseLeave={plugin.current.reset}
       setApi={setCountManager}
     >
-      <CarouselContent className="z-10">
+      <CarouselContent className="z-10 ml-0 -ml-0">
         {filteredElements.map((el, index) => (
-          <CarouselItem className={`overflow-hidden ${dimensions}`} key={index}>
+          <CarouselItem className={`overflow-hidden pl-0 rounded-2xl sm:rounded-3xl ${dimensions}`} key={index}>
             <Banner props={el} isPriority={config.priority && index === 0} />
           </CarouselItem>
         ))}

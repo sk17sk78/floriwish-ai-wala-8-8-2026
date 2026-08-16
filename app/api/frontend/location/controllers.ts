@@ -12,9 +12,18 @@ import { handleError } from "@/common/utils/api/error";
 import { type CityDocument } from "@/common/types/documentation/presets/city";
 import { type MongooseErrorType } from "@/common/types/apiTypes";
 
+// In-memory L1 cache
+let inMemoryLocationCache: { data: CityDocument[]; timestamp: number } | null = null;
+const L1_TTL_MS = 120 * 1000; // 120 seconds
+
 // controllers
 export const getCities = async (): Promise<CityDocument[] | null> => {
   try {
+    const now = Date.now();
+    if (inMemoryLocationCache && (now - inMemoryLocationCache.timestamp) < L1_TTL_MS) {
+      return inMemoryLocationCache.data;
+    }
+
     await connectDB();
 
     const documents = await Cities.find({
@@ -26,9 +35,9 @@ export const getCities = async (): Promise<CityDocument[] | null> => {
       .lean()
       .exec();
 
-    // Return empty array if no documents found (query succeeded but no results)
-    // Return null only on error
-    return (documents || []) as unknown as CityDocument[];
+    const result = (documents || []) as unknown as CityDocument[];
+    inMemoryLocationCache = { data: result, timestamp: now };
+    return result;
   } catch (error: any) {
     return null;
   }
