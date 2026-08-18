@@ -31,8 +31,13 @@ export const pushNotificationLogSchema = new Schema<
     },
     targetType: {
       type: String,
-      enum: ["all", "user", "guest"],
+      enum: ["all", "loggedin", "guest", "mobile", "desktop", "tablet", "user"],
       default: "all"
+    },
+    targetLabel: {
+      type: String,
+      required: false,
+      default: ""
     },
     targetUserId: {
       type: Schema.Types.ObjectId,
@@ -52,6 +57,23 @@ export const pushNotificationLogSchema = new Schema<
       type: Number,
       default: 0
     },
+    /** Number of tokens auto-deactivated due to expired/invalid registration */
+    invalidCount: {
+      type: Number,
+      default: 0
+    },
+    /** Overall campaign delivery status */
+    status: {
+      type: String,
+      enum: ["sent", "partial", "failed", "scheduled", "cancelled"],
+      default: "sent"
+    },
+    /** Timestamp when the notification was dispatched to FCM */
+    sentAt: {
+      type: Date,
+      required: false,
+      default: null
+    },
     sentBy: {
       type: Schema.Types.ObjectId,
       ref: "Admin",
@@ -65,3 +87,5 @@ export const pushNotificationLogSchema = new Schema<
 );
 
 pushNotificationLogSchema.index({ createdAt: -1 });
+pushNotificationLogSchema.index({ status: 1, createdAt: -1 });
+

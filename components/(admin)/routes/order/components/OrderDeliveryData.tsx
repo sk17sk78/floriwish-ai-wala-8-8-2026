@@ -31,9 +31,28 @@ export default function OrderDeliveryData({
   const { documents: occasions } = useSelector(selectOccasion.documentList);
   const { documents: venues } = useSelector(selectVenue.documentList);
 
-  // variables
-  const occasion = occasions.find(({ _id }) => String(_id) === String(checkout?.occasion));
-  const venue = venues.find(({ _id }) => String(_id) === String(checkout?.venue));
+  const defaultAddress =
+    customer?.addresses?.find((addr) => addr.isDefault) ||
+    customer?.addresses?.[0];
+
+  const customerName =
+    checkout?.name || customer?.name || (customer as any)?.createdBy || "N/A";
+  const customerMobile =
+    checkout?.contact?.mobileNumber || customer?.mobileNumber || "N/A";
+  const customerEmail =
+    checkout?.contact?.mail || customer?.mail || "N/A";
+
+  const addressText =
+    checkout?.location?.address || defaultAddress?.address || "No address provided";
+  const landmarkText =
+    checkout?.location?.landmark || defaultAddress?.landmark || "";
+
+  const occasion = occasions.find(
+    ({ _id }) => String(_id) === String(checkout?.occasion)
+  );
+  const venue = venues.find(
+    ({ _id }) => String(_id) === String(checkout?.venue)
+  );
 
   return (
     <section className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-4 rounded-xl border border-zinc-100">
@@ -46,15 +65,17 @@ export default function OrderDeliveryData({
         <div className="space-y-2">
           <div className="flex items-center gap-3 text-sm">
             <span className="w-20 text-zinc-400">Name:</span>
-            <span className="font-medium text-zinc-800">{checkout?.name || "N/A"}</span>
+            <span className="font-medium text-zinc-800">{customerName}</span>
           </div>
           <div className="flex items-center gap-3 text-sm">
             <span className="w-20 text-zinc-400">Mobile:</span>
-            <span className="font-medium text-zinc-800">{checkout?.contact?.mobileNumber || "N/A"}</span>
+            <span className="font-medium text-zinc-800">{customerMobile}</span>
           </div>
           <div className="flex items-center gap-3 text-sm">
             <span className="w-20 text-zinc-400">Email:</span>
-            <span className="font-medium text-zinc-800 underline decoration-zinc-200 underline-offset-4">{checkout?.contact?.mail || "N/A"}</span>
+            <span className="font-medium text-zinc-800 underline decoration-zinc-200 underline-offset-4">
+              {customerEmail}
+            </span>
           </div>
           {occasion && (
             <div className="flex items-center gap-3 text-sm">
@@ -78,15 +99,21 @@ export default function OrderDeliveryData({
           <div className="space-y-2">
             <div className="flex items-center gap-3 text-sm">
               <span className="w-20 text-zinc-400">Name:</span>
-              <span className="font-bold text-red-600">{checkout?.receiverName || "N/A"}</span>
+              <span className="font-bold text-red-600">
+                {checkout?.receiverName || "N/A"}
+              </span>
             </div>
             <div className="flex items-center gap-3 text-sm">
               <span className="w-20 text-zinc-400">Mobile:</span>
-              <span className="font-bold text-red-600">{checkout?.receiverMobileNumber || "N/A"}</span>
+              <span className="font-bold text-red-600">
+                {checkout?.receiverMobileNumber || "N/A"}
+              </span>
             </div>
           </div>
         ) : (
-          <p className="text-xs text-zinc-400 italic">Order will be delivered to the customer themselves.</p>
+          <p className="text-xs text-zinc-400 italic">
+            Order will be delivered to the customer themselves.
+          </p>
         )}
 
         <div className="mt-6 pt-4 border-t border-zinc-50 space-y-3">
@@ -98,37 +125,24 @@ export default function OrderDeliveryData({
             <div className="flex items-start gap-2">
               <span className="px-2 py-0.5 bg-zinc-100 text-zinc-600 rounded text-xs font-medium">
                 {(() => {
-                  const cityValue = checkout?.location?.city || (checkout as any)?.city;
-                  if (!cityValue) {
-                    // Fallback: try to find city from customer addresses by matching pincode
-                    if (customer && customer.addresses && checkout?.location?.pincode) {
-                      const matchingAddress = customer.addresses.find(
-                        (addr) => addr.pincode === checkout.location.pincode
-                      );
-                      if (matchingAddress) {
-                        const cityDoc = cities.find(
-                          ({ _id, name }) =>
-                            String(_id) === String(matchingAddress.city) ||
-                            name === matchingAddress.city
-                        );
-                        if (cityDoc) return cityDoc.name;
-                        return matchingAddress.city;
-                      }
-                    }
-                    return "City N/A";
-                  }
+                  const cityValue =
+                    checkout?.location?.city ||
+                    (checkout as any)?.city ||
+                    defaultAddress?.city;
+                  if (!cityValue) return "City N/A";
 
                   const cityDoc = cities.find(
-                    ({ _id }) =>
+                    ({ _id, name }) =>
                       String(_id) === String(cityValue) ||
+                      name?.toLowerCase() === String(cityValue).toLowerCase() ||
                       (typeof cityValue === "object" &&
                         cityValue !== null &&
                         String(_id) === String((cityValue as any)._id))
                   );
 
-                  if (cityDoc) return cityDoc.name;
-
-                  if (typeof cityValue === "string") return cityValue;
+                  if (cityDoc && cityDoc.name) return cityDoc.name;
+                  if (typeof cityValue === "string" && cityValue.trim())
+                    return cityValue.trim();
                   if (typeof cityValue === "object" && cityValue !== null)
                     return (cityValue as any).name || "City N/A";
 
@@ -136,15 +150,15 @@ export default function OrderDeliveryData({
                 })()}
               </span>
               <span className="px-2 py-0.5 bg-zinc-100 text-zinc-600 rounded text-xs font-medium">
-                {checkout?.location?.pincode || "Pincode N/A"}
+                {checkout?.location?.pincode || defaultAddress?.pincode || "Pincode N/A"}
               </span>
             </div>
-            <p className="text-sm text-zinc-700 leading-relaxed bg-zinc-50 p-2.5 rounded-lg border border-zinc-100/50">
-              {checkout?.location?.address || "No address provided"}
+            <p className="text-sm text-zinc-700 leading-relaxed bg-zinc-50 p-2.5 rounded-lg border border-zinc-100/50 whitespace-pre-line">
+              {addressText}
             </p>
-            {checkout?.location?.landmark && (
+            {landmarkText && (
               <p className="text-xs text-zinc-500">
-                <span className="font-semibold">Landmark:</span> {checkout.location.landmark}
+                <span className="font-semibold">Landmark:</span> {landmarkText}
               </p>
             )}
           </div>
@@ -155,7 +169,9 @@ export default function OrderDeliveryData({
         <div className="md:col-span-2 pt-4 border-t border-zinc-100">
           <div className="flex items-center gap-2 text-sm text-zinc-600">
             <Asterisk size={14} className="text-zinc-400" />
-            <span className="font-semibold text-zinc-400 uppercase text-[10px] tracking-widest">Venue:</span>
+            <span className="font-semibold text-zinc-400 uppercase text-[10px] tracking-widest">
+              Venue:
+            </span>
             <span className="font-medium">{venue.name}</span>
           </div>
         </div>

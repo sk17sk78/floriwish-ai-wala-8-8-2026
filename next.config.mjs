@@ -192,6 +192,36 @@ const nextConfig = {
           },
         ],
       },
+      {
+        // Service Worker — MUST NOT be cached (or very short TTL)
+        // so new SW versions propagate immediately
+        source: "/firebase-messaging-sw.js",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=0, must-revalidate" },
+          { key: "Service-Worker-Allowed", value: "/" }
+        ]
+      },
+      {
+        // PWA Manifest — short cache so updates are picked up quickly
+        source: "/manifest.json",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=0, must-revalidate" },
+          { key: "Content-Type", value: "application/manifest+json" }
+        ]
+      },
+      {
+        // PWA Icons — cacheable long-term
+        source: "/icons/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" }
+        ]
+      },
+      {
+        source: "/apple-touch-icon.png",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" }
+        ]
+      }
     ];
   },
   sassOptions: {

@@ -418,28 +418,47 @@ export function CartProvider({ children }: { children: ReactNode }) {
         checkout
       } as CartDocument);
 
-      if (
-        isCloudReady &&
-        JSON.stringify(checkout) !== JSON.stringify(checkoutCloud)
-      ) {
-        if (!isLoading) {
-          setIsLoading(true);
-
-          updateCart(id, { checkout } as CartDocument)
-            .then(() => {
+      if (checkout) {
+        const activeId = id || profileCartId;
+        if (activeId) {
+          updateCart(activeId, {
+            items,
+            price,
+            checkout
+          } as CartDocument)
+            .then(({ data: updatedCart }) => {
+              if (updatedCart) {
+                setCheckoutCloud(checkout);
+                setIsCloudReady(true);
+              }
             })
             .catch((error) => {
-            })
-            .finally(() => {
-              setIsLoading(false);
+              console.error("[useCart] updateCart error:", error);
             });
-
-          setCheckoutCloud(checkout);
+        } else {
+          addCart({
+            customer: customerId || undefined,
+            items,
+            price,
+            checkout
+          } as CartDocument)
+            .then(({ data: newCart }) => {
+              if (newCart) {
+                const newId = String(newCart._id);
+                setId(newId);
+                onChangeCustomerCartId(newId);
+                setCheckoutCloud(checkout);
+                setIsCloudReady(true);
+              }
+            })
+            .catch((error) => {
+              console.error("[useCart] addCart error:", error);
+            });
         }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [checkout]);
+  }, [checkout, items, price, id, profileCartId, customerId]);
 
   // coupon
   useEffect(() => {
@@ -706,6 +725,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentPercentage]);
 
+  // Sync selectedCity from product page/header into checkout
+  useEffect(() => {
+    if (isReady && selectedCity?.name) {
+      setCheckout((prev) => {
+        if (prev?.location?.city === selectedCity.name) return prev;
+        return {
+          ...(prev || {}),
+          location: {
+            ...(prev?.location || {}),
+            city: selectedCity.name
+          }
+        } as CartCheckoutDocument;
+      });
+    }
+  }, [isReady, selectedCity?.name]);
+
   useEffect(() => {
     if (isReady && isProfileReady) {
       if (SHOW_LOGS) {
@@ -730,7 +765,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             } as CartCheckoutContactDocument,
             location: {
               address: defaultAddress.address,
-              city: defaultAddress.city,
+              city: selectedCity?.name || defaultAddress.city,
               pincode: defaultAddress.pincode
             } as CartCheckoutLocationDocument
           } as CartCheckoutDocument);
@@ -738,7 +773,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isReady, isProfileReady]);
+  }, [isReady, isProfileReady, selectedCity?.name]);
 
   // order
   useEffect(() => {

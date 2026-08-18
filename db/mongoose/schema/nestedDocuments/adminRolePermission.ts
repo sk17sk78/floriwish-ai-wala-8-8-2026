@@ -2,82 +2,60 @@
 import { Schema } from "mongoose";
 
 // schemas
-import { adminPermissionSchema } from "@/db/mongoose/schema/nestedDocuments/adminPermission";
-import { blogPermissionSchema } from "@/db/mongoose/schema/nestedDocuments/blogPermission";
-import { cachePermissionSchema } from "./cachePermission";
-import { categoryPermissionSchema } from "@/db/mongoose/schema/nestedDocuments/categoryPermission";
-import { contentPermissionSchema } from "./contentPermission";
-import { customerPermissionSchema } from "@/db/mongoose/schema/nestedDocuments/customerPermission";
-import { franchisePermissionSchema } from "@/db/mongoose/schema/nestedDocuments/franchisePermission";
-import { mediaPermissionSchema } from "@/db/mongoose/schema/nestedDocuments/mediaPermission";
-import { orderPermissionSchema } from "@/db/mongoose/schema/nestedDocuments/orderPermission";
-import { pagePermissionSchema } from "@/db/mongoose/schema/nestedDocuments/pagePermission";
-import { presetPermissionSchema } from "@/db/mongoose/schema/nestedDocuments/presetPermission";
-import { sellerPermissionSchema } from "@/db/mongoose/schema/nestedDocuments/sellerPermission";
-import { settingPermissionSchema } from "@/db/mongoose/schema/nestedDocuments/settingPermission";
-import { vendorPermissionSchema } from "@/db/mongoose/schema/nestedDocuments/vendorPermission";
+import { genericPermissionSchema } from "@/db/mongoose/schema/nestedDocuments/genericPermission";
 
 // types
 import { type AdminRolePermissionDocument } from "@/common/types/documentation/nestedDocuments/adminRolePermission";
 
-// schemas
 export const adminRolePermissionSchema =
   new Schema<AdminRolePermissionDocument>(
     {
-      preset: {
-        type: presetPermissionSchema,
+      configs: {
+        type: genericPermissionSchema,
         required: false
       },
       media: {
-        type: mediaPermissionSchema,
+        type: genericPermissionSchema,
+        required: false
+      },
+      product: {
+        type: genericPermissionSchema,
         required: false
       },
       category: {
-        type: categoryPermissionSchema,
+        type: genericPermissionSchema,
         required: false
       },
-      content: {
-        type: contentPermissionSchema,
-        required: false
-      },
-      page: {
-        type: pagePermissionSchema,
+      pages: {
+        type: genericPermissionSchema,
         required: false
       },
       order: {
-        type: orderPermissionSchema,
+        type: genericPermissionSchema,
         required: false
       },
       blog: {
-        type: blogPermissionSchema,
+        type: genericPermissionSchema,
         required: false
       },
-      admin: {
-        type: adminPermissionSchema,
+      mobilecatgories: {
+        type: genericPermissionSchema,
         required: false
       },
-      customer: {
-        type: customerPermissionSchema,
+      settings: {
+        type: genericPermissionSchema,
         required: false
       },
-      franchise: {
-        type: franchisePermissionSchema,
+      support: {
+        type: genericPermissionSchema,
         required: false
       },
-      seller: {
-        type: sellerPermissionSchema,
+      registrations: {
+        type: genericPermissionSchema,
         required: false
       },
-      vendor: {
-        type: vendorPermissionSchema,
-        required: false
-      },
-      setting: {
-        type: settingPermissionSchema,
-        required: false
-      },
-      cache: {
-        type: cachePermissionSchema,
+      notifications: {
+        type: genericPermissionSchema,
         required: false
       }
     },

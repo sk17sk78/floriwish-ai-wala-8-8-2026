@@ -176,10 +176,10 @@ export default function TableContent(
   return (
     <>
       <section
-        className={`${mode && mode === "frontend" ? "" : "relative max-h-[calc(100dvh_-_90px)]"} max-1200:px-3.5 sm:px-0 pb-24 w-full grid grid-cols-1 justify-start items-start h-full overflow-scroll scrollbar-hide`}
+        className={`${mode && mode === "frontend" ? "" : "relative max-h-[calc(100dvh_-_90px)]"} max-1200:px-2 sm:px-0 pb-24 w-full h-full overflow-y-auto overflow-x-auto scrollbar-hide`}
       >
         <div
-          className={`${mode && mode === "frontend" ? "" : "relative"} flex flex-col sm:w-full h-fit even:*:bg-transparent`}
+          className={`${mode && mode === "frontend" ? "" : "relative"} flex flex-col w-full min-w-[950px] 2xl:min-w-full h-fit even:*:bg-transparent`}
         >
           {/* header ------------------------- */}
           <div
@@ -286,8 +286,8 @@ function Tuple({
       title={typeof item.value.label === "string" ? item.value.label : undefined}
       className={
         index2 === 0
-          ? `text-[14px] min-w-0 overflow-hidden text-ellipsis whitespace-nowrap flex items-center ${item.value.align === "left" ? "justify-start" : item.value.align === "center" ? "justify-center" : item.value.align === "right" ? "justify-end" : "justify-start"}`
-          : `flex items-center min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[14px] ${item.value.align === "left" ? "justify-start" : item.value.align === "center" ? "justify-center" : item.value.align === "right" ? "justify-end" : "justify-center"}`
+          ? `text-[13px] min-w-0 flex items-center font-medium text-zinc-900 leading-tight line-clamp-2 break-words ${item.value.align === "left" ? "justify-start text-left" : item.value.align === "center" ? "justify-center text-center" : item.value.align === "right" ? "justify-end text-right" : "justify-start text-left"}`
+          : `flex items-center min-w-0 text-[13px] leading-tight ${item.value.align === "left" ? "justify-start text-left" : item.value.align === "center" ? "justify-center text-center" : item.value.align === "right" ? "justify-end text-right" : "justify-center text-center"}`
       }
     >
       {item.value.label}

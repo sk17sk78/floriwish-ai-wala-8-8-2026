@@ -18,7 +18,50 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
-// Background push notification handler
+const messaging = firebase.messaging();
+
+// ─── SW Lifecycle Handlers ────────────────────────────────────────────────────
+self.addEventListener("install", function (event) {
+  event.waitUntil(self.skipWaiting());
+});
+
+self.addEventListener("activate", function (event) {
+  event.waitUntil(self.clients.claim());
+});
+
+// ─── Firebase Official Background Handler ──────────────────────────────────────
+messaging.onBackgroundMessage(function (payload) {
+  const notification = payload.notification || {};
+  const data = payload.data || {};
+
+  const title = notification.title || data.title || "Floriwish";
+  const body = notification.body || data.body || "New notification from Floriwish";
+  const image = notification.image || notification.imageUrl || data.image || data.imageUrl || "";
+  const url = data.url || data.click_action || notification.click_action || "/";
+  const icon = "/icons/icon-192x192.png";
+  const badge = "/icons/icon-192x192.png";
+
+  const options = {
+    body: body,
+    icon: icon,
+    badge: badge,
+    data: {
+      url: url,
+      ...data
+    },
+    requireInteraction: true,
+    tag: data.tag || "floriwish-" + Date.now(),
+    renotify: true
+  };
+
+  if (image) {
+    options.image = image;
+  }
+
+  return self.registration.showNotification(title, options);
+});
+
+// ─── Fallback Background Push Handler ──────────────────────────────────────────
 self.addEventListener("push", function (event) {
   if (!event.data) return;
 
@@ -30,9 +73,9 @@ self.addEventListener("push", function (event) {
     const title = notification.title || data.title || "Floriwish";
     const body = notification.body || data.body || "New update from Floriwish";
     const image = notification.image || notification.imageUrl || data.image || data.imageUrl || "";
-    const url = data.url || data.click_action || "/";
-    const icon = "/user.png";
-    const badge = "/user.png";
+    const url = data.url || data.click_action || notification.click_action || "/";
+    const icon = "/icons/icon-192x192.png";
+    const badge = "/icons/icon-192x192.png";
 
     const options = {
       body: body,
@@ -42,8 +85,8 @@ self.addEventListener("push", function (event) {
         url: url,
         ...data
       },
-      requireInteraction: false,
-      tag: data.tag || "floriwish-push-notification",
+      requireInteraction: true,
+      tag: data.tag || "floriwish-push-" + Date.now(),
       renotify: true
     };
 
@@ -57,7 +100,7 @@ self.addEventListener("push", function (event) {
   }
 });
 
-// Notification Click Handler - Focus tab or Open target URL
+// ─── Notification Click Handler ────────────────────────────────────────────────
 self.addEventListener("notificationclick", function (event) {
   event.notification.close();
 
@@ -67,21 +110,22 @@ self.addEventListener("notificationclick", function (event) {
     clients
       .matchAll({ type: "window", includeUncontrolled: true })
       .then(function (clientList) {
-        // Check if there is already an open Floriwish tab
         for (let i = 0; i < clientList.length; i++) {
           const client = clientList[i];
-          if (client.url && "focus" in client) {
-            client.focus();
+          if (client.url && new URL(client.url).origin === self.location.origin) {
+            if ("focus" in client) {
+              client.focus();
+            }
             if ("navigate" in client) {
               return client.navigate(clickUrl);
             }
             return client;
           }
         }
-        // If no tab is open, open a new window
         if (clients.openWindow) {
           return clients.openWindow(clickUrl);
         }
       })
   );
 });
+

@@ -42,6 +42,9 @@ export default function SearchPage() {
   const [filteredResults, setFilteredResults] = useState<SearchContentsType[]>(
     [],
   );
+  const [matchingCategories, setMatchingCategories] = useState<
+    { name: string; slug: string }[]
+  >([]);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -60,6 +63,7 @@ export default function SearchPage() {
   useEffect(() => {
     if (!searchKey) {
       setFilteredResults([]);
+      setMatchingCategories([]);
       setIsLoading(false);
       return;
     }
@@ -67,6 +71,19 @@ export default function SearchPage() {
     setIsLoading(true);
     const cityId = selectedCity ? String(selectedCity._id) : "null";
 
+    // 1. Fetch matching categories
+    fetch(`/api/frontend/search/categories?key=${encodeURIComponent(searchKey)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.data) {
+          setMatchingCategories(data.data);
+        }
+      })
+      .catch(() => {
+        setMatchingCategories([]);
+      });
+
+    // 2. Fetch products
     fetch(
       `${API_SEARCH_CONTENTS}?cityId=${cityId}&key=${encodeURIComponent(searchKey)}&limit=200`,
       {
@@ -126,7 +143,27 @@ export default function SearchPage() {
           totalReviews={0}
         />
 
-        {/* PRODUCTS ------------------------------------------ */}
+        {/* CATEGORIES PILLS SLIDER (PHOTO 1 / PHOTO 3) ----------------- */}
+        {matchingCategories.length > 0 && (
+          <div className="py-2.5 sm:py-3.5 mb-2 max-sm:px-3.5">
+            <h3 className="font-semibold text-base sm:text-lg text-charcoal-3 mb-2.5 tracking-tight">
+              Categories
+            </h3>
+            <div className="flex items-center gap-2 sm:gap-2.5 overflow-x-auto scrollbar-hide py-1">
+              {matchingCategories.map(({ name, slug }, index) => (
+                <Link
+                  key={index}
+                  href={`/${slug.replace(/^\//, "")}`}
+                  className="text-xs sm:text-sm font-medium bg-ivory-2 text-charcoal-3/80 border border-charcoal-3/15 hover:border-charcoal-3/30 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl cursor-pointer transition-all duration-300 hover:bg-white hover:shadow-xs hover:text-charcoal-3 whitespace-nowrap shrink-0 flex items-center justify-center"
+                >
+                  {name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* PRODUCTS COUNT & SORT ------------------------------------------ */}
         <CategoryContentCountSort
           count={filteredResults.length}
           sortBy={

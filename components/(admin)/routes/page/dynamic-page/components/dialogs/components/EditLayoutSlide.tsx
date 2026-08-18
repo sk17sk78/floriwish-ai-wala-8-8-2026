@@ -1297,7 +1297,7 @@ export default function EditLayoutSlide({
                                   <PopoverContent
                                     side="right"
                                     sideOffset={10}
-                                    className="flex flex-col justify-start outline-none border-none rounded-2xl !z-[9999] px-5 relative w-[400px]"
+                                    className="flex flex-col justify-start outline-none border-none rounded-2xl !z-[950] px-5 relative w-[400px]"
                                   >
                                     <div className="flex items-center justify-between">
                                       <span className="text-xl font-light pt-1 pb-1.5">

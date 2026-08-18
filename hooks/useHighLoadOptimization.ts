@@ -22,6 +22,33 @@ export function useHighLoadOptimization() {
         state: 'closed' | 'open' | 'half-open';
     }>>(new Map());
 
+    // processQueue must be declared BEFORE queueRequest (which calls it)
+    const processQueue = useCallback(() => {
+        if (loadBalancer.current.processing || loadBalancer.current.queued.length === 0) {
+            return;
+        }
+
+        loadBalancer.current.processing = true;
+
+        const processNext = () => {
+            if (loadBalancer.current.queued.length === 0) {
+                loadBalancer.current.processing = false;
+                return;
+            }
+
+            // Sort by priority
+            loadBalancer.current.queued.sort((a, b) => b.priority - a.priority);
+            const next = loadBalancer.current.queued.shift();
+
+            if (next) {
+                next.fn().then(next.resolve).catch(next.reject);
+                setTimeout(processNext, 100); // Controlled processing rate
+            }
+        };
+
+        processNext();
+    }, []);
+
     // Smart request queuing with priority
     const queueRequest = useCallback(async <T>(
         requestFn: () => Promise<T>,
@@ -69,33 +96,8 @@ export function useHighLoadOptimization() {
 
             processQueue();
         });
-    }, []);
-
-    const processQueue = useCallback(() => {
-        if (loadBalancer.current.processing || loadBalancer.current.queued.length === 0) {
-            return;
-        }
-
-        loadBalancer.current.processing = true;
-
-        const processNext = () => {
-            if (loadBalancer.current.queued.length === 0) {
-                loadBalancer.current.processing = false;
-                return;
-            }
-
-            // Sort by priority
-            loadBalancer.current.queued.sort((a, b) => b.priority - a.priority);
-            const next = loadBalancer.current.queued.shift();
-
-            if (next) {
-                next.fn().then(next.resolve).catch(next.reject);
-                setTimeout(processNext, 100); // Controlled processing rate
-            }
-        };
-
-        processNext();
-    }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [processQueue]);
 
     // Rate limiting per user/session
     const isRateLimited = useCallback((

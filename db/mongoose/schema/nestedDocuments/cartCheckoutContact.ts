@@ -10,7 +10,8 @@ export const cartCheckoutContactSchema =
     {
       mobileNumber: {
         type: String,
-        required: true
+        required: false,
+        default: ""
       },
       alternateMobileNumber: {
         type: String,
@@ -18,7 +19,8 @@ export const cartCheckoutContactSchema =
       },
       mail: {
         type: String,
-        required: true
+        required: false,
+        default: ""
       }
     },
     { timestamps: true }

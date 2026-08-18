@@ -9,6 +9,7 @@ import {
 
 // requests
 import { fetchOccasions } from "@/request/preset/occasion";
+import { fetchLocationData } from "@/request/location/locationData";
 
 // hooks
 import { useEffect, useState } from "react";
@@ -23,6 +24,7 @@ import { type CartCheckoutDocument } from "@/common/types/documentation/nestedDo
 import { type ChangeEvent } from "react";
 import { type ContentDocument } from "@/common/types/documentation/contents/content";
 import { type OccasionDocument } from "@/common/types/documentation/presets/occasion";
+import { type CityDocument } from "@/common/types/documentation/presets/city";
 
 export default function CartCheckoutDetail({
   onClose
@@ -70,6 +72,8 @@ export default function CartCheckoutDetail({
     { _id: "love", name: "Love & Romance" }
   ] as unknown as OccasionDocument[]);
   const [showOccasionList, setShowOccasionList] = useState(false);
+  const [adminCities, setAdminCities] = useState<CityDocument[]>([]);
+  const [showCityList, setShowCityList] = useState(false);
 
   // variables
   const isOnlyAllIndiaDeliverableItems =
@@ -96,6 +100,17 @@ export default function CartCheckoutDetail({
 
   // side effects
   useEffect(() => {
+    fetchLocationData()
+      .then((res) => {
+        if (res?.data && Array.isArray(res.data)) {
+          setAdminCities(res.data as CityDocument[]);
+        }
+      })
+      .catch((err) => {
+        console.error("[CartCheckoutDetail] fetchLocationData error:", err);
+      });
+  }, []);
+  useEffect(() => {
     if (!occasions.length) {
       fetchOccasions({
         active: true,
@@ -116,33 +131,100 @@ export default function CartCheckoutDetail({
 
   useEffect(() => {
     if (isReady) {
-      setCheckout({
-        name: cartCheckout?.name || customerDetail?.name || "",
-        contact: {
-          mobileNumber:
-            cartCheckout?.contact?.mobileNumber ||
-            customerDetail?.mobileNumber?.split("-")[1] ||
-            "",
-          mail: cartCheckout?.contact?.mail || customerDetail?.mail || ""
-        },
-        location: {
-          address:
-            cartCheckout?.location?.address ||
-            customerAddresses?.find(({ isDefault }) => isDefault)?.address ||
-            "",
-          city: isOnlyAllIndiaDeliverableItems
-            ? cartCheckout?.location?.city
-            : selectedCity?.name || "",
-          pincode: cartCheckout?.location?.pincode || ""
-        },
-        ...(cartCheckout?.occasion ? { occasion: cartCheckout?.occasion } : {}),
-        deliverToSomeoneElse: cartCheckout?.deliverToSomeoneElse || false,
-        receiverName: cartCheckout?.receiverName || "",
-        receiverMobileNumber: cartCheckout?.receiverMobileNumber || ""
-      } as CartCheckoutDocument);
+      setCheckout((prev) => {
+        const resolvedName =
+          cartCheckout?.name ||
+          (customerDetail?.name && customerDetail.name !== "User"
+            ? customerDetail.name
+            : "") ||
+          prev.name ||
+          "";
+
+        const resolvedMobile =
+          cartCheckout?.contact?.mobileNumber ||
+          (customerDetail?.mobileNumber
+            ? customerDetail.mobileNumber.includes("-")
+              ? customerDetail.mobileNumber.split("-")[1]
+              : customerDetail.mobileNumber
+            : "") ||
+          prev.contact?.mobileNumber ||
+          "";
+
+        const resolvedEmail =
+          cartCheckout?.contact?.mail ||
+          customerDetail?.mail ||
+          prev.contact?.mail ||
+          "";
+
+        const defaultAddr =
+          customerAddresses?.find(({ isDefault }) => isDefault) ||
+          customerAddresses?.[0];
+
+        // Delivery address and landmark should NOT be auto-filled from saved profile (customer enters manually)
+        const resolvedAddress =
+          cartCheckout?.location?.address ||
+          prev.location?.address ||
+          "";
+
+        // Prioritize city selected on product page / header
+        const resolvedCity =
+          selectedCity?.name ||
+          cartCheckout?.location?.city ||
+          prev.location?.city ||
+          defaultAddr?.city ||
+          "";
+
+        const resolvedPincode =
+          cartCheckout?.location?.pincode ||
+          defaultAddr?.pincode ||
+          prev.location?.pincode ||
+          "";
+
+        const resolvedLandmark =
+          cartCheckout?.location?.landmark ||
+          prev.location?.landmark ||
+          "";
+
+        return {
+          ...prev,
+          name: resolvedName,
+          contact: {
+            mobileNumber: resolvedMobile,
+            mail: resolvedEmail
+          },
+          location: {
+            address: resolvedAddress,
+            city: resolvedCity,
+            pincode: resolvedPincode,
+            landmark: resolvedLandmark
+          },
+          ...(cartCheckout?.occasion
+            ? { occasion: cartCheckout.occasion }
+            : prev.occasion
+            ? { occasion: prev.occasion }
+            : {}),
+          deliverToSomeoneElse:
+            cartCheckout?.deliverToSomeoneElse ?? prev.deliverToSomeoneElse ?? false,
+          receiverName: cartCheckout?.receiverName || prev.receiverName || "",
+          receiverMobileNumber:
+            cartCheckout?.receiverMobileNumber || prev.receiverMobileNumber || ""
+        } as CartCheckoutDocument;
+      });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isReady]);
+  }, [isReady, cartCheckout, customerDetail, customerAddresses, selectedCity?.name]);
+
+  // Immediately update city field when selectedCity changes
+  useEffect(() => {
+    if (selectedCity?.name) {
+      setCheckout((prev) => ({
+        ...prev,
+        location: {
+          ...prev.location,
+          city: selectedCity.name
+        }
+      } as CartCheckoutDocument));
+    }
+  }, [selectedCity?.name]);
 
   const inputStyles = "w-full rounded-xl border border-ash-3/30 bg-ivory-2 px-3.5 py-2.5 text-sm text-charcoal-3 placeholder-charcoal-3/40 outline-none transition-all duration-200 focus:border-sienna-1/40 focus:ring-2 focus:ring-sienna-1/15 focus:bg-white";
   const labelStyles = "mb-1.5 block text-xs font-bold text-charcoal-3/60 uppercase tracking-tight";
@@ -194,7 +276,7 @@ export default function CartCheckoutDetail({
                 <input 
                   placeholder="10-digit mobile number" 
                   className={inputStyles + " flex-1"}
-                  type="tel"
+                  type="tel" 
                   maxLength={10}
                   value={checkout.contact.mobileNumber}
                   onChange={(e) => setCheckout({...checkout, contact: {...checkout.contact, mobileNumber: e.target.value.replace(/\D/g, '')}} as CartCheckoutDocument)}
@@ -259,16 +341,92 @@ export default function CartCheckoutDetail({
           <div className="flex flex-col gap-4">
             <p className="text-[10px] font-bold tracking-widest text-charcoal-3/40 uppercase">Delivery Location</p>
             
-            <div>
-              <label className={labelStyles}>City <span className="text-red-400">*</span></label>
-              <input 
-                placeholder="Enter city name" 
-                className={inputStyles}
-                type="text" 
-                value={checkout.location.city}
-                disabled={!isOnlyAllIndiaDeliverableItems}
-                onChange={(e) => setCheckout({...checkout, location: {...checkout.location, city: e.target.value}} as CartCheckoutDocument)}
-              />
+            <div className="relative">
+              <label className={labelStyles}>
+                City <span className="text-red-400">*</span>
+              </label>
+              <div className="relative">
+                <div className="relative flex items-center">
+                  <MapPin size={16} className="absolute left-3.5 text-charcoal-3/40 pointer-events-none" />
+                  <input 
+                    placeholder="Search or select city..." 
+                    className={inputStyles + " pl-10 pr-9"}
+                    type="text" 
+                    value={checkout.location.city}
+                    onFocus={() => setShowCityList(true)}
+                    onChange={(e) => {
+                      setCheckout({
+                        ...checkout,
+                        location: { ...checkout.location, city: e.target.value }
+                      } as CartCheckoutDocument);
+                      setShowCityList(true);
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCityList(!showCityList)}
+                    className="absolute right-3 text-charcoal-3/40 hover:text-charcoal-3 transition-colors"
+                  >
+                    <ChevronDown size={18} className={`transition-transform ${showCityList ? 'rotate-180' : ''}`} />
+                  </button>
+                </div>
+
+                {showCityList && (
+                  <div className="absolute left-0 right-0 top-full z-[100] mt-1 max-h-60 overflow-y-auto rounded-xl border border-ash-3/20 bg-ivory-1 shadow-xl">
+                    <div className="p-1">
+                      {adminCities
+                        .filter((city) =>
+                          !checkout.location.city ||
+                          city.name.toLowerCase().includes(checkout.location.city.toLowerCase())
+                        )
+                        .map((city) => (
+                          <button
+                            key={String(city._id)}
+                            type="button"
+                            onClick={() => {
+                              setCheckout({
+                                ...checkout,
+                                location: { ...checkout.location, city: city.name }
+                              } as CartCheckoutDocument);
+                              setShowCityList(false);
+                            }}
+                            className={`w-full flex items-center justify-between px-3.5 py-2.5 text-left text-sm rounded-lg transition-colors ${
+                              checkout.location.city?.toLowerCase() === city.name.toLowerCase()
+                                ? 'bg-sienna-3/30 text-sienna-1 font-semibold'
+                                : 'text-charcoal-3 hover:bg-ivory-2'
+                            }`}
+                          >
+                            <span className="flex items-center gap-2">
+                              <MapPin size={14} className="text-charcoal-3/40" />
+                              {city.name}
+                            </span>
+                            {city.state && (
+                              <span className="text-[11px] text-charcoal-3/40 font-medium">
+                                {typeof city.state === "string" ? city.state : (city.state as any)?.name || ""}
+                              </span>
+                            )}
+                          </button>
+                        ))}
+
+                      {adminCities.filter((city) =>
+                        !checkout.location.city ||
+                        city.name.toLowerCase().includes(checkout.location.city.toLowerCase())
+                      ).length === 0 && (
+                        <div className="px-4 py-3 text-xs text-charcoal-3/60 italic flex items-center justify-between">
+                          <span>Custom City: &quot;{checkout.location.city}&quot;</span>
+                          <button
+                            type="button"
+                            onClick={() => setShowCityList(false)}
+                            className="text-sienna-1 font-semibold underline text-xs"
+                          >
+                            Use this
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div>

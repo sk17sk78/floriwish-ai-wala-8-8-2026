@@ -41,43 +41,51 @@ const getTableContentGenerator =
       header: [
         {
           label: "Content\u00A0Name",
-          span: 4,
-          sortable: false
+          span: 3,
+          sortable: false,
+          align: "left"
         },
         {
           label: "Customer\u00A0Name",
-          span: 2,
-          sortable: false
+          span: 1.8,
+          sortable: false,
+          align: "left"
         },
         {
           label: "Placed\u00A0On",
-          span: 2,
-          sortable: false
+          span: 1.8,
+          sortable: false,
+          align: "left"
         },
         {
           label: "Delivery/Event\u00A0On",
-          span: 2,
-          sortable: false
+          span: 1.4,
+          sortable: false,
+          align: "left"
         },
         {
           label: "Amount",
-          span: 1,
-          sortable: false
+          span: 1.4,
+          sortable: false,
+          align: "center"
         },
         {
           label: "Details",
-          span: 1,
-          sortable: false
+          span: 0.7,
+          sortable: false,
+          align: "center"
         },
         {
           label: "Status",
-          span: 2,
-          sortable: false
+          span: 1.8,
+          sortable: false,
+          align: "center"
         },
         {
           label: "City",
-          span: 1,
-          sortable: false
+          span: 1.2,
+          sortable: false,
+          align: "left"
         }
       ],
 
@@ -113,18 +121,68 @@ const getTableContentGenerator =
                   },
                   i
                 ) => {
+                  const rawContentId =
+                    typeof contentId === "object" && contentId !== null
+                      ? (contentId as any)._id
+                      : contentId;
+                  const embeddedName =
+                    typeof contentId === "object" && contentId !== null
+                      ? (contentId as any).name
+                      : (delivery as any)?.name;
+                  const contentDoc = contents.find(
+                    ({ _id }) =>
+                      String(_id) === String(rawContentId) ||
+                      String(_id) === String(contentId)
+                  );
                   const contentName =
-                    contents.find(({ _id }) => String(_id) === String(contentId))
-                      ?.name || "";
+                    contentDoc?.name || embeddedName || "-";
+
+                  // Extract City
+                  let cityDisplay = "-";
+                  const checkoutCity =
+                    cart?.checkout?.location?.city ||
+                    (cart?.checkout as any)?.city ||
+                    (delivery as any)?.city;
+                  const defaultAddress =
+                    customer?.addresses?.find((addr) => addr.isDefault) ||
+                    customer?.addresses?.[0];
+                  const addressCity = defaultAddress?.city;
+                  const rawCity = checkoutCity || addressCity || (customer as any)?.city;
+
+                  if (rawCity) {
+                    const cityDoc = cities.find(
+                      ({ _id, name }) =>
+                        String(_id) === String(rawCity) ||
+                        name?.toLowerCase() === String(rawCity).toLowerCase() ||
+                        (typeof rawCity === "object" &&
+                          rawCity !== null &&
+                          String(_id) === String((rawCity as any)._id))
+                    );
+                    if (cityDoc && cityDoc.name) {
+                      cityDisplay = cityDoc.name;
+                    } else if (typeof rawCity === "string" && rawCity.trim()) {
+                      cityDisplay = rawCity.trim();
+                    } else if (
+                      typeof rawCity === "object" &&
+                      rawCity !== null &&
+                      (rawCity as any).name
+                    ) {
+                      cityDisplay = (rawCity as any).name;
+                    }
+                  }
 
                   return {
                     cols: [
                       {
                         value: {
                           label: contentName,
-                          // cartItemsLength > 1
-                          //   ? `${orderId}\u2011${i + 1}`
-                          //   : orderId,
+                          type: "text"
+                        },
+                        action: { action: () => { }, type: "none" }
+                      },
+                      {
+                        value: {
+                          label: customer?.name || "-",
                           type: "text",
                           align: "left"
                         },
@@ -132,7 +190,8 @@ const getTableContentGenerator =
                       },
                       {
                         value: {
-                          label: customer?.name?.replace(/\s/g, "\u00A0") || "-",
+                          label:
+                            moment(createdAt).format("DD MMM YY, hh:mm A") || "-",
                           type: "text"
                         },
                         action: { action: () => { }, type: "none" }
@@ -140,19 +199,7 @@ const getTableContentGenerator =
                       {
                         value: {
                           label:
-                            moment(createdAt)
-                              .format("DD MMM YY, hh:mm A")
-                              .replace(/\s/g, "\u00A0") || "-",
-                          type: "text"
-                        },
-                        action: { action: () => { }, type: "none" }
-                      },
-                      {
-                        value: {
-                          label:
-                            moment(delivery?.date)
-                              .format("DD MMM YY")
-                              .replace(/\s/g, "\u00A0") || "-",
+                            moment(delivery?.date).format("DD MMM YY") || "-",
                           type: "text"
                         },
                         action: { action: () => { }, type: "none" }
@@ -195,39 +242,7 @@ const getTableContentGenerator =
                       },
                       {
                         value: {
-                          label: (() => {
-                            const cityValue = cart.checkout?.location?.city || (cart.checkout as any)?.city;
-                            if (!cityValue) {
-                              // Fallback: try to find city from customer addresses by matching pincode
-                              if (customer && customer.addresses && cart.checkout?.location?.pincode) {
-                                const matchingAddress = customer.addresses.find(
-                                  (addr) => addr.pincode === cart.checkout?.location?.pincode
-                                );
-                                if (matchingAddress) {
-                                  const cityDoc = cities.find(
-                                    ({ _id, name }) =>
-                                      String(_id) === String(matchingAddress.city) ||
-                                      name === matchingAddress.city
-                                  );
-                                  if (cityDoc) return cityDoc.name;
-                                  return matchingAddress.city;
-                                }
-                              }
-                              return "-";
-                            }
-                            const cityDoc = cities.find(
-                              ({ _id }) =>
-                                String(_id) === String(cityValue) ||
-                                (typeof cityValue === "object" &&
-                                  cityValue !== null &&
-                                  String(_id) === String((cityValue as any)._id))
-                            );
-                            if (cityDoc) return cityDoc.name;
-                            if (typeof cityValue === "string") return cityValue;
-                            if (typeof cityValue === "object" && cityValue !== null)
-                              return (cityValue as any).name || "-";
-                            return "-";
-                          })(),
+                          label: cityDisplay,
                           type: "text"
                         },
                         action: { action: () => { }, type: "none" }

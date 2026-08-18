@@ -73,24 +73,6 @@ export default async function Home() {
 
   return (
     <BodyWrapper fullWidth>
-      {desktopLcpUrl && (
-        <link
-          rel="preload"
-          as="image"
-          href={desktopLcpUrl}
-          media="(min-width: 640px)"
-          fetchPriority="high"
-        />
-      )}
-      {mobileLcpUrl && (
-        <link
-          rel="preload"
-          as="image"
-          href={mobileLcpUrl}
-          media="(max-width: 639px)"
-          fetchPriority="high"
-        />
-      )}
       <main>
         <h1 className="visually-hidden">{WEBSITE_NAME}</h1>
         <BentoHomepage data={homepageLayouts} inFrontend />

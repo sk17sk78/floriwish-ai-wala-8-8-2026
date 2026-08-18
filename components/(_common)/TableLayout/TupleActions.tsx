@@ -220,7 +220,7 @@ export default function TupleActions(
           />
         </div>
       )}
-      {isSuperAdmin && (showDrop || showDelete) && (
+      {(showDrop || showDelete) && (
         <>
           <div
             className="transition-all duration-300 hover:text-rose-600"

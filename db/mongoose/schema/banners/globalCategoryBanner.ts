@@ -32,6 +32,7 @@ export interface IGlobalCategoryBannerDocument extends Document {
   autoApplyFuture: boolean;
   isActive: boolean;
   priority: number;
+  targetDevice?: "all" | "desktop" | "mobile";
   bannerType: "default" | "mini" | "micro" | "large" | "square";
   autoScroll: boolean;
   scrollInterval: number;
@@ -171,6 +172,11 @@ export const globalCategoryBannerSchema = new Schema<
       required: false,
       default: 10,
       index: true
+    },
+    targetDevice: {
+      type: String,
+      enum: ["all", "desktop", "mobile"],
+      default: "all"
     },
     bannerType: {
       type: String,

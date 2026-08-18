@@ -4,6 +4,7 @@ import { OPTIMIZE_IMAGE } from "@/config/image";
 // components
 import NextImage from "@/components/custom/NextImage";
 import Link from "next/link";
+import { convertToCloudFrontUrl } from "@/common/utils/convertToCloudFrontUrl";
 
 // types
 import { type BannerCarouselElementsType } from "../static/types";
@@ -15,8 +16,8 @@ export default function Banner({
   props: BannerCarouselElementsType;
   isPriority?: boolean;
 }) {
-  const mobileSrc = props.image.mobile.url || props.image.desktop.url || "";
-  const desktopSrc = props.image.desktop.url || props.image.mobile.url || "";
+  const mobileSrc = convertToCloudFrontUrl(props.image.mobile.url || props.image.desktop.url || "");
+  const desktopSrc = convertToCloudFrontUrl(props.image.desktop.url || props.image.mobile.url || "");
   const alt = props.image.desktop.alt || props.image.mobile.alt || "Banner Image";
 
   const content = (
@@ -25,14 +26,14 @@ export default function Banner({
         <source media="(min-width: 640px)" srcSet={desktopSrc} />
         <source media="(max-width: 639px)" srcSet={mobileSrc} />
         <img
-          src={mobileSrc}
+          src={mobileSrc || desktopSrc}
           alt={alt}
           className="object-cover object-center h-full w-full rounded-2xl sm:rounded-3xl"
           loading={isPriority ? "eager" : "lazy"}
           fetchPriority={isPriority ? "high" : "low"}
           decoding="async"
           width={1200}
-          height={400}
+          height={600}
         />
       </picture>
     </div>
@@ -52,6 +53,9 @@ export default function Banner({
 }
 
 export function CategoryListBanner(props: BannerCarouselElementsType) {
+  const desktopSrc = convertToCloudFrontUrl(props.image.desktop.url || "");
+  const alt = props.image.desktop.alt || "Banner Image";
+
   return props.isLink ? (
     <div className="grid *:row-start-1 *:col-start-1 h-[180px] min-[450px]:h-[250px] md:h-[300px]">
       <Link
@@ -62,8 +66,8 @@ export function CategoryListBanner(props: BannerCarouselElementsType) {
       >
         <NextImage
           className={`sm:rounded-3xl object-cover h-full w-full`}
-          src={props.image.desktop.url || ""}
-          alt={props.image.desktop.alt || "Banner Image"}
+          src={desktopSrc}
+          alt={alt}
           width={1200}
           height={480}
           priority={true}
@@ -75,8 +79,8 @@ export function CategoryListBanner(props: BannerCarouselElementsType) {
     <section>
       <NextImage
         className={`sm:rounded-3xl object-cover w-full aspect-[3/1] sm:aspect-[9/2] md:aspect-[6/1]`}
-        src={props.image.desktop.url || ""}
-        alt={props.image.desktop.alt || "Banner Image"}
+        src={desktopSrc}
+        alt={alt}
         width={1200}
         height={480}
         quality={75}

@@ -185,7 +185,10 @@ export const getContentCategoryPageSlugs = async (): Promise<
 
     return result;
   } catch (error: any) {
-    console.error('[ERR getSlugs]', error);
+    if (inMemorySlugsCache?.data) {
+      return inMemorySlugsCache.data;
+    }
+    console.error('[ERR getSlugs]', error?.message || error);
     return null;
   }
 };

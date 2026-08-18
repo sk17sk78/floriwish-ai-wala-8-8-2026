@@ -101,6 +101,7 @@ export default function DeliveredOrderTable({
     dispatch(createCartAction.fetchDocumentList());
     dispatch(createCustomerAction.fetchDocumentList());
     dispatch(createCityAction.fetchDocumentList());
+    dispatch(createContentAction.fetchDocumentList());
   };
 
   // side effects

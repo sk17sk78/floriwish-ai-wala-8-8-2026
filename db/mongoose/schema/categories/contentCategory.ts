@@ -102,27 +102,3 @@ contentCategorySchema.index({
   createdBy: "text",
   updatedBy: "text"
 });
-
-// Cascading updates for redundant category images
-contentCategorySchema.post("findOneAndUpdate", async function (doc) {
-  try {
-    if (doc && doc.slug && doc.media && doc.media.icon) {
-      // Import utility dynamically to avoid potential issues during model initialization
-      const { updateCategoryReferenceImages } = await import("@/common/utils/api/categoryReference");
-      await updateCategoryReferenceImages(doc.slug, doc.media.icon.toString());
-    }
-  } catch (error) {
-    console.error("Error in ContentCategory post-findOneAndUpdate hook:", error);
-  }
-});
-
-contentCategorySchema.post("save", async function (doc) {
-  try {
-    if (doc && doc.slug && doc.media && doc.media.icon) {
-      const { updateCategoryReferenceImages } = await import("@/common/utils/api/categoryReference");
-      await updateCategoryReferenceImages(doc.slug, doc.media.icon.toString());
-    }
-  } catch (error) {
-    console.error("Error in ContentCategory post-save hook:", error);
-  }
-});

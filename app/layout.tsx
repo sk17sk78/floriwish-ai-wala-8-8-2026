@@ -32,6 +32,17 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Floriwish - Send Gifts, Flowers, Cakes & Balloon Decoration",
   description: "Your One-Stop Shop for All Your Gifting & Celebration Needs",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    title: "Floriwish",
+    statusBarStyle: "black-translucent",
+    startupImage: [
+      {
+        url: "https://d22rebqllszdz8.cloudfront.net/c738cc2b-aab2-472f-925d-c673915cfacc/a35c7f6964a04132.webp"
+      }
+    ]
+  },
   alternates: {
     canonical: "https://floriwish.com",
   },
@@ -58,7 +69,22 @@ export const metadata: Metadata = {
       "https://d22rebqllszdz8.cloudfront.net/c738cc2b-aab2-472f-925d-c673915cfacc/a35c7f6964a04132.webp",
     ],
   },
+  icons: {
+    icon: [
+      { url: "/icons/icon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/icon-96x96.png", sizes: "96x96", type: "image/png" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" }
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+      { url: "/icons/icon-152x152.png", sizes: "152x152", type: "image/png" },
+      { url: "/icons/icon-120x120.png", sizes: "120x120", type: "image/png" }
+    ]
+  }
 };
+
+import NotificationPrompt from "@/components/(frontend)/notifications/NotificationPrompt";
 
 export default function RootLayout({ children }: { children: Children }) {
   return (
@@ -70,8 +96,47 @@ export default function RootLayout({ children }: { children: Children }) {
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://d22rebqllszdz8.cloudfront.net" />
         <link rel="dns-prefetch" href="https://d3lno5tuwkddps.cloudfront.net" />
-        {/* Critical resource hints */}
+
+        {/* ── PWA & iOS Meta Tags ─────────────────────────────────── */}
+        {/* Tells iOS Safari this is a PWA-capable site */}
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        {/* Status bar appearance when opened from Home Screen */}
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        {/* App name shown on iOS Home Screen */}
+        <meta name="apple-mobile-web-app-title" content="Floriwish" />
+        {/* Application name for Android PWA */}
+        <meta name="application-name" content="Floriwish" />
+        {/* Theme color for browser chrome (Android) */}
         <meta name="theme-color" content="#b76e79" />
+        {/* MS Tile for Windows */}
+        <meta name="msapplication-TileColor" content="#b76e79" />
+        <meta name="msapplication-TileImage" content="/icons/icon-144x144.png" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        {/* Manifest link */}
+        <link rel="manifest" href="/manifest.json" />
+        {/* Apple Touch Icons */}
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" sizes="120x120" href="/icons/icon-120x120.png" />
+        <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png" />
+        {/* iOS Splash Screens (iPhone/iPad) */}
+        {/* iPhone 14 Pro Max */}
+        <link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+          href="https://d22rebqllszdz8.cloudfront.net/c738cc2b-aab2-472f-925d-c673915cfacc/a35c7f6964a04132.webp" />
+        {/* iPhone 14 / 13 / 12 */}
+        <link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+          href="https://d22rebqllszdz8.cloudfront.net/c738cc2b-aab2-472f-925d-c673915cfacc/a35c7f6964a04132.webp" />
+        {/* iPhone SE */}
+        <link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="https://d22rebqllszdz8.cloudfront.net/c738cc2b-aab2-472f-925d-c673915cfacc/a35c7f6964a04132.webp" />
+        {/* iPad Pro 12.9" */}
+        <link rel="apple-touch-startup-image" media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="https://d22rebqllszdz8.cloudfront.net/c738cc2b-aab2-472f-925d-c673915cfacc/a35c7f6964a04132.webp" />
+        {/* iPad Air 10.9" */}
+        <link rel="apple-touch-startup-image" media="screen and (device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="https://d22rebqllszdz8.cloudfront.net/c738cc2b-aab2-472f-925d-c673915cfacc/a35c7f6964a04132.webp" />
+        {/* ────────────────────────────────────────────────────────── */}
       </head>
       <body className="relative font-sans antialiased">
         <NextTopLoader
@@ -85,6 +150,7 @@ export default function RootLayout({ children }: { children: Children }) {
           speed={200}
           shadow="0 0 10px #b76e79,0 0 5px #b76e79"
         />
+        <NotificationPrompt />
         {children}
         {/* GA deferred — page load block nahi karega */}
         <Script

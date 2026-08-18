@@ -7,9 +7,9 @@ import { addFileToS3 } from "@/lib/aws/s3";
 export const dynamic = "force-dynamic";
 
 // Automatically optimizes, auto-rotates (EXIF), converts to WebP, and compresses strictly under 100KB
-async function optimizeReviewPhotoToWebpUnder100KB(buffer: Buffer): Promise<Buffer> {
+async function optimizeReviewPhotoToWebpUnder100KB(buffer: Buffer): Promise<{ buffer: Buffer; format: string }> {
   try {
-    const TARGET_SIZE = 100 * 1024; // 100KB max
+    const TARGET_SIZE = 120 * 1024; // 120KB target
 
     // 1st Pass: 1080px @ 80% WebP
     let optimized = await sharp(buffer)
@@ -19,42 +19,31 @@ async function optimizeReviewPhotoToWebpUnder100KB(buffer: Buffer): Promise<Buff
       .toBuffer();
 
     if (optimized.length <= TARGET_SIZE) {
-      return optimized;
+      return { buffer: optimized, format: "webp" };
     }
 
     // 2nd Pass: 900px @ 70% WebP
     optimized = await sharp(buffer)
       .rotate()
       .resize(900, 900, { fit: "inside", withoutEnlargement: true })
-      .webp({ quality: 70, effort: 5 })
+      .webp({ quality: 70, effort: 4 })
       .toBuffer();
 
     if (optimized.length <= TARGET_SIZE) {
-      return optimized;
+      return { buffer: optimized, format: "webp" };
     }
 
     // 3rd Pass: 800px @ 60% WebP
     optimized = await sharp(buffer)
       .rotate()
       .resize(800, 800, { fit: "inside", withoutEnlargement: true })
-      .webp({ quality: 60, effort: 6 })
+      .webp({ quality: 60, effort: 4 })
       .toBuffer();
 
-    if (optimized.length <= TARGET_SIZE) {
-      return optimized;
-    }
-
-    // 4th Pass: 700px @ 50% WebP (Guarantees < 100KB for any complex image)
-    optimized = await sharp(buffer)
-      .rotate()
-      .resize(700, 700, { fit: "inside", withoutEnlargement: true })
-      .webp({ quality: 50, effort: 6 })
-      .toBuffer();
-
-    return optimized;
+    return { buffer: optimized, format: "webp" };
   } catch (err) {
     console.warn("[WARN] Sharp WebP optimization failed, falling back to original buffer:", err);
-    return buffer;
+    return { buffer, format: "jpeg" };
   }
 }
 
@@ -70,11 +59,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Accept any camera or gallery photo up to 25MB (will be compressed to < 100KB WebP)
-    const MAX_SIZE = 25 * 1024 * 1024;
+    // Accept photos up to 30MB
+    const MAX_SIZE = 30 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
       return NextResponse.json(
-        { success: false, error: "Photo size is too large (max 25MB)" },
+        { success: false, error: "Photo size is too large (max 30MB)" },
         { status: 400 }
       );
     }
@@ -82,16 +71,18 @@ export async function POST(req: NextRequest) {
     const rawBuffer = Buffer.from(await file.arrayBuffer());
 
     // Automatically convert to WebP and compress under 100KB
-    const optimizedBuffer = await optimizeReviewPhotoToWebpUnder100KB(rawBuffer);
+    const { buffer: optimizedBuffer, format } = await optimizeReviewPhotoToWebpUnder100KB(rawBuffer);
 
     const timestamp = Date.now();
+    const randomSuffix = Math.random().toString(36).substring(2, 7);
     const cleanFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-    const baseName = `review_${timestamp}_${path.basename(cleanFileName, path.extname(cleanFileName))}`;
-    const fileName = `${baseName}.webp`;
+    const baseName = `review_${timestamp}_${randomSuffix}_${path.basename(cleanFileName, path.extname(cleanFileName))}`;
+    const extension = format === "webp" ? "webp" : "jpg";
+    const fileName = `${baseName}.${extension}`;
 
     let finalUrl = "";
 
-    // 1. Try Uploading to AWS S3 (as image/webp)
+    // 1. Try Uploading to AWS S3
     if (
       process.env.AWS_S3_BUCKET_NAME &&
       process.env.AWS_ACCESS_KEY_ID &&
@@ -103,7 +94,7 @@ export async function POST(req: NextRequest) {
           fileType: "image",
           fileName: fileName,
           buffer: optimizedBuffer,
-          extension: "webp"
+          extension: extension
         });
 
         const cloudfrontDomain =
@@ -120,7 +111,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 2. Fallback to local storage if S3 is unavailable
+    // 2. Fallback to local storage if S3 is unavailable or failed
     if (!finalUrl) {
       const uploadDir = path.join(process.cwd(), "public", "uploads", "customer-reviews");
       if (!fs.existsSync(uploadDir)) {
@@ -136,7 +127,7 @@ export async function POST(req: NextRequest) {
       url: finalUrl,
       fileName: fileName,
       fileSizeKb: (optimizedBuffer.length / 1024).toFixed(1),
-      format: "webp"
+      format: extension
     });
   } catch (error: any) {
     console.error("[ERR POST /api/frontend/v2/frontend/review/upload]", error);

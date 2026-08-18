@@ -78,6 +78,26 @@ export default function CustomerOrderList({
                 }) as OrderDocument
             );
 
+        case "Cancelled":
+          return orders
+            ?.filter((order) =>
+              (order.cart as CartDocument).items.some(
+                ({ status }) => status === "cancelled"
+              )
+            )
+            ?.map(
+              (order) =>
+                ({
+                  ...order,
+                  cart: {
+                    ...(order.cart as CartDocument),
+                    items: (order.cart as CartDocument).items.filter(
+                      ({ status }) => status === "cancelled"
+                    )
+                  }
+                }) as OrderDocument
+            );
+
         case "Failed":
           return orders.filter(
             ({ payment: { status } }) => status === "pending"

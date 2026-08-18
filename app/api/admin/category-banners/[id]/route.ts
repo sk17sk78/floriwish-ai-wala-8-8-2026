@@ -54,6 +54,7 @@ export async function PUT(
       allCategories,
       autoApplyFuture,
       isActive,
+      targetDevice,
       priority,
       bannerType,
       autoScroll,
@@ -70,26 +71,30 @@ export async function PUT(
     if (openInNewTab !== undefined) banner.openInNewTab = !!openInNewTab;
     if (startDate !== undefined) banner.startDate = startDate ? new Date(startDate) : null;
     if (endDate !== undefined) banner.endDate = endDate ? new Date(endDate) : null;
-    if (desktopImage?.url) {
+    const effectiveDesktop = desktopImage?.url ? desktopImage : (mobileImage?.url ? mobileImage : banner.desktopImage);
+    const effectiveMobile = mobileImage?.url ? mobileImage : (desktopImage?.url ? desktopImage : banner.mobileImage);
+
+    if (effectiveDesktop?.url) {
       banner.desktopImage = {
-        url: desktopImage.url,
-        alt: desktopImage.alt || banner.altText || banner.title,
-        width: desktopImage.width || 1200,
-        height: desktopImage.height || 400
+        url: effectiveDesktop.url,
+        alt: effectiveDesktop.alt || banner.altText || banner.title,
+        width: effectiveDesktop.width || 1200,
+        height: effectiveDesktop.height || 400
       };
     }
-    if (mobileImage?.url) {
+    if (effectiveMobile?.url) {
       banner.mobileImage = {
-        url: mobileImage.url,
-        alt: mobileImage.alt || banner.altText || banner.title,
-        width: mobileImage.width || 480,
-        height: mobileImage.height || 240
+        url: effectiveMobile.url,
+        alt: effectiveMobile.alt || banner.altText || banner.title,
+        width: effectiveMobile.width || 480,
+        height: effectiveMobile.height || 240
       };
     }
     if (appliedCategories !== undefined) banner.appliedCategories = appliedCategories;
     if (allCategories !== undefined) banner.allCategories = !!allCategories;
     if (autoApplyFuture !== undefined) banner.autoApplyFuture = !!autoApplyFuture;
     if (isActive !== undefined) banner.isActive = !!isActive;
+    if (targetDevice !== undefined) banner.targetDevice = targetDevice;
     if (priority !== undefined) banner.priority = Number(priority);
     if (bannerType !== undefined) banner.bannerType = bannerType;
     if (autoScroll !== undefined) banner.autoScroll = !!autoScroll;

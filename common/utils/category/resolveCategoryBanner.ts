@@ -48,6 +48,7 @@ export async function resolveActiveGlobalCategoryBanner(slug: string) {
 
     return {
       type: activeBanner.bannerType || "default",
+      targetDevice: activeBanner.targetDevice || "all",
       autoScroll: activeBanner.autoScroll ?? true,
       scrollInterval: activeBanner.scrollInterval || 7,
       loopInfinitely: true,

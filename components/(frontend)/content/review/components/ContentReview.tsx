@@ -15,13 +15,10 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { type ContentReviewData } from "../types/ContentReviewData";
 
 const AVATAR_PALETTES = [
-  { bg: "bg-[#059669]", text: "text-white" }, // emerald
-  { bg: "bg-[#d97706]", text: "text-white" }, // amber
-  { bg: "bg-[#7c3aed]", text: "text-white" }, // violet
-  { bg: "bg-[#0284c7]", text: "text-white" }, // sky
-  { bg: "bg-[#be185d]", text: "text-white" }, // pink/rose
-  { bg: "bg-[#4f46e5]", text: "text-white" }, // indigo
-  { bg: "bg-[#0d9488]", text: "text-white" }, // teal
+  { bg: "bg-zinc-100", text: "text-zinc-700", border: "border-zinc-200" },
+  { bg: "bg-stone-100", text: "text-stone-700", border: "border-stone-200" },
+  { bg: "bg-neutral-100", text: "text-neutral-700", border: "border-neutral-200" },
+  { bg: "bg-slate-100", text: "text-slate-700", border: "border-slate-200" },
 ];
 
 function ContentReview({
@@ -30,7 +27,16 @@ function ContentReview({
   review: ContentReviewData;
 }) {
   const initial = (customerName || "V").trim()[0]?.toUpperCase() || "V";
-  const [likes, setLikes] = useState(Math.floor(Math.random() * 8) + 2);
+  const initialLikes = useMemo(() => {
+    let hash = 0;
+    const str = (customerName || "") + (location || "");
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return (Math.abs(hash) % 7) + 3;
+  }, [customerName, location]);
+
+  const [likes, setLikes] = useState(initialLikes);
   const [hasLiked, setHasLiked] = useState(false);
   const [activePhotoIndex, setActivePhotoIndex] = useState<number | null>(null);
 
@@ -55,57 +61,57 @@ function ContentReview({
 
   return (
     <>
-      <div className="w-[260px] min-[400px]:w-[275px] sm:w-[295px] md:w-[315px] lg:w-[325px] shrink-0 snap-start">
-        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-zinc-100 shadow-2xs flex flex-col justify-between h-full transition-all duration-300 hover:border-zinc-200 hover:shadow-xs">
-          <div className="flex flex-col gap-2">
+      <div className="w-[260px] min-[400px]:w-[280px] sm:w-[300px] md:w-[320px] lg:w-[330px] shrink-0 snap-start">
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-zinc-200/70 shadow-xs flex flex-col justify-between h-full transition-all duration-300 hover:border-zinc-300 hover:shadow-sm">
+          <div className="flex flex-col gap-2.5">
             {/* Header Row: Avatar + Name + Verified Badge + Date */}
             <div className="flex items-center gap-2.5">
               <div
-                className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full ${palette.bg} ${palette.text} font-bold flex items-center justify-center text-xs sm:text-sm shadow-xs shrink-0 select-none`}
+                className={`w-9 h-9 rounded-full ${palette.bg} ${palette.text} ${palette.border} border font-semibold flex items-center justify-center text-xs sm:text-sm shrink-0 select-none`}
               >
                 {initial}
               </div>
               <div className="flex flex-col min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
-                  <span className="font-bold text-xs sm:text-sm text-zinc-900 truncate">
+                  <span className="font-semibold text-xs sm:text-sm text-zinc-900 truncate">
                     {customerName}
                   </span>
                   <span
                     title="Verified Buyer"
-                    className="inline-flex items-center text-[#0ea5e9] shrink-0"
+                    className="inline-flex items-center text-emerald-600 shrink-0"
                   >
-                    <CheckCircle2 className="w-3.5 h-3.5 fill-[#0ea5e9] text-white" />
+                    <CheckCircle2 className="w-3.5 h-3.5 fill-emerald-600 text-white" />
                   </span>
                 </div>
               </div>
-              <span className="text-[10px] sm:text-[11px] text-zinc-400 font-normal shrink-0">
+              <span className="text-[11px] text-zinc-400 font-normal shrink-0">
                 {date}
               </span>
             </div>
 
-            {/* Rating & City Row (With Fractional/Half Star Display & Score) */}
+            {/* Rating & City Row */}
             <div className="flex items-center gap-1.5 text-xs text-zinc-500 font-medium">
-              <ContentReviewRating rating={totalRating} size={12} showScore={true} scoreTextStyles="text-[11px] font-bold text-zinc-700 ml-1" />
+              <ContentReviewRating rating={totalRating} size={12} showScore={true} scoreTextStyles="text-xs font-semibold text-zinc-800 ml-1" />
               <span className="text-zinc-300">•</span>
-              <div className="flex items-center gap-1 truncate text-zinc-500 text-[10.5px] sm:text-[11px]">
+              <div className="flex items-center gap-1 truncate text-zinc-500 text-[11px] sm:text-xs">
                 <MapPin className="w-3 h-3 text-zinc-400 shrink-0" />
                 <span className="truncate">{location}</span>
               </div>
             </div>
 
             {/* Review Comment Text */}
-            <p className="text-[11.5px] sm:text-xs text-zinc-700 leading-relaxed font-normal mt-0.5 line-clamp-3">
+            <p className="text-xs sm:text-[13px] text-zinc-700 leading-relaxed font-normal mt-0.5 line-clamp-3">
               {review}
             </p>
 
             {/* Uploaded Customer Photos Thumbnail Strip */}
             {photos && photos.length > 0 && (
-              <div className="flex items-center gap-1.5 pt-0.5 overflow-x-auto scrollbar-hide">
+              <div className="flex items-center gap-1.5 pt-1 overflow-x-auto scrollbar-hide">
                 {photos.map((photoUrl, pIdx) => (
                   <div
                     key={pIdx}
                     onClick={() => setActivePhotoIndex(pIdx)}
-                    className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-lg overflow-hidden border border-zinc-200 bg-zinc-50 group/photo cursor-pointer shrink-0"
+                    className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl overflow-hidden border border-zinc-200 bg-zinc-50 group/photo cursor-pointer shrink-0 hover:border-zinc-400 transition-colors"
                   >
                     <img
                       src={photoUrl}
@@ -121,19 +127,19 @@ function ContentReview({
             )}
           </div>
 
-          {/* Helpful footer micro-interaction */}
-          <div className="pt-2.5 mt-2 border-t border-zinc-100/80 flex items-center justify-between text-[10px] sm:text-[10.5px] text-zinc-400">
-            <span className="text-emerald-600 font-medium flex items-center gap-1">
-              ✓ Verified Purchase
+          {/* Footer: Verified & Helpful */}
+          <div className="pt-3 mt-3 border-t border-zinc-100 flex items-center justify-between text-xs text-zinc-400">
+            <span className="text-zinc-500 font-medium flex items-center gap-1 text-[11px]">
+              <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Verified Purchase
             </span>
             <button
               type="button"
               onClick={handleLike}
-              className={`inline-flex items-center gap-1 transition-colors cursor-pointer ${
-                hasLiked ? "text-violet-600 font-semibold" : "text-zinc-400 hover:text-zinc-700"
+              className={`inline-flex items-center gap-1 text-[11px] transition-colors cursor-pointer ${
+                hasLiked ? "text-zinc-900 font-semibold" : "text-zinc-400 hover:text-zinc-700"
               }`}
             >
-              <ThumbsUp className={`w-2.5 h-2.5 ${hasLiked ? "fill-violet-600" : ""}`} />
+              <ThumbsUp className={`w-3 h-3 ${hasLiked ? "fill-zinc-900 text-zinc-900" : ""}`} />
               <span>Helpful ({likes})</span>
             </button>
           </div>

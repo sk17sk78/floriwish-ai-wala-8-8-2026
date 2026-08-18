@@ -1,186 +1,531 @@
-import { Metadata } from "next";
-import FranchiseEnquiryForm from "./FranchiseEnquiryForm";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Franchise Opportunities | Floriwish",
-  description:
-    "Join the Floriwish family and start your own successful gifting business with our franchise program.",
-};
+import { useState } from "react";
+import NextImage from "@/components/custom/NextImage";
+import FranchiseEnquiryForm from "./FranchiseEnquiryForm";
+import WhyChooseUsSection from "@/components/(frontend)/global/_Templates/WhyChooseUs/WhyChooseUsSection";
+import {
+  Building2,
+  CheckCircle2,
+  Clock3,
+  Coins,
+  Gem,
+  GraduationCap,
+  Headphones,
+  HelpCircle,
+  PackageCheck,
+  ShieldCheck,
+  Sparkles,
+  Store,
+  TrendingUp,
+  Truck,
+  Users,
+  Eye,
+  Layers
+} from "lucide-react";
+
+const STORE_PHOTOS = [
+  {
+    src: "https://d22rebqllszdz8.cloudfront.net/sample-images/fdecf765809047d5.webp",
+    alt: "Floriwish Retail Boutique Storefront",
+    title: "Storefront Exterior",
+    subtitle: "High-Visibility Luxury Retail Branding",
+    tag: "Exterior View",
+  },
+  {
+    src: "https://d22rebqllszdz8.cloudfront.net/sample-images/245e066513a04d06.webp",
+    alt: "Floriwish Retail Showroom Interior",
+    title: "Showroom Interior",
+    subtitle: "Modern Walk-in Gifting Experience",
+    tag: "Interior View",
+  },
+];
+
+const PILLARS = [
+  {
+    icon: TrendingUp,
+    title: "Proven High ROI Model",
+    desc: "Robust unit economics with healthy 35-45% gross margins and rapid break-even periods.",
+  },
+  {
+    icon: Store,
+    title: "Established Brand Value",
+    desc: "Leverage customer trust, nationwide marketing campaigns, and instant brand recognition.",
+  },
+  {
+    icon: GraduationCap,
+    title: "Complete Staff Training",
+    desc: "Comprehensive SOPs, master florist conditioning training, and inventory management support.",
+  },
+  {
+    icon: Truck,
+    title: "Direct Supply Chain",
+    desc: "Centralized sourcing of farm-fresh flowers, artisan cakes, packaging, and exotic gifts.",
+  },
+];
+
+const FRANCHISE_MODELS = [
+  {
+    title: "Cloud Studio / Dark Workshop",
+    investment: "₹5 - ₹10 Lakhs",
+    space: "250 - 450 sq.ft.",
+    roi: "6 - 9 Months",
+    desc: "Ideal for online order fulfillment, rapid deliveries, and lower overhead operating costs.",
+    highlight: "Low Overhead",
+  },
+  {
+    title: "Retail Flower & Cake Boutique",
+    investment: "₹10 - ₹20 Lakhs",
+    space: "400 - 800 sq.ft.",
+    roi: "9 - 14 Months",
+    desc: "High footfall storefront in prime commercial areas, combining walk-ins with online orders.",
+    highlight: "Most Popular",
+    popular: true,
+  },
+  {
+    title: "Flagship Luxury Experience Hub",
+    investment: "₹20 - ₹35 Lakhs",
+    space: "800 - 1500 sq.ft.",
+    roi: "12 - 18 Months",
+    desc: "Premium experiential center featuring live florist bar, luxury hampers, and event styling.",
+    highlight: "Maximum Revenue",
+  },
+];
+
+const ONBOARDING_STEPS = [
+  {
+    step: "01",
+    title: "Submit Enquiry",
+    desc: "Fill the franchise form with your planned city and investment range.",
+  },
+  {
+    step: "02",
+    title: "Discovery & Location",
+    desc: "Our business development team reviews location feasibility and territory exclusivity.",
+  },
+  {
+    step: "03",
+    title: "Agreement & Fit-out",
+    desc: "Formal partnership sign-off followed by turnkey architectural & store design guidance.",
+  },
+  {
+    step: "04",
+    title: "Training & Grand Launch",
+    desc: "Staff training on recipes, floral designs, POS systems, and marketing rollout.",
+  },
+];
+
+const FAQS = [
+  {
+    q: "Who can apply for a Floriwish Franchise?",
+    a: "Entrepreneurs, existing florist/bakery owners wanting to upgrade to a national brand, or business professionals with adequate investment capacity and passion for customer delight.",
+  },
+  {
+    q: "Does Floriwish offer territory exclusivity?",
+    a: "Yes. Every franchise partner is granted a defined geographical pin-code territory where online and app orders from that zone are directed exclusively to your outlet.",
+  },
+  {
+    q: "How does the supply chain and procurement work?",
+    a: "We have direct tie-ups with premium flower farms in Ooty/Bangalore, international bloom importers, and certified packaging vendors to ensure wholesale cost benefits for your store.",
+  },
+  {
+    q: "What training and ongoing support is provided?",
+    a: "We provide comprehensive 10-day staff training on floral conditioning, cake assembly, CRM order handling, POS billing, plus dedicated account managers for daily operational support.",
+  },
+  {
+    q: "What is the expected timeline from signing to store opening?",
+    a: "Typically 3 to 6 weeks, depending on store size, interior fit-outs, and staff onboarding.",
+  },
+];
 
 export default function FranchisePage() {
+  const [activePhotoIdx, setActivePhotoIdx] = useState<number>(0);
+
   return (
-    <div className="min-h-screen w-full bg-white text-gray-800 font-poppins selection:bg-[#b76e79] selection:text-white">
-      {/* --- HERO & FORM SECTION --- */}
-      <section className="relative w-full bg-gradient-to-br from-[#FAF7F2] via-white to-[#f4e8ea] px-4 py-16 md:py-24 overflow-hidden">
-        {/* Decorative background blob */}
-        <div className="absolute top-0 left-0 w-96 h-96 bg-[#b76e79] opacity-5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#b76e79] opacity-5 rounded-full blur-3xl translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
+    <div className="min-h-screen w-full bg-[#fdfcfb] text-zinc-800 selection:bg-[#ad2355] selection:text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+        {/* Top Header Section */}
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ad2355]/10 border border-[#ad2355]/20 text-[#ad2355] text-[11px] sm:text-xs font-semibold tracking-wide uppercase mb-3">
+            <Sparkles className="w-3 h-3" />
+            <span>Business Expansion Opportunities</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 tracking-tight leading-tight">
+            Own a <span className="text-[#ad2355]">Floriwish</span> Franchise
+          </h1>
+          <p className="text-xs sm:text-sm md:text-base text-zinc-600 mt-2.5 leading-relaxed max-w-xl mx-auto">
+            Become a part of India&apos;s fastest growing premium floral & gifting brand. Turn your entrepreneurial vision into a highly profitable local enterprise.
+          </p>
+        </div>
 
-        <div className="max-w-7xl mx-auto relative z-10 flex flex-col lg:flex-row gap-16 items-center">
-          {/* Left Content */}
-          <div className="lg:w-1/2 flex flex-col items-center lg:items-start w-full text-center lg:text-left">
-            <div className="inline-block px-4 py-1.5 bg-rose-50 text-[#b76e79] font-medium text-sm rounded-full mb-6 border border-rose-100 shadow-sm">
-              Partner with the Best
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-gray-900 mb-6 tracking-tight leading-tight">
-              Own a <span className="text-[#b76e79]">Floriwish</span> Franchise
-            </h1>
-            <p className="text-gray-600 mb-12 text-lg md:text-lg max-w-lg leading-relaxed">
-              Become a part of India&apos;s fastest-growing premium gifting
-              network and turn your passion into a thriving business.
-            </p>
-
-            {/* Support Grid - Modern Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full max-w-lg">
-              {[
-                {
-                  title: "High ROI",
-                  desc: "Proven business model with quick break-even periods.",
-                  icon: "M13 7h8m0 0v8m0-8l-8 8-4-4-6 6",
-                },
-                {
-                  title: "Brand Power",
-                  desc: "Leverage the trust and reach of the Floriwish brand.",
-                  icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
-                },
-                {
-                  title: "Training",
-                  desc: "Comprehensive training on operations and floral design.",
-                  icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477-4.5 1.253",
-                },
-                {
-                  title: "24/7 Support",
-                  desc: "Our dedicated team is here to help you scale seamlessly.",
-                  icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
-                },
-              ].map((feature, idx) => (
-                <div
-                  key={idx}
-                  className="bg-white/70 backdrop-blur-sm p-6 sm:p-5 rounded-2xl border border-white shadow-sm hover:shadow-md transition-shadow"
-                >
-                  <div className="w-12 h-12 sm:w-10 sm:h-10 bg-rose-50 rounded-xl flex items-center justify-center text-[#b76e79] mb-4">
-                    <svg
-                      className="w-6 h-6 sm:w-5 sm:h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+        {/* Hero Grid: Left Store Visual & Pillars + Right Form */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start">
+          {/* Left Column: Real Store Showroom Showcase + Pillars + Stats */}
+          <div className="lg:col-span-5 flex flex-col gap-5 sm:gap-6">
+            {/* Real Store Photo Showcase with View Switcher */}
+            <div className="bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 border border-zinc-200/80 shadow-xs flex flex-col gap-3">
+              {/* Photo Header & View Switcher */}
+              <div className="flex items-center justify-between px-1">
+                <span className="text-[11px] sm:text-xs font-bold text-[#ad2355] uppercase tracking-wider flex items-center gap-1.5">
+                  <Store className="w-3.5 h-3.5" />
+                  <span>Retail Store Concept</span>
+                </span>
+                <div className="flex items-center gap-1 bg-zinc-100 p-0.5 rounded-lg">
+                  {STORE_PHOTOS.map((photo, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setActivePhotoIdx(idx)}
+                      className={`text-[10px] sm:text-[11px] font-semibold px-2.5 py-1 rounded-md transition-all cursor-pointer ${
+                        activePhotoIdx === idx
+                          ? "bg-white text-zinc-900 shadow-2xs"
+                          : "text-zinc-500 hover:text-zinc-800"
+                      }`}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d={feature.icon}
-                      />
-                    </svg>
-                  </div>
-                  <h3 className="font-semibold text-gray-900 mb-1 text-lg sm:text-base">
-                    {feature.title}
-                  </h3>
-                  <p className="text-base sm:text-sm text-gray-500 leading-relaxed">
-                    {feature.desc}
-                  </p>
+                      {photo.tag}
+                    </button>
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              {/* Main Active Image Display */}
+              <div className="relative w-full h-[220px] min-[400px]:h-[250px] sm:h-[290px] md:h-[310px] rounded-xl sm:rounded-2xl overflow-hidden border border-zinc-200/60 bg-zinc-100">
+                <NextImage
+                  src={STORE_PHOTOS[activePhotoIdx].src}
+                  alt={STORE_PHOTOS[activePhotoIdx].alt}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 500px"
+                  className="object-cover transition-transform duration-500 hover:scale-102 select-none"
+                  priority
+                />
+                <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent text-white">
+                  <span className="text-xs font-bold block leading-tight">
+                    {STORE_PHOTOS[activePhotoIdx].title}
+                  </span>
+                  <span className="text-[10.5px] text-zinc-300 font-normal">
+                    {STORE_PHOTOS[activePhotoIdx].subtitle}
+                  </span>
+                </div>
+              </div>
+
+              {/* Dual Thumbnail Grid */}
+              <div className="grid grid-cols-2 gap-2 pt-0.5">
+                {STORE_PHOTOS.map((item, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => setActivePhotoIdx(idx)}
+                    className={`relative h-14 sm:h-16 rounded-xl overflow-hidden cursor-pointer border-2 transition-all ${
+                      activePhotoIdx === idx
+                        ? "border-[#ad2355] ring-2 ring-[#ad2355]/20"
+                        : "border-transparent opacity-70 hover:opacity-100"
+                    }`}
+                  >
+                    <NextImage
+                      src={item.src}
+                      alt={item.alt}
+                      fill
+                      sizes="200px"
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/20" />
+                    <span className="absolute bottom-1 left-1.5 text-[9.5px] font-bold text-white bg-black/60 px-1.5 py-0.5 rounded">
+                      {item.tag}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Why Franchise with Floriwish (Pillars) */}
+            <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200/80 shadow-xs">
+              <span className="text-[10px] sm:text-[11px] font-semibold text-[#ad2355] uppercase tracking-wider block mb-1">
+                Franchise Advantages
+              </span>
+              <h2 className="text-base sm:text-lg font-bold text-zinc-900 tracking-tight mb-4">
+                Why Partner With Floriwish?
+              </h2>
+
+              <div className="space-y-3.5">
+                {PILLARS.map((item, idx) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={idx} className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-[#ad2355]/10 border border-[#ad2355]/20 flex items-center justify-center text-[#ad2355] shrink-0 mt-0.5">
+                        <Icon className="w-4 h-4 stroke-[2]" />
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <h3 className="text-xs sm:text-[13px] font-bold text-zinc-900">
+                          {item.title}
+                        </h3>
+                        <p className="text-[11px] sm:text-xs text-zinc-500 font-normal leading-relaxed mt-0.5">
+                          {item.desc}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Quick Metrics Card */}
+            <div className="bg-zinc-900 text-white rounded-2xl p-4 sm:p-5 shadow-xs">
+              <div className="flex items-center gap-2 mb-3 pb-3 border-b border-zinc-800">
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <span className="text-xs font-semibold text-zinc-300">
+                  National Brand Power
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 text-center divide-x divide-zinc-800">
+                <div>
+                  <span className="text-base sm:text-lg font-bold text-white block">35-45%</span>
+                  <span className="text-[10px] text-zinc-400 font-normal">Gross Margins</span>
+                </div>
+                <div>
+                  <span className="text-base sm:text-lg font-bold text-white block">400+</span>
+                  <span className="text-[10px] text-zinc-400 font-normal">Cities Network</span>
+                </div>
+                <div>
+                  <span className="text-base sm:text-lg font-bold text-white block">6-12 Mo</span>
+                  <span className="text-[10px] text-zinc-400 font-normal">Avg Break-even</span>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Right Content - Elevated Form */}
-          <div className="lg:w-1/2 w-full max-w-xl mx-auto lg:mx-0">
-            <div className="bg-white p-8 md:p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 relative">
-              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#b76e79] to-[#d89ba5] rounded-t-3xl"></div>
-              <h2 className="text-2xl md:text-3xl font-bold mb-2 text-gray-900">
-                Start Your Journey
-              </h2>
-              <p className="text-gray-500 mb-8 text-sm">
-                Fill out the form below and our team will get back to you
-                shortly.
-              </p>
+          {/* Right Column: Enquiry Form */}
+          <div className="lg:col-span-7">
+            <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-7 md:p-8 border border-zinc-200/80 shadow-xs">
+              <div className="pb-4 mb-5 border-b border-zinc-100">
+                <span className="text-[10px] sm:text-[11px] font-semibold text-[#ad2355] uppercase tracking-wider block">
+                  Confidential Inquiry
+                </span>
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-zinc-900 tracking-tight mt-0.5">
+                  Franchise Application Details
+                </h2>
+                <p className="text-xs text-zinc-500 mt-1">
+                  Express your interest below. Our franchise expansion head will connect with you for a personalized briefing.
+                </p>
+              </div>
+
               <FranchiseEnquiryForm />
             </div>
           </div>
         </div>
-      </section>
 
-      {/* --- WHY FRANCHISE SECTION --- */}
-      <section className="max-w-7xl mx-auto px-4 py-24">
-        <div className="text-center mb-16 max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900 tracking-tight">
-            Why Partner with Us?
-          </h2>
-          <p className="text-gray-600 text-lg leading-relaxed">
-            Floriwish is more than just a gifting brand; we are a community
-            dedicated to spreading joy. Join us in our journey and build a
-            highly profitable, sustainable business.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            {
-              title: "Global Reach",
-              desc: "Benefit from our strong online presence and extensive customer base across India and beyond.",
-              icon: "M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2 2 2 0 012 2v.659M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
-            },
-            {
-              title: "Seamless Supply Chain",
-              desc: "Access our established network of premium vendors and logistics partners for flawless daily operations.",
-              icon: "M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4",
-            },
-            {
-              title: "Marketing Support",
-              desc: "Get end-to-end marketing, social media assets, and branding support to drive local demand.",
-              icon: "M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z",
-            },
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              className="bg-gray-50 p-8 rounded-3xl border border-gray-100 hover:bg-white hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group"
-            >
-              <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                <svg
-                  className="w-7 h-7 text-[#b76e79]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d={item.icon}
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900">
-                {item.title}
-              </h3>
-              <p className="text-gray-600 leading-relaxed">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* --- CTA SECTION --- */}
-      <section className="mx-4 mb-16">
-        <div className="max-w-6xl mx-auto bg-gradient-to-r from-[#b76e79] to-[#a25a65] rounded-3xl px-6 py-20 text-center shadow-2xl relative overflow-hidden">
-          {/* Decorative background elements inside CTA */}
-          <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white opacity-10 rounded-full blur-2xl"></div>
-          <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-white opacity-10 rounded-full blur-2xl"></div>
-
-          <div className="relative z-10 max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight">
-              Ready to Grow with Floriwish?
+        {/* --- STORE ARCHITECTURE & FIT-OUT SPOTLIGHT --- */}
+        <section className="mt-14 sm:mt-20 pt-8 border-t border-zinc-200/70">
+          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
+            <span className="text-[11px] font-semibold text-[#ad2355] uppercase tracking-widest block mb-1">
+              Turnkey Store Architecture
+            </span>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-zinc-900 tracking-tight">
+              Aesthetic, High-Converting Store Design
             </h2>
-            <p className="text-rose-100 mb-10 text-lg md:text-xl font-normal">
-              Join hands with India&apos;s most loved gifting brand and start
-              your entrepreneurial journey today.
+            <p className="text-xs sm:text-sm text-zinc-500 mt-1.5">
+              Every Floriwish store is engineered for maximum visual appeal, customer comfort, and streamlined order fulfillment.
             </p>
-            <button className="bg-white text-[#b76e79] px-10 py-4 rounded-xl font-bold text-lg hover:bg-rose-50 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-              Apply for Franchise
-            </button>
           </div>
-        </div>
-      </section>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Exterior Card */}
+            <div className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-zinc-200/80 shadow-xs group">
+              <div className="relative w-full h-[220px] sm:h-[260px] md:h-[280px]">
+                <NextImage
+                  src={STORE_PHOTOS[0].src}
+                  alt={STORE_PHOTOS[0].alt}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 600px"
+                  className="object-cover group-hover:scale-102 transition-transform duration-500"
+                />
+                <span className="absolute top-3 left-3 bg-black/70 backdrop-blur-xs text-white text-[10.5px] font-semibold px-2.5 py-1 rounded-full">
+                  Exterior Storefront
+                </span>
+              </div>
+              <div className="p-5 sm:p-6">
+                <h3 className="text-base sm:text-lg font-bold text-zinc-900 mb-1.5">
+                  High-Impact Street Visibility
+                </h3>
+                <p className="text-xs text-zinc-500 leading-relaxed font-normal">
+                  Illuminated 3D brand signage, modern matte black framing, and floor-to-ceiling glass display ensuring your store stands out in any premium high street or commercial zone.
+                </p>
+              </div>
+            </div>
+
+            {/* Interior Card */}
+            <div className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-zinc-200/80 shadow-xs group">
+              <div className="relative w-full h-[220px] sm:h-[260px] md:h-[280px]">
+                <NextImage
+                  src={STORE_PHOTOS[1].src}
+                  alt={STORE_PHOTOS[1].alt}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 600px"
+                  className="object-cover group-hover:scale-102 transition-transform duration-500"
+                />
+                <span className="absolute top-3 left-3 bg-black/70 backdrop-blur-xs text-white text-[10.5px] font-semibold px-2.5 py-1 rounded-full">
+                  Interior Showroom
+                </span>
+              </div>
+              <div className="p-5 sm:p-6">
+                <h3 className="text-base sm:text-lg font-bold text-zinc-900 mb-1.5">
+                  Optimized Retail Experience
+                </h3>
+                <p className="text-xs text-zinc-500 leading-relaxed font-normal">
+                  Temperature-controlled floral display stations, specialized bakery chillers, curated gift hamper shelving, and integrated digital order screens for fast walk-ins.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* --- FRANCHISE MODELS SECTION --- */}
+        <section className="mt-14 sm:mt-20 pt-8 border-t border-zinc-200/70">
+          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
+            <span className="text-[11px] font-semibold text-[#ad2355] uppercase tracking-widest block mb-1">
+              Custom Formats
+            </span>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-zinc-900 tracking-tight">
+              Flexible Franchise Formats
+            </h2>
+            <p className="text-xs sm:text-sm text-zinc-500 mt-1.5">
+              Choose the right model that matches your city size, location, and investment budget.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+            {FRANCHISE_MODELS.map((model, idx) => (
+              <div
+                key={idx}
+                className={`bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border flex flex-col justify-between transition-all duration-200 ${
+                  model.popular
+                    ? "border-[#ad2355] ring-2 ring-[#ad2355]/15 shadow-sm"
+                    : "border-zinc-200/80 shadow-2xs hover:border-zinc-300"
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span
+                      className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
+                        model.popular
+                          ? "bg-[#ad2355] text-white"
+                          : "bg-zinc-100 text-zinc-700"
+                      }`}
+                    >
+                      {model.highlight}
+                    </span>
+                  </div>
+
+                  <h3 className="text-base sm:text-lg font-bold text-zinc-900 mb-1">
+                    {model.title}
+                  </h3>
+                  <p className="text-xs text-zinc-500 font-normal leading-relaxed mb-5">
+                    {model.desc}
+                  </p>
+
+                  <div className="space-y-2.5 border-t border-zinc-100 pt-4 text-xs">
+                    <div className="flex justify-between items-center">
+                      <span className="text-zinc-500 font-normal">Initial Investment</span>
+                      <span className="font-bold text-zinc-900">{model.investment}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-zinc-500 font-normal">Space Required</span>
+                      <span className="font-semibold text-zinc-800">{model.space}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-zinc-500 font-normal">Target ROI Timeline</span>
+                      <span className="font-semibold text-emerald-700">{model.roi}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* --- ONBOARDING STEPS SECTION --- */}
+        <section className="mt-14 sm:mt-20 pt-8 border-t border-zinc-200/70">
+          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
+            <span className="text-[11px] font-semibold text-[#ad2355] uppercase tracking-widest block mb-1">
+              Simple Journey
+            </span>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-zinc-900 tracking-tight">
+              How To Get Started
+            </h2>
+            <p className="text-xs sm:text-sm text-zinc-500 mt-1.5">
+              4 straightforward steps from initial enquiry to your grand opening.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+            {ONBOARDING_STEPS.map((item, idx) => (
+              <div
+                key={idx}
+                className="bg-white rounded-2xl p-5 border border-zinc-200/80 shadow-2xs relative flex flex-col justify-between"
+              >
+                <div>
+                  <span className="text-xl font-extrabold text-[#ad2355] block mb-2 font-mono">
+                    {item.step}
+                  </span>
+                  <h3 className="text-sm font-bold text-zinc-900 mb-1">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs text-zinc-500 font-normal leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* --- FAQ SECTION --- */}
+        <section className="max-w-4xl mx-auto mt-14 sm:mt-20 pt-8 border-t border-zinc-200/70">
+          <div className="text-center mb-6 sm:mb-10">
+            <span className="text-[11px] font-semibold text-[#ad2355] uppercase tracking-widest block mb-1">
+              Got Questions?
+            </span>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-zinc-900 tracking-tight">
+              Franchise FAQ
+            </h2>
+            <p className="text-xs sm:text-sm text-zinc-500 mt-1">
+              Everything you need to know about setting up a Floriwish outlet.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {FAQS.map((faq, idx) => (
+              <details
+                key={idx}
+                className="group bg-white hover:bg-zinc-50/60 rounded-2xl border border-zinc-200/80 p-4 sm:p-5 transition-all cursor-pointer shadow-2xs"
+              >
+                <summary className="font-semibold text-xs sm:text-sm md:text-base text-zinc-900 flex items-center justify-between list-none outline-none">
+                  <span>{faq.q}</span>
+                  <span className="transition-transform duration-200 group-open:rotate-180 text-zinc-400 group-hover:text-[#ad2355] ml-2 shrink-0">
+                    <svg
+                      fill="none"
+                      height="18"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                      width="18"
+                    >
+                      <path d="M6 9l6 6 6-6" />
+                    </svg>
+                  </span>
+                </summary>
+                <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed mt-2.5 pt-2.5 border-t border-zinc-100">
+                  {faq.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+        <WhyChooseUsSection />
+      </div>
     </div>
   );
 }

@@ -183,6 +183,8 @@ function CategoryPage({
       <CategoryReviewSection
         categoryId={String(category._id)}
         reviews={category?.personalizedReviews}
+        rating={category._page?.averageRating}
+        ratingCount={category._page?.ratingCount}
       />
       <CategoryBottomContentSection
         bottomContent={category?.info?.bottomContent}

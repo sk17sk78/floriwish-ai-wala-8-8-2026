@@ -45,23 +45,41 @@ export function removeLocalIds(obj: AnyObject): AnyObject {
 
 export function excludePartialCheckout(cartDoc: CartDocument): CartDocument {
   const checkout = cartDoc.checkout;
-  if (
-    checkout &&
-    checkout.name &&
-    checkout.name.length &&
-    checkout.location.address &&
-    checkout.location.address.length &&
-    checkout.location.pincode &&
-    checkout.location.pincode.length &&
-    checkout.contact.mail &&
-    checkout.contact.mail.length &&
-    checkout.contact.mobileNumber &&
-    checkout.contact.mobileNumber.length
-  )
-    return cartDoc;
+  if (!checkout) return cartDoc;
+
+  // Check if at least one field has data
+  const hasData =
+    Boolean(checkout.name?.trim()) ||
+    Boolean(checkout.contact?.mobileNumber?.trim()) ||
+    Boolean(checkout.contact?.mail?.trim()) ||
+    Boolean(checkout.location?.address?.trim()) ||
+    Boolean(checkout.location?.city?.trim()) ||
+    Boolean(checkout.location?.pincode?.trim()) ||
+    Boolean(checkout.receiverName?.trim()) ||
+    Boolean(checkout.occasion);
+
+  if (hasData) {
+    return {
+      ...cartDoc,
+      checkout: {
+        ...checkout,
+        name: checkout.name || "",
+        contact: {
+          mobileNumber: checkout.contact?.mobileNumber || "",
+          mail: checkout.contact?.mail || "",
+          alternateMobileNumber: checkout.contact?.alternateMobileNumber || ""
+        },
+        location: {
+          address: checkout.location?.address || "",
+          city: checkout.location?.city || "",
+          pincode: checkout.location?.pincode || "",
+          landmark: checkout.location?.landmark || ""
+        }
+      }
+    } as CartDocument;
+  }
 
   const { checkout: _, ...duplicated } = cartDoc;
-
   return duplicated as CartDocument;
 }
 

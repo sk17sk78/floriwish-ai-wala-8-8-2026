@@ -34,7 +34,7 @@ export default function Breadcrumbs({
       }}
     >
       <div
-        className={`${hideInMobile ? "max-sm:hidden" : ""} ${forceShowBreadcrumb ? "" : "max-sm:hidden"} px-3 1200:px-0 pt-1.5 pb-4 lg:pt-3 max-sm:pb-0 mt-2 sm:mt-2 lg:mt-2`}
+        className={`${hideInMobile ? "max-sm:hidden" : ""} ${forceShowBreadcrumb ? "" : "max-sm:hidden"} px-3 1200:px-0 pt-1.5 pb-2 lg:pt-3 max-sm:pb-0 mt-2 sm:mt-2 lg:mt-2`}
       >
         <Breadcrumb className="overflow-x-scroll scrollbar-hide whitespace-nowrap flex-nowrap">
           <BreadcrumbList className="overflow-x-scroll scrollbar-hide whitespace-nowrap flex-nowrap">

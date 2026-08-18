@@ -14,8 +14,7 @@ if (!cached) {
 // Global connection event handlers for auto-recovery on network drops
 if (!(global as any).mongooseEventsAttached) {
   mongoose.connection.on("disconnected", () => {
-    console.warn("⚠️ MongoDB disconnected, resetting connection cache...");
-    if ((global as any).mongoose && mongoose.connection.readyState === 0) {
+    if ((global as any).mongoose) {
       (global as any).mongoose.conn = null;
       (global as any).mongoose.promise = null;
     }
@@ -23,15 +22,7 @@ if (!(global as any).mongooseEventsAttached) {
 
   mongoose.connection.on("error", (err: any) => {
     const errorMsg = err?.message || String(err);
-    // Ignore transient pool clearing notifications from idle socket timeout as driver auto-refreshes them
-    if (errorMsg.includes("Connection pool") || errorMsg.includes("SSL routines")) {
-      console.info("ℹ️ MongoDB pool auto-clearing stale idle socket (normal cloud keepalive behavior)");
-    } else {
-      console.warn("⚠️ MongoDB connection error event:", errorMsg);
-    }
-    
-    // Only reset global singleton if connection is actually completely dead/disconnected (readyState === 0)
-    if (mongoose.connection.readyState === 0 && (global as any).mongoose) {
+    if ((global as any).mongoose) {
       (global as any).mongoose.conn = null;
       (global as any).mongoose.promise = null;
     }
@@ -52,36 +43,30 @@ const connectDB = async (): Promise<Mongoose> => {
     return cached.conn;
   }
 
-  // If connection is in a disconnected state (0), reset promise to force fresh connection
-  if (mongoose.connection.readyState === 0) {
+  // If connection is not ready, force clean reset
+  if (mongoose.connection.readyState !== 1) {
     cached.conn = null;
     cached.promise = null;
   }
 
   if (!cached.promise) {
-    console.log("🔄 Attempting MongoDB connection...");
     cached.promise = mongoose
       .connect(uri as string, {
         dbName,
-        minPoolSize: 2,  // Keep warm connections alive (eliminates cold-start latency)
-        maxPoolSize: 30, // Headroom for high concurrency burst traffic
-        maxIdleTimeMS: 30000, // Recycle idle connections before cloud NAT/firewall drops them
+        minPoolSize: 0, // Prevents OpenSSL idle socket TLS corruption on macOS/Node
+        maxPoolSize: 15,
+        maxIdleTimeMS: 15000,
         socketTimeoutMS: 45000,
-        connectTimeoutMS: 10000,
-        serverSelectionTimeoutMS: 10000,
-        heartbeatFrequencyMS: 5000,  // Faster reconnection detection
+        connectTimeoutMS: 15000,
+        serverSelectionTimeoutMS: 15000,
         retryWrites: true,
-        retryReads: true,
-        tls: true,
-        family: 4 // IPv4 only (avoids dual-stack IPv6 DNS delays)
+        retryReads: true
       })
       .then((m) => {
-        console.log("✅ MongoDB connected successfully");
         cached.conn = m;
         return m;
       })
       .catch((error) => {
-        console.error("❌ MongoDB connection failed:", error?.message || error);
         cached.conn = null;
         cached.promise = null;
         throw error;

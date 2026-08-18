@@ -208,6 +208,8 @@ function SubTopicPage({
       <CategoryReviewSection
         categoryId={String(subTopic._id)}
         reviews={subTopic?.personalizedReviews}
+        rating={subTopic._page?.averageRating}
+        ratingCount={subTopic._page?.ratingCount}
       />
       <CategoryBottomContentSection
         bottomContent={subTopic?.info?.bottomContent}

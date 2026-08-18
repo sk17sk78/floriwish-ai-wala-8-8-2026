@@ -30,6 +30,8 @@ import { SettingProvider } from "@/hooks/useSetting/useSetting";
 import { Check } from "lucide-react";
 import { HorizontalSpacing } from "@/components/(frontend)/global/_Spacings/HorizontalSpacings";
 
+import { useAppStates } from "@/hooks/useAppState/useAppState";
+
 export default function CartPage() {
   // states
   const [showCheckoutDetail, setShowCheckoutDetail] = useState<boolean>(false);
@@ -37,6 +39,22 @@ export default function CartPage() {
 
   // hooks - must be called unconditionally (no try-catch allowed)
   const { isReady, items } = useCart();
+  const {
+    auth: {
+      data: { isAuthenticated },
+      method: { onChangeShowAuth }
+    }
+  } = useAppStates();
+
+  // Prompt login immediately on landing in cart if not logged in
+  useEffect(() => {
+    if (isReady && items && items.length > 0 && !isAuthenticated) {
+      const timer = setTimeout(() => {
+        onChangeShowAuth(true);
+      }, 350);
+      return () => clearTimeout(timer);
+    }
+  }, [isReady, items, isAuthenticated, onChangeShowAuth]);
 
   if (!isReady) {
     return (

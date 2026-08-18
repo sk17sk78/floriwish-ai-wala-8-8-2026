@@ -3,228 +3,254 @@ import NextImage from "@/components/custom/NextImage";
 import { LocationProvider } from "@/hooks/useLocation/useLocation";
 import VendorRegisterForm from "./VendorRegisterForm";
 import WhyChooseUsSection from "@/components/(frontend)/global/_Templates/WhyChooseUs/WhyChooseUsSection";
+import {
+  Building2,
+  CheckCircle2,
+  Clock3,
+  CreditCard,
+  PhoneCall,
+  ShieldCheck,
+  Sparkles,
+  Store,
+  TrendingUp,
+  Truck,
+  Users
+} from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Vendor Registration | Floriwish",
-  description: "Register as a vendor on Floriwish and grow your business.",
+  title: "Partner With Us / Vendor Registration | Floriwish",
+  description: "Join the Floriwish Partner Network. Grow your florist, bakery, or decoration business with verified customer orders across 400+ cities in India.",
 };
+
+const BENEFITS = [
+  {
+    icon: TrendingUp,
+    title: "Instant Daily Order Volume",
+    description: "Receive daily orders from verified customers in your city with zero upfront marketing spend.",
+  },
+  {
+    icon: CreditCard,
+    title: "Weekly Direct Payouts",
+    description: "Transparent, automated weekly settlements directly deposited into your bank account.",
+  },
+  {
+    icon: Store,
+    title: "100% Free Onboarding",
+    description: "No setup fees, no monthly listing charges. You only fulfill orders and grow your revenue.",
+  },
+  {
+    icon: PhoneCall,
+    title: "Dedicated Partner Support",
+    description: "Personal account manager assistance and instant WhatsApp alerts for every new order.",
+  },
+];
+
+const FAQS = [
+  {
+    q: "Who can register as a vendor on Floriwish?",
+    a: "Local florists, artisan bakers, balloon & event decorators, and handcrafted gift creators with an active workshop or retail store across India are welcome to join our network.",
+  },
+  {
+    q: "Is there any registration or onboarding fee?",
+    a: "No. Partner registration on Floriwish is 100% free. We do not charge any upfront joining fees or recurring monthly subscription costs.",
+  },
+  {
+    q: "How do I receive and dispatch orders?",
+    a: "When a customer places an order in your serviceable area, you receive an instant alert on WhatsApp and email with complete product specifications, delivery slot, and recipient address.",
+  },
+  {
+    q: "How and when are payments settled?",
+    a: "All completed orders are settled on a scheduled weekly cycle directly via NEFT/IMPS to your registered bank account, along with itemized statement reports.",
+  },
+  {
+    q: "What documents are required to get started?",
+    a: "You just need basic business identification (Aadhaar/PAN), business address proof, and active bank account details for payouts. GST registration is optional for qualifying small vendors.",
+  },
+];
 
 export default function VendorRegisterPage() {
   return (
-    <div className="min-h-screen w-full bg-[#FCFBFA] pb-12 text-gray-800 font-poppins selection:bg-[#b76e79] selection:text-white">
-      {/* --- HERO & FORM SECTION --- */}
-      <section className="max-w-7xl mx-auto px-4 py-12 md:py-20">
-        <div className="flex flex-col lg:flex-row gap-16 lg:gap-10 items-center lg:items-start">
-          {/* Left Content - Story & Stats */}
-          <div className="lg:w-1/2 flex flex-col items-center lg:items-start w-full relative z-10 text-center lg:text-left">
-            <div className="inline-block px-4 py-1.5 bg-rose-50 text-[#b76e79] rounded-full text-sm font-semibold tracking-wide mb-6">
-              Partner with Floriwish
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 tracking-tight leading-tight">
-              Grow your business <br />
-              <span className="text-[#b76e79] font-serif italic pr-2">
-                beautifully.
-              </span>
-            </h1>
-            <p className="text-gray-500 mb-12 text-lg md:text-sm leading-relaxed max-w-md mx-auto lg:mx-0">
-              Join India&apos;s fastest-growing premium gifting platform. Get
-              immediate access to millions of active buyers and elevate your
-              brand presence.
-            </p>
+    <div className="min-h-screen w-full bg-[#fdfcfb] text-zinc-800 selection:bg-[#ad2355] selection:text-white">
+      {/* Top Container */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+        {/* Header Hero Section */}
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ad2355]/10 border border-[#ad2355]/20 text-[#ad2355] text-[11px] sm:text-xs font-semibold tracking-wide uppercase mb-3">
+            <Sparkles className="w-3 h-3" />
+            <span>Floriwish Partner Network</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 tracking-tight leading-tight">
+            Grow Your Gifting Business <br className="hidden sm:inline" />
+            <span className="text-[#ad2355]">With Floriwish</span>
+          </h1>
+          <p className="text-xs sm:text-sm md:text-base text-zinc-600 mt-2.5 leading-relaxed max-w-xl mx-auto">
+            Join India&apos;s fastest growing floral & gifting platform. Connect with thousands of active buyers and expand your workshop effortlessly.
+          </p>
+        </div>
 
-            {/* Stats - Minimalist Grid */}
-            <div className="relative w-full max-w-[400px] h-[300px] hidden lg:block opacity-90 mt-auto">
-              <NextImage
-                src="/user_old.png"
-                alt="Floriwish Vendor"
-                fill
-                sizes="400px"
-                className="object-contain object-bottom"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#FCFBFA] via-transparent to-transparent pointer-events-none"></div>
-            </div>
-            <div className="grid grid-cols-2 gap-x-8 gap-y-10 w-full max-w-lg mb-12 mx-auto lg:mx-0">
-              <div className="flex flex-col items-center lg:items-start">
-                <div className="w-12 h-12 rounded-2xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-[#b76e79] mb-4">
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-1">15M+</h3>
-                <p className="text-sm text-gray-500 font-medium">
-                  Customers Reached
-                </p>
+        {/* Main Grid: Left Partner Visual & Benefits / Right Form */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start">
+          {/* Left Column: Lady Visual Showcase + Benefits + Stats */}
+          <div className="lg:col-span-5 flex flex-col gap-5 sm:gap-6">
+            {/* Florist Lady Image Card - Responsive across Mobile & Desktop */}
+            <div className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-gradient-to-br from-rose-50 via-zinc-50 to-amber-50/40 border border-zinc-200/80 shadow-xs flex flex-col items-center">
+              {/* Partner Story Tag */}
+              <div className="w-full p-4 sm:p-5 flex items-center justify-between z-10">
+                <span className="text-[11px] sm:text-xs font-bold text-[#ad2355] uppercase tracking-wider flex items-center gap-1.5">
+                  <Store className="w-3.5 h-3.5" />
+                  <span>Partner Community</span>
+                </span>
+                <span className="text-[10px] sm:text-[11px] bg-white/90 border border-zinc-200/80 rounded-full px-2.5 py-0.5 font-medium text-zinc-600 shadow-2xs">
+                  Pan-India Network
+                </span>
               </div>
-              <div className="flex flex-col items-center lg:items-start">
-                <div className="w-12 h-12 rounded-2xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-[#b76e79] mb-4">
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-1">500+</h3>
-                <p className="text-sm text-gray-500 font-medium">
-                  Cities & Towns Covered
-                </p>
+
+              {/* Lady Photo Container */}
+              <div className="relative w-full h-[220px] min-[400px]:h-[260px] sm:h-[300px] md:h-[330px] lg:h-[300px]">
+                <NextImage
+                  src="/user_old.png"
+                  alt="Floriwish Florist Partner"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 450px"
+                  className="object-contain object-bottom select-none"
+                  priority
+                />
+                {/* Soft gradient bottom fade */}
+                <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-zinc-50 via-zinc-50/60 to-transparent pointer-events-none" />
               </div>
-              <div className="flex flex-col items-center lg:items-start">
-                <div className="w-12 h-12 rounded-2xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-[#b76e79] mb-4">
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                    />
-                  </svg>
+
+              {/* Floating Quote Badge */}
+              <div className="w-full p-4 pt-1 z-10">
+                <div className="bg-white/95 backdrop-blur-xs p-3 sm:p-3.5 rounded-xl sm:rounded-2xl border border-zinc-200/90 shadow-2xs">
+                  <p className="text-[11px] sm:text-xs text-zinc-700 italic leading-relaxed">
+                    &ldquo;Partnering with Floriwish doubled our daily orders within the first month. Payouts are always on time!&rdquo;
+                  </p>
+                  <span className="text-[10px] sm:text-[11px] font-semibold text-zinc-900 mt-1 block">
+                    — Sunita Verma, Master Florist (Pune)
+                  </span>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-1">200+</h3>
-                <p className="text-sm text-gray-500 font-medium">
-                  Gifting Categories
-                </p>
-              </div>
-              <div className="flex flex-col items-center lg:items-start">
-                <div className="w-12 h-12 rounded-2xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-[#b76e79] mb-4">
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-1">2.5M+</h3>
-                <p className="text-sm text-gray-500 font-medium">
-                  Orders Delivered
-                </p>
               </div>
             </div>
 
-            {/* Subtle decorative image */}
+            {/* Why Partner With Us (Benefits) */}
+            <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200/80 shadow-xs">
+              <h2 className="text-sm sm:text-base font-bold text-zinc-900 tracking-tight mb-4 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-[#ad2355]" />
+                <span>Partner Benefits</span>
+              </h2>
+
+              <div className="space-y-3.5">
+                {BENEFITS.map((item, idx) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={idx} className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-[#ad2355]/10 border border-[#ad2355]/20 flex items-center justify-center text-[#ad2355] shrink-0 mt-0.5">
+                        <Icon className="w-4 h-4 stroke-[2]" />
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <h3 className="text-xs sm:text-[13px] font-bold text-zinc-900">
+                          {item.title}
+                        </h3>
+                        <p className="text-[11px] sm:text-xs text-zinc-500 font-normal leading-relaxed mt-0.5">
+                          {item.description}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Stats Bar */}
+            <div className="bg-zinc-900 text-white rounded-2xl p-4 sm:p-5 shadow-xs">
+              <div className="grid grid-cols-3 gap-2 text-center divide-x divide-zinc-800">
+                <div>
+                  <span className="text-base sm:text-lg font-bold text-white block">400+</span>
+                  <span className="text-[10px] text-zinc-400 font-normal">Cities Covered</span>
+                </div>
+                <div>
+                  <span className="text-base sm:text-lg font-bold text-white block">100%</span>
+                  <span className="text-[10px] text-zinc-400 font-normal">Timely Payouts</span>
+                </div>
+                <div>
+                  <span className="text-base sm:text-lg font-bold text-white block">24/7</span>
+                  <span className="text-[10px] text-zinc-400 font-normal">Partner Support</span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Right Content - Form Card */}
-          <div className="lg:w-1/2 w-full relative">
-            {/* Background glow for premium feel */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-rose-100 to-[#b76e79]/20 rounded-[2.5rem] blur-xl opacity-50"></div>
-
-            <div className="relative bg-white p-8 md:p-12 rounded-[2rem] border border-gray-100 shadow-2xl shadow-gray-200/50">
-              <div className="mb-10">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                  Vendor Application
+          {/* Right Column: Registration Form */}
+          <div className="lg:col-span-7">
+            <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-7 md:p-8 border border-zinc-200/80 shadow-xs">
+              <div className="pb-4 mb-5 border-b border-zinc-100">
+                <span className="text-[10px] sm:text-[11px] font-semibold text-[#ad2355] uppercase tracking-wider block">
+                  Quick Onboarding
+                </span>
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-zinc-900 tracking-tight mt-0.5">
+                  Vendor Application Details
                 </h2>
-                <p className="text-gray-500">
-                  Fill out the form below and our team will get back to you
-                  within 24 hours.
+                <p className="text-xs text-zinc-500 mt-1">
+                  Fill in your basic business details below. Our onboarding specialist will reach out within 24 hours.
                 </p>
               </div>
+
               <LocationProvider>
                 <VendorRegisterForm />
               </LocationProvider>
             </div>
           </div>
         </div>
-      </section>
 
-      {/* --- FAQ SECTION --- */}
-      <section className="max-w-3xl mx-auto px-4 py-20">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight mb-4">
-            Common Questions
-          </h2>
-          <p className="text-gray-500">
-            Everything you need to know about becoming a vendor.
-          </p>
-        </div>
+        {/* FAQ Section */}
+        <section className="max-w-4xl mx-auto mt-14 sm:mt-20 pt-8 border-t border-zinc-200/70">
+          <div className="text-center mb-6 sm:mb-10">
+            <span className="text-[11px] font-semibold text-[#ad2355] uppercase tracking-widest block mb-1">
+              Have Questions?
+            </span>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-zinc-900 tracking-tight">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-xs sm:text-sm text-zinc-500 mt-1">
+              Everything you need to know about partnering with Floriwish.
+            </p>
+          </div>
 
-        <div className="space-y-4">
-          {[
-            "Who can register as a vendor on Floriwish?",
-            "Is there any registration fee?",
-            "How do I get orders from Floriwish?",
-            "How do I get paid for completed orders?",
-            "Do I need to handle customer service?",
-          ].map((question, idx) => (
-            <div
-              key={idx}
-              className="bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all duration-300"
-            >
-              <input
-                type="checkbox"
-                id={`faq-${idx}`}
-                className="peer hidden"
-              />
-              <label
-                htmlFor={`faq-${idx}`}
-                className="group flex justify-between items-center font-medium text-lg cursor-pointer text-gray-800 py-5 px-6"
+          <div className="space-y-3">
+            {FAQS.map((faq, idx) => (
+              <details
+                key={idx}
+                className="group bg-white hover:bg-zinc-50/60 rounded-2xl border border-zinc-200/80 p-4 sm:p-5 transition-all cursor-pointer shadow-2xs"
               >
-                <span>{question}</span>
-                <span className="transition-transform duration-300 peer-checked:rotate-180 text-gray-400 group-hover:text-[#b76e79]">
-                  <svg
-                    fill="none"
-                    height="20"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                    width="20"
-                  >
-                    <path d="M6 9l6 6 6-6"></path>
-                  </svg>
-                </span>
-              </label>
-              <div className="grid grid-rows-[0fr] opacity-0 transition-all duration-300 ease-in-out peer-checked:grid-rows-[1fr] peer-checked:opacity-100">
-                <div className="overflow-hidden">
-                  <p className="text-gray-500 pb-6 px-6 leading-relaxed text-sm">
-                    Placeholder answer for {question}. This text will smoothly
-                    slide down and fade in when the user clicks the accordion.
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+                <summary className="font-semibold text-xs sm:text-sm md:text-base text-zinc-900 flex items-center justify-between list-none outline-none">
+                  <span>{faq.q}</span>
+                  <span className="transition-transform duration-200 group-open:rotate-180 text-zinc-400 group-hover:text-[#ad2355] ml-2 shrink-0">
+                    <svg
+                      fill="none"
+                      height="18"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                      width="18"
+                    >
+                      <path d="M6 9l6 6 6-6" />
+                    </svg>
+                  </span>
+                </summary>
+                <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed mt-2.5 pt-2.5 border-t border-zinc-100">
+                  {faq.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </section>
+      </div>
 
-      <WhyChooseUsSection />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+        <WhyChooseUsSection />
+      </div>
     </div>
   );
 }

@@ -152,6 +152,8 @@ export default function TableLayout({
       {query && (
         <TableLayoutQuerySidebar
           showSidebar={showSidebar}
+          onClose={() => setShowSidebar(false)}
+          onReset={query.onReset}
           search={query.search}
           limit={
             pagination

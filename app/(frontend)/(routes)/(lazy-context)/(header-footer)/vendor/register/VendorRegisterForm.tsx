@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "@/hooks/useLocation/useLocation";
-import { MapPin, Search, ChevronDown, CheckCircle2, ArrowRight, RefreshCcw, Building2 } from "lucide-react";
+import { MapPin, Search, ChevronDown, CheckCircle2, ArrowRight, Loader2, Building2, Store, Phone, Mail, User } from "lucide-react";
 import Link from "next/link";
 
 export default function VendorRegisterForm() {
-  const { cities, onSearch } = useLocation();
+  const { onSearch } = useLocation();
   const [status, setStatus] = useState<
     "idle" | "submitting" | "success" | "error"
   >("idle");
@@ -71,7 +71,7 @@ export default function VendorRegisterForm() {
 
       const data = await res.json().catch(() => null);
       if (!res.ok || !data?.success) {
-        throw new Error(data?.message || data?.error || "Submission failed");
+        throw new Error(data?.message || data?.error || "Submission failed. Please try again.");
       }
 
       form.reset();
@@ -81,57 +81,58 @@ export default function VendorRegisterForm() {
       setMessage("Thanks! We received your vendor application.");
     } catch (err) {
       setStatus("error");
-      setMessage(err instanceof Error ? err.message : "Something went wrong");
+      setMessage(err instanceof Error ? err.message : "Something went wrong. Please check your connection and try again.");
     }
   };
 
-  // Render Human-Crafted Thank You Screen
+  // Render Clean Human Thank You Screen
   if (status === "success") {
     return (
-      <div className="py-12 px-8 bg-[#faf7f2] border border-[#e8ded1] rounded-2xl text-center space-y-6">
-        <div className="w-14 h-14 bg-[#b76e79] text-white rounded-full flex items-center justify-center mx-auto shadow-sm">
-          <CheckCircle2 className="w-8 h-8 stroke-[2]" />
+      <div className="py-10 px-6 sm:px-8 bg-zinc-50 border border-zinc-200/80 rounded-2xl text-center space-y-5">
+        <div className="w-12 h-12 bg-[#ad2355]/10 text-[#ad2355] border border-[#ad2355]/20 rounded-full flex items-center justify-center mx-auto shadow-xs">
+          <CheckCircle2 className="w-6 h-6 stroke-[2.5]" />
         </div>
 
-        <div className="space-y-2 max-w-md mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
+        <div className="space-y-1.5 max-w-md mx-auto">
+          <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">
             Application Received!
           </h2>
-          <p className="text-sm text-gray-600 leading-relaxed font-normal">
-            Thank you for registering with Floriwish. We have received your vendor application details and our onboarding team will reach out to you within 24 hours.
+          <p className="text-xs sm:text-sm text-zinc-500 leading-relaxed">
+            Thank you for registering with Floriwish Partner Network. Our vendor onboarding team will verify your details and reach out to you within 24 hours.
           </p>
         </div>
 
         {submittedDetails && (
-          <div className="p-4 bg-white rounded-xl border border-[#e5dcd0] max-w-sm mx-auto text-left space-y-1">
-            <p className="text-xs uppercase tracking-wider font-bold text-[#b76e79]">
-              Application Reference
-            </p>
-            <p className="text-sm font-bold text-gray-900">
+          <div className="p-3.5 bg-white rounded-xl border border-zinc-200 max-w-sm mx-auto text-left space-y-1">
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-[#ad2355] block">
+              Application Details
+            </span>
+            <p className="text-sm font-semibold text-zinc-900">
               {submittedDetails.fullName}
             </p>
-            <p className="text-xs text-gray-500 font-medium">
-              Business: <span className="text-gray-800 font-semibold">{submittedDetails.businessName}</span>
+            <p className="text-xs text-zinc-500">
+              Business: <span className="text-zinc-800 font-medium">{submittedDetails.businessName}</span>
             </p>
           </div>
         )}
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
           <button
+            type="button"
             onClick={() => {
               setStatus("idle");
               setSubmittedDetails(null);
             }}
-            className="px-5 py-3 text-xs font-semibold text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 rounded-xl transition-colors cursor-pointer w-full sm:w-auto"
+            className="px-4 py-2.5 text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-50 border border-zinc-300 rounded-xl transition-colors cursor-pointer w-full sm:w-auto"
           >
             Submit Another Application
           </button>
 
           <Link
             href="/"
-            className="px-6 py-3 text-xs font-semibold text-white bg-[#b76e79] hover:bg-[#9a5963] rounded-xl transition-colors shadow-sm w-full sm:w-auto inline-flex items-center justify-center gap-1.5"
+            className="px-5 py-2.5 text-xs font-semibold text-white bg-[#ad2355] hover:bg-[#8e1944] rounded-xl transition-colors shadow-xs w-full sm:w-auto inline-flex items-center justify-center gap-1.5"
           >
-            <span>Back to Floriwish Home</span>
+            <span>Back to Home</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -140,67 +141,67 @@ export default function VendorRegisterForm() {
   }
 
   const inputClass =
-    "w-full px-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#b76e79]/10 focus:border-[#b76e79] transition-all duration-300 text-gray-900 placeholder-gray-400 text-sm";
-  const labelClass = "block text-sm font-medium text-gray-600 mb-2";
+    "w-full px-3.5 py-2.5 sm:py-3 bg-zinc-50 border border-zinc-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#ad2355] focus:ring-2 focus:ring-[#ad2355]/15 transition-all duration-200 text-zinc-900 placeholder-zinc-400 text-xs sm:text-sm";
+  const labelClass = "block text-xs font-medium text-zinc-700 mb-1.5";
 
   const categories = [
-    "Florist",
-    "Decoration",
-    "Balloon Decoration",
-    "Bakery",
-    "Gifting",
-    "Other",
+    "Florist & Fresh Flowers",
+    "Bakery & Cakes",
+    "Balloon & Party Decoration",
+    "Handcrafted Gifts & Hampers",
+    "Plants & Garden",
+    "Other Speciality Gifting",
   ];
 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit}>
+    <form className="space-y-4 sm:space-y-5" onSubmit={handleSubmit}>
       {/* Row 1: Name & Email */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelClass}>
-            Full Name <span className="text-rose-500">*</span>
+            Full Name <span className="text-zinc-400">*</span>
           </label>
           <input
             name="fullName"
             type="text"
-            placeholder="John Doe"
+            placeholder="e.g. Rajesh Kumar"
             className={inputClass}
             required
           />
         </div>
         <div>
           <label className={labelClass}>
-            Email <span className="text-rose-500">*</span>
+            Email Address <span className="text-zinc-400">*</span>
           </label>
           <input
             name="email"
             type="email"
-            placeholder="john@example.com"
+            placeholder="e.g. rajesh@example.com"
             className={inputClass}
             required
           />
         </div>
       </div>
 
-      {/* Business Name */}
+      {/* Row 2: Business Name */}
       <div>
         <label className={labelClass}>
-          Business Name <span className="text-rose-500">*</span>
+          Business / Shop Name <span className="text-zinc-400">*</span>
         </label>
         <input
           name="businessName"
           type="text"
-          placeholder="Your brand or shop name"
+          placeholder="e.g. Blossom Florist & Decor"
           className={inputClass}
           required
         />
       </div>
 
-      {/* Row 2: City & Category */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Row 3: City & Category */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="relative" ref={cityRef}>
           <label className={labelClass}>
-            City <span className="text-rose-500">*</span>
+            City <span className="text-zinc-400">*</span>
           </label>
           <div className="relative">
             <input
@@ -217,24 +218,24 @@ export default function VendorRegisterForm() {
               onFocus={() => setShowCityResults(true)}
               required
             />
-            <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400">
-              <Search className="w-4 h-4" />
+            <div className="absolute inset-y-0 right-3.5 flex items-center pointer-events-none text-zinc-400">
+              <Search className="w-3.5 h-3.5" />
             </div>
           </div>
 
           {showCityResults && filteredCities.length > 0 && (
-            <div className="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-xl shadow-xl max-h-60 overflow-y-auto overflow-x-hidden">
+            <div className="absolute z-50 w-full mt-1.5 bg-white border border-zinc-200 rounded-xl shadow-lg max-h-52 overflow-y-auto">
               {filteredCities.map((city, idx) => (
                 <div
                   key={idx}
-                  className="px-4 py-3 hover:bg-rose-50 cursor-pointer flex items-center gap-3 transition-colors border-b border-gray-50 last:border-none"
+                  className="px-3.5 py-2.5 hover:bg-[#ad2355]/5 cursor-pointer flex items-center gap-2.5 transition-colors border-b border-zinc-100 last:border-none"
                   onClick={() => {
                     setCitySearch(city.name);
                     setShowCityResults(false);
                   }}
                 >
-                  <MapPin className="w-4 h-4 text-[#b76e79] shrink-0" />
-                  <span className="text-sm font-medium text-gray-700">
+                  <MapPin className="w-3.5 h-3.5 text-[#ad2355] shrink-0" />
+                  <span className="text-xs sm:text-sm font-medium text-zinc-800">
                     {city.name}
                   </span>
                 </div>
@@ -245,17 +246,17 @@ export default function VendorRegisterForm() {
 
         <div className="relative">
           <label className={labelClass}>
-            Interested Category <span className="text-rose-500">*</span>
+            Primary Category <span className="text-zinc-400">*</span>
           </label>
           <div className="relative">
             <select
               name="interestedCategory"
-              className={`${inputClass} appearance-none cursor-pointer`}
+              className={`${inputClass} appearance-none cursor-pointer pr-9`}
               required
               defaultValue=""
             >
-              <option value="" disabled className="text-gray-400">
-                Select Category
+              <option value="" disabled className="text-zinc-400">
+                Select your business category
               </option>
               {categories.map((cat) => (
                 <option
@@ -266,72 +267,67 @@ export default function VendorRegisterForm() {
                 </option>
               ))}
             </select>
-            <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400">
-              <ChevronDown className="w-5 h-5" />
+            <div className="absolute inset-y-0 right-3.5 flex items-center pointer-events-none text-zinc-400">
+              <ChevronDown className="w-4 h-4" />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Row 3: Phone Numbers */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Row 4: Phone Numbers */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <div className="flex justify-between items-end mb-2">
-            <label className="block text-sm font-medium text-gray-600">
-              Mobile Number <span className="text-rose-500">*</span>
-            </label>
-            <span className="text-xs font-semibold text-[#b76e79] cursor-pointer hover:text-[#9a5963] transition-colors tracking-wide">
-              Verify OTP
-            </span>
-          </div>
-          <div className="flex rounded-xl border border-gray-200 bg-gray-50/50 focus-within:bg-white focus-within:ring-4 focus-within:ring-[#b76e79]/10 focus-within:border-[#b76e79] transition-all duration-300 overflow-hidden">
-            <span className="px-4 py-3.5 bg-gray-100/50 border-r border-gray-200 text-gray-500 font-medium select-none text-sm">
+          <label className={labelClass}>
+            Mobile Number <span className="text-zinc-400">*</span>
+          </label>
+          <div className="flex rounded-xl border border-zinc-200 bg-zinc-50 focus-within:bg-white focus-within:border-[#ad2355] focus-within:ring-2 focus-within:ring-[#ad2355]/15 transition-all overflow-hidden">
+            <span className="px-3 py-2.5 sm:py-3 bg-zinc-100/70 border-r border-zinc-200 text-zinc-500 font-medium select-none text-xs sm:text-sm">
               +91
             </span>
             <input
               name="mobile"
               type="tel"
-              placeholder="99999 00000"
-              className="w-full px-4 py-3.5 bg-transparent outline-none text-gray-900 placeholder-gray-400 text-sm"
+              placeholder="98765 43210"
+              className="w-full px-3 py-2.5 sm:py-3 bg-transparent outline-none text-zinc-900 placeholder-zinc-400 text-xs sm:text-sm"
               required
             />
           </div>
         </div>
 
         <div>
-          <label className={labelClass}>Whatsapp Number</label>
-          <div className="flex rounded-xl border border-gray-200 bg-gray-50/50 focus-within:bg-white focus-within:ring-4 focus-within:ring-[#b76e79]/10 focus-within:border-[#b76e79] transition-all duration-300 overflow-hidden">
-            <span className="px-4 py-3.5 bg-gray-100/50 border-r border-gray-200 text-gray-500 font-medium select-none text-sm">
+          <label className={labelClass}>WhatsApp Number (Optional)</label>
+          <div className="flex rounded-xl border border-zinc-200 bg-zinc-50 focus-within:bg-white focus-within:border-[#ad2355] focus-within:ring-2 focus-within:ring-[#ad2355]/15 transition-all overflow-hidden">
+            <span className="px-3 py-2.5 sm:py-3 bg-zinc-100/70 border-r border-zinc-200 text-zinc-500 font-medium select-none text-xs sm:text-sm">
               +91
             </span>
             <input
               name="whatsapp"
               type="tel"
-              placeholder="Optional"
-              className="w-full px-4 py-3.5 bg-transparent outline-none text-gray-900 placeholder-gray-400 text-sm"
+              placeholder="Same as mobile or alternate"
+              className="w-full px-3 py-2.5 sm:py-3 bg-transparent outline-none text-zinc-900 placeholder-zinc-400 text-xs sm:text-sm"
             />
           </div>
         </div>
       </div>
 
-      {/* Row 4: Address & Additional Info */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="h-full">
+      {/* Row 5: Business Address & GST */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
           <label className={labelClass}>
-            Address <span className="text-rose-500">*</span>
+            Business Workshop / Store Address <span className="text-zinc-400">*</span>
           </label>
           <textarea
             name="address"
-            placeholder="Complete business address"
-            rows={5}
-            className={`${inputClass} h-[138px] resize-none`}
+            placeholder="Shop no, street, locality, pin code"
+            rows={3}
+            className={`${inputClass} resize-none`}
             required
-          ></textarea>
+          />
         </div>
 
-        <div className="flex flex-col justify-between space-y-6">
+        <div className="flex flex-col justify-between gap-4">
           <div>
-            <label className={labelClass}>GST Number (Optional)</label>
+            <label className={labelClass}>GSTIN (Optional)</label>
             <input
               name="gstNumber"
               type="text"
@@ -340,85 +336,79 @@ export default function VendorRegisterForm() {
             />
           </div>
           <div className="relative">
-            <label className={labelClass}>How did you find us?</label>
+            <label className={labelClass}>How did you hear about us?</label>
             <div className="relative">
               <select
                 name="foundUs"
-                className={`${inputClass} appearance-none cursor-pointer`}
+                className={`${inputClass} appearance-none cursor-pointer pr-9`}
                 defaultValue=""
               >
-                <option value="" disabled className="text-gray-400">
-                  Select source
+                <option value="" disabled className="text-zinc-400">
+                  Select an option
                 </option>
                 <option value="google">Google Search</option>
-                <option value="social">Social Media</option>
-                <option value="referral">Referral</option>
+                <option value="social">Social Media (Instagram / FB)</option>
+                <option value="referral">Vendor Referral / Friend</option>
                 <option value="other">Other</option>
               </select>
-              <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400">
-                <ChevronDown className="w-5 h-5" />
+              <div className="absolute inset-y-0 right-3.5 flex items-center pointer-events-none text-zinc-400">
+                <ChevronDown className="w-4 h-4" />
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Social Links */}
+      {/* Row 6: Social / Portfolio Link (Optional) */}
       <div>
         <label className={labelClass}>
-          Social Links <span className="text-rose-500">*</span>
+          Instagram / Website / Catalogue Link (Optional)
         </label>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative w-full sm:w-48 shrink-0">
+        <div className="flex flex-col sm:flex-row gap-2.5">
+          <div className="relative w-full sm:w-44 shrink-0">
             <select
               name="socialPlatform"
-              className={`${inputClass} appearance-none cursor-pointer`}
-              defaultValue=""
+              className={`${inputClass} appearance-none cursor-pointer pr-8`}
+              defaultValue="instagram"
             >
-              <option value="" disabled>
-                Platform
-              </option>
               <option value="instagram">Instagram</option>
-              <option value="facebook">Facebook</option>
               <option value="website">Website</option>
-              <option value="other">Other</option>
+              <option value="facebook">Facebook</option>
+              <option value="other">Other Link</option>
             </select>
-            <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400">
-              <ChevronDown className="w-5 h-5" />
+            <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-zinc-400">
+              <ChevronDown className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="flex w-full gap-3">
-            <input
-              name="socialLink"
-              type="url"
-              placeholder="https://..."
-              className={`${inputClass} flex-1`}
-            />
-            <button
-              type="button"
-              className="shrink-0 bg-gray-900 text-white px-8 py-3.5 rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors shadow-sm cursor-pointer"
-            >
-              Add
-            </button>
-          </div>
+          <input
+            name="socialLink"
+            type="url"
+            placeholder="https://instagram.com/yourbrand"
+            className={`${inputClass} flex-1`}
+          />
         </div>
       </div>
 
       {/* Submit Button */}
-      <div className="pt-4">
+      <div className="pt-2">
         <button
           type="submit"
           disabled={status === "submitting"}
-          className="w-full bg-[#b76e79] disabled:opacity-70 text-white font-semibold text-lg py-4 rounded-xl shadow-lg shadow-[#b76e79]/20 hover:shadow-[#b76e79]/40 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+          className="w-full bg-[#ad2355] hover:bg-[#8e1944] disabled:opacity-70 text-white font-semibold text-xs sm:text-sm py-3.5 rounded-xl shadow-md shadow-[#ad2355]/20 hover:shadow-lg hover:shadow-[#ad2355]/30 transition-all duration-200 cursor-pointer active:scale-98 flex items-center justify-center gap-2"
         >
-          {status === "submitting"
-            ? "Submitting Application..."
-            : "Submit Application"}
+          {status === "submitting" ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Submitting Application...</span>
+            </>
+          ) : (
+            <span>Submit Partner Application</span>
+          )}
         </button>
       </div>
 
       {status === "error" && message && (
-        <div className="p-4 rounded-xl text-sm font-medium bg-rose-50 text-rose-700 border border-rose-200">
+        <div className="p-3 rounded-xl text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">
           {message}
         </div>
       )}

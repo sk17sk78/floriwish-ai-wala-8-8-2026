@@ -9,7 +9,7 @@ export const cartItemDeliverySchema = new Schema<CartItemDeliveryDocument>(
   {
     date: {
       type: Date,
-      required: true
+      required: false
     },
     type: {
       type: Schema.Types.ObjectId,

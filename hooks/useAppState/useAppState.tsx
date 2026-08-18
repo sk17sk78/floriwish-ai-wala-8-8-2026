@@ -593,3 +593,9 @@ export const useAppStates = (): AppStates => {
 
   return context;
 };
+
+// Safe hook for components that may be mounted outside AppStatesProvider (e.g. RootLayout)
+export const useOptionalAppStates = (): AppStates | undefined => {
+  return useContext(AppStates);
+};
+

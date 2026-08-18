@@ -315,7 +315,12 @@ export default function SelectImage(
                 return (
                   <div
                     key={index}
-                    className={`grid *:col-start-1 *:row-start-1 rounded-xl group ${isBanner ? "" : "aspect-square"}`}
+                    onClick={() => {
+                      if (!disabled && !selectMultiple) {
+                        setShowImageManagement(true);
+                      }
+                    }}
+                    className={`relative rounded-xl group overflow-hidden ${isBanner ? "" : "aspect-square"} ${!disabled && !selectMultiple ? "cursor-pointer" : ""}`}
                   >
                     <NextImage
                       src={image.url}
@@ -329,34 +334,46 @@ export default function SelectImage(
                       draggable={false}
                       height={isBanner ? 300 : 100}
                       width={isBanner ? 300 : 100}
-                      className={`w-full h-full object-cover object-center rounded-xl`}
+                      className="w-full h-full object-cover object-center rounded-xl"
                     />
                     {!disabled && (
-                      <div className="flex items-center justify-center gap-5 w-full h-full group-hover:backdrop-blur-[3px] rounded-xl transition-all duration-300">
+                      <div className="absolute inset-0 flex items-center justify-center gap-3 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-200 rounded-xl">
                         {!selectMultiple && (
-                          <PenLine
-                            className="p-2 text-blue-600 hover:text-white bg-transparent hover:bg-blue-600 rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-all duration-300"
-                            strokeWidth={2}
-                            width={40}
-                            height={40}
-                            onClick={() => {
+                          <button
+                            type="button"
+                            title="Change Image"
+                            className="p-2.5 text-white bg-blue-600 hover:bg-blue-700 active:scale-95 rounded-full shadow-lg cursor-pointer transition-all duration-200 flex items-center justify-center"
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setShowImageManagement(true);
                             }}
-                          />
+                          >
+                            <PenLine
+                              strokeWidth={2}
+                              width={20}
+                              height={20}
+                            />
+                          </button>
                         )}
-                        <Trash2
-                          className="p-2 text-red-600 hover:text-white bg-transparent hover:bg-red-600 rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-all duration-300"
-                          strokeWidth={2}
-                          width={40}
-                          height={40}
-                          onClick={() => {
+                        <button
+                          type="button"
+                          title="Remove Image"
+                          className="p-2.5 text-white bg-rose-600 hover:bg-rose-700 active:scale-95 rounded-full shadow-lg cursor-pointer transition-all duration-200 flex items-center justify-center"
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setImageIds((prevImageIds) =>
                               [...prevImageIds].filter(
                                 (imageId) => String(imageId) !== String(image._id)
                               )
                             );
                           }}
-                        />
+                        >
+                          <Trash2
+                            strokeWidth={2}
+                            width={20}
+                            height={20}
+                          />
+                        </button>
                       </div>
                     )}
                   </div>

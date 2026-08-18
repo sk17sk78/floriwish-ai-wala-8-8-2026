@@ -5,5 +5,6 @@ export const FILTERS: OrderFilter[] = [
   "All",
   "Upcoming",
   "Delivered",
+  "Cancelled",
   "Failed"
 ];

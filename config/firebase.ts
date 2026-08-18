@@ -55,43 +55,110 @@ export const getFirebaseMessagingClient = async (): Promise<Messaging | null> =>
 };
 
 /**
- * Register Service Worker and retrieve FCM Web Push Registration Token
+ * Detect platform for token registration payload
  */
-export const requestFCMToken = async (): Promise<string | null> => {
+export const detectPlatform = (): string => {
+  if (typeof navigator === "undefined") return "web";
+  const ua = navigator.userAgent;
+  const isIOS = /iPhone|iPad|iPod/i.test(ua);
+  const isAndroid = /Android/i.test(ua);
+  const isPWA =
+    typeof window !== "undefined" &&
+    (window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as any).standalone === true);
+
+  if (isIOS && isPWA) return "pwa-ios";
+  if (isIOS) return "ios";
+  if (isAndroid) return "android";
+  return "web";
+};
+
+/**
+ * Register Service Worker and retrieve FCM Web Push Registration Token.
+ *
+ * CRITICAL FIX: We now await `swRegistration.ready` (not just the register() promise)
+ * before calling getToken(). On mobile Chrome, the SW may be in "installing" state
+ * right after register() returns — getToken() requires SW to be fully "activated".
+ * Awaiting `.ready` ensures the SW is active before FCM tries to use it.
+ */
+export const requestFCMToken = async (): Promise<{ token: string | null; error?: string }> => {
   try {
     if (typeof window === "undefined" || !("Notification" in window)) {
-      return null;
+      return { token: null, error: "Notifications not supported in this environment" };
     }
 
     if (Notification.permission !== "granted") {
-      return null;
+      return { token: null, error: "Notification permission not granted" };
+    }
+
+    if (!("serviceWorker" in navigator)) {
+      return { token: null, error: "Service Worker not supported in this browser" };
     }
 
     const messagingInstance = await getFirebaseMessagingClient();
-    if (!messagingInstance) return null;
+    if (!messagingInstance) {
+      return { token: null, error: "Firebase Messaging could not be initialized" };
+    }
 
-    // Register / get service worker registration for scope /
-    let swRegistration: ServiceWorkerRegistration | undefined;
-    if ("serviceWorker" in navigator) {
+    // Step 1: Register the service worker
+    let swRegistration: ServiceWorkerRegistration;
+    try {
       swRegistration = await navigator.serviceWorker.register("/firebase-messaging-sw.js", {
         scope: "/"
       });
+    } catch (swErr: any) {
+      console.error("[FCM SW] Registration failed:", swErr);
+      return { token: null, error: `Service Worker registration failed: ${swErr.message}` };
     }
 
-    const token = await getToken(messagingInstance, {
-      vapidKey: FIREBASE_VAPID_KEY || undefined,
-      serviceWorkerRegistration: swRegistration
-    });
+    // ─── CRITICAL MOBILE FIX ──────────────────────────────────────────────
+    // await .ready ensures the SW transitions from "installing" → "activated"
+    // before we call getToken(). Without this, mobile Chrome returns null or
+    // throws because the SW is not yet controlling the page.
+    // ─────────────────────────────────────────────────────────────────────
+    try {
+      await navigator.serviceWorker.ready;
+    } catch (readyErr) {
+      console.warn("[FCM SW] SW ready wait error:", readyErr);
+      // Non-fatal — continue with the registered SW
+    }
 
-    return token || null;
-  } catch (error) {
-    console.warn("Error getting FCM Token:", error);
-    return null;
+    // Step 2: Get FCM token with the activated SW registration
+    try {
+      const token = await getToken(messagingInstance, {
+        vapidKey: FIREBASE_VAPID_KEY || undefined,
+        serviceWorkerRegistration: swRegistration
+      });
+
+      if (!token) {
+        return { token: null, error: "FCM returned an empty token — check VAPID key and Firebase project settings" };
+      }
+
+      return { token };
+    } catch (tokenErr: any) {
+      // Log the specific FCM error code for easier debugging
+      const code = tokenErr?.code || "unknown";
+      console.error(`[FCM getToken] Error (code: ${code}):`, tokenErr);
+
+      let message = tokenErr.message || "Failed to get FCM token";
+      if (code === "messaging/permission-blocked") {
+        message = "Notification permission is blocked in browser settings";
+      } else if (code === "messaging/failed-service-worker-registration") {
+        message = "Service Worker registration failed";
+      } else if (code === "messaging/token-unsubscribe-failed") {
+        message = "Failed to unsubscribe from previous token";
+      }
+
+      return { token: null, error: message };
+    }
+  } catch (error: any) {
+    console.error("[FCM] Unexpected error:", error);
+    return { token: null, error: error.message || "Unexpected error getting FCM token" };
   }
 };
 
 /**
- * Listen to foreground FCM messages
+ * Listen to foreground FCM messages (when the app is open in browser)
  */
 export const listenToForegroundMessages = async (
   callback: (payload: MessagePayload) => void

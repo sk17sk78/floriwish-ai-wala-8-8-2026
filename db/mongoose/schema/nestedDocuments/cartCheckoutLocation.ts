@@ -10,7 +10,8 @@ export const cartCheckoutLocationSchema =
     {
       address: {
         type: String,
-        required: true
+        required: false,
+        default: ""
       },
       landmark: {
         type: String,
@@ -18,11 +19,13 @@ export const cartCheckoutLocationSchema =
       },
       city: {
         type: String,
-        required: true
+        required: false,
+        default: ""
       },
       pincode: {
         type: String,
-        required: true
+        required: false,
+        default: ""
       }
     },
     { timestamps: true }

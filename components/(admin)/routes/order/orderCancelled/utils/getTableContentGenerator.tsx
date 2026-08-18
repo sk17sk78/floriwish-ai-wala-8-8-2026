@@ -41,43 +41,51 @@ const getTableContentGenerator =
       header: [
         {
           label: "Content\u00A0Name",
-          span: 4,
-          sortable: false
+          span: 3,
+          sortable: false,
+          align: "left"
         },
         {
           label: "Customer\u00A0Name",
-          span: 2,
-          sortable: false
+          span: 1.8,
+          sortable: false,
+          align: "left"
         },
         {
           label: "Placed\u00A0On",
-          span: 2,
-          sortable: false
+          span: 1.8,
+          sortable: false,
+          align: "left"
         },
         {
           label: "Delivery/Event\u00A0On",
-          span: 2,
-          sortable: false
+          span: 1.4,
+          sortable: false,
+          align: "left"
         },
         {
           label: "Amount",
-          span: 1,
-          sortable: false
+          span: 1.4,
+          sortable: false,
+          align: "center"
         },
         {
           label: "Details",
-          span: 1,
-          sortable: false
+          span: 0.7,
+          sortable: false,
+          align: "center"
         },
         {
           label: "Status",
-          span: 2,
-          sortable: false
+          span: 1.8,
+          sortable: false,
+          align: "center"
         },
         {
           label: "City",
-          span: 1,
-          sortable: false
+          span: 1.2,
+          sortable: false,
+          align: "left"
         }
       ],
 
@@ -196,28 +204,18 @@ const getTableContentGenerator =
                       {
                         value: {
                           label: (() => {
-                            const cityValue = cart.checkout?.location?.city || (cart.checkout as any)?.city;
-                            if (!cityValue) {
-                              // Fallback: try to find city from customer addresses by matching pincode
-                              if (customer && customer.addresses && cart.checkout?.location?.pincode) {
-                                const matchingAddress = customer.addresses.find(
-                                  (addr) => addr.pincode === cart.checkout?.location?.pincode
-                                );
-                                if (matchingAddress) {
-                                  const cityDoc = cities.find(
-                                    ({ _id, name }) =>
-                                      String(_id) === String(matchingAddress.city) ||
-                                      name === matchingAddress.city
-                                  );
-                                  if (cityDoc) return cityDoc.name;
-                                  return matchingAddress.city;
-                                }
-                              }
-                              return "-";
+                            let cityValue = cart?.checkout?.location?.city || (cart?.checkout as any)?.city || (delivery as any)?.city;
+                            if (!cityValue && customer?.addresses?.length) {
+                              const matchingAddress = cart?.checkout?.location?.pincode
+                                ? customer.addresses.find((addr) => addr.pincode === cart.checkout?.location?.pincode)
+                                : customer.addresses[0];
+                              cityValue = matchingAddress?.city;
                             }
+                            if (!cityValue) return "-";
                             const cityDoc = cities.find(
-                              ({ _id }) =>
+                              ({ _id, name }) =>
                                 String(_id) === String(cityValue) ||
+                                name?.toLowerCase() === String(cityValue).toLowerCase() ||
                                 (typeof cityValue === "object" &&
                                   cityValue !== null &&
                                   String(_id) === String((cityValue as any)._id))

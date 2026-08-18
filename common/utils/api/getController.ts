@@ -91,8 +91,26 @@ const getController = <
         : documents;
 
       return successData<DocumentT[]>(responseDocuments as DocumentT[], count);
-    } catch (error) {
-      console.error("❌ DB Error in getDocuments:", error);
+    } catch (error: any) {
+      const errorMsg = error?.message || String(error);
+      const isTransient =
+        errorMsg.includes("SSL") ||
+        errorMsg.includes("PoolClearedError") ||
+        errorMsg.includes("MongoNetworkError") ||
+        errorMsg.includes("ECONNRESET") ||
+        errorMsg.includes("ECONNREFUSED");
+
+      if (isTransient && (!attempt || attempt < 2)) {
+        await new Promise((r) => setTimeout(r, 300));
+        return getController<DocumentT, ModelT>(Model).getDocuments(
+          searchParams,
+          sessionMiddleware,
+          responseDataMiddleware,
+          (attempt || 1) + 1
+        );
+      }
+
+      console.error("❌ DB Error in getDocuments:", errorMsg);
       return handleError(error as MongooseErrorType);
     }
   },
@@ -106,28 +124,6 @@ const getController = <
     const { filter, select, populate } = getQuery(searchParams, documentId);
 
     try {
-      // !session behaviour is unpredictable
-      // const document = await withSession<DocumentT | null>(
-      //   null,
-      //   async (session) => {
-      //     const sessionDocument = await Model.findOne(filter)
-      //       .select(select)
-      //       .populate(populate)
-      //       .session(session);
-
-      //     let newSessionDocument: DocumentT = sessionDocument as DocumentT;
-
-      //     newSessionDocument = sessionMiddleware
-      //       ? isAsync(sessionMiddleware)
-      //         ? await sessionMiddleware(newSessionDocument, session)
-      //         : (sessionMiddleware(newSessionDocument, session) as DocumentT)
-      //       : newSessionDocument;
-
-      //     return newSessionDocument;
-      //   },
-      //   attempt
-      // );
-
       await connectDB();
 
       const document = await Model.findOne(filter)
@@ -150,7 +146,26 @@ const getController = <
 
       return successData<DocumentT>(responseDocument);
     } catch (error: any) {
-      console.error("❌ DB Error in getDocument:", error);
+      const errorMsg = error?.message || String(error);
+      const isTransient =
+        errorMsg.includes("SSL") ||
+        errorMsg.includes("PoolClearedError") ||
+        errorMsg.includes("MongoNetworkError") ||
+        errorMsg.includes("ECONNRESET") ||
+        errorMsg.includes("ECONNREFUSED");
+
+      if (isTransient && (!attempt || attempt < 2)) {
+        await new Promise((r) => setTimeout(r, 300));
+        return getController<DocumentT, ModelT>(Model).getDocument(
+          documentId,
+          searchParams,
+          sessionMiddleware,
+          responseDataMiddleware,
+          (attempt || 1) + 1
+        );
+      }
+
+      console.error("❌ DB Error in getDocument:", errorMsg);
       return handleError(error as MongooseErrorType);
     }
   },

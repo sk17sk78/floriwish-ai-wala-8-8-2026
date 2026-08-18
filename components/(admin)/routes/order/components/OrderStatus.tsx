@@ -38,7 +38,7 @@ export default function OrderStatus({
 
   return (
     <Input
-      className="min-w-[150px]"
+      className="w-full min-w-[105px] max-w-[125px] text-xs"
       type="dropdown"
       name="status"
       isRequired={false}
@@ -47,10 +47,10 @@ export default function OrderStatus({
       validCheck={false}
       nullOption={false}
       options={[
-        { label: "New", value: "new" },
-        // { label: "Preparing", value: "preparing" },
-        { label: "Running", value: "on-the-way" },
-        { label: "Completed", value: "completed" },
+        { label: "Order Confirmed", value: "new" },
+        { label: "Being Prepared", value: "preparing" },
+        { label: "Out for Delivery", value: "on-the-way" },
+        { label: "Delivered", value: "completed" },
         { label: "Cancelled", value: "cancelled" }
       ]}
       customValue={{
@@ -65,6 +65,7 @@ export default function OrderStatus({
                     const updatedCartItem = { ...cartItem };
 
                     updatedCartItem.status = newStatus as OrderStatus;
+                    (updatedCartItem as any).updatedAt = new Date();
 
                     return updatedCartItem;
                   }

@@ -37,7 +37,7 @@ export default function CartPaymentButton({
     }
   } = useAppStates();
   const { onInitiateNewPayment } = usePayment();
-  const { onCreateCart } = useCart();
+  const { onCreateCart, price: cartContextPrice } = useCart();
 
   // states
   const [gateway, setGateway] = useState<"razorpay" | "payu">("razorpay");
@@ -45,6 +45,18 @@ export default function CartPaymentButton({
   // variables
   const defaultGateway = payment?.default || "razorpay";
   const showSelectGateway = payment?.active?.razorpay && payment?.active?.payu;
+
+  const activeCartId = cartId || (cart as any)?._id;
+  const payableAmount =
+    cart?.price?.payable ??
+    cartContextPrice?.payable ??
+    cart?.price?.total ??
+    cartContextPrice?.total ??
+    0;
+  const paymentPercentage =
+    cart?.price?.paymentPercentage ??
+    cartContextPrice?.paymentPercentage ??
+    100;
 
   const areItemsComplete = cart?.items?.every((item) => {
     const content = item.content as ContentDocument;
@@ -86,13 +98,13 @@ export default function CartPaymentButton({
         onClick={
           isAuthenticated
             ? cart?.checkout && isCheckoutComplete
-              ? cartId
+              ? activeCartId
                 ? () => {
                     onInitiateNewPayment({
                       gateway,
-                      cartId,
-                      amount: cart.price.payable,
-                      percentage: cart.price.paymentPercentage
+                      cartId: String(activeCartId),
+                      amount: payableAmount,
+                      percentage: paymentPercentage
                     });
                   }
                 : () => {

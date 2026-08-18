@@ -22,17 +22,27 @@ import CategoryBannerImage from "./CategoryBannerImage";
 import { type BannerDocument } from "@/common/types/documentation/nestedDocuments/banner";
 
 function CategoryBanner({
-  banner: {
+  banner
+}: {
+  banner: BannerDocument & { targetDevice?: "all" | "desktop" | "mobile" };
+}) {
+  const {
     type,
     autoScroll,
     scrollInterval,
     loopInfinitely,
     showIndicators,
-    images
-  }
-}: {
-  banner: BannerDocument;
-}) {
+    images,
+    targetDevice = "all"
+  } = banner;
+
+  const deviceVisibilityClass =
+    targetDevice === "desktop"
+      ? "max-sm:hidden"
+      : targetDevice === "mobile"
+      ? "sm:hidden"
+      : "";
+
   // references
   const plugin = useRef(
     Autoplay({
@@ -86,7 +96,7 @@ function CategoryBanner({
   }, [manageCarouselCount, countManager]);
 
   return (
-    <div className="py-2 max-sm:px-3.5">
+    <div className={`py-2 max-sm:px-3.5 ${deviceVisibilityClass}`}>
       <Carousel
         plugins={autoScroll ? [plugin.current] : undefined}
         className={`grid *:row-start-1 *:col-start-1 w-full ${dimensions}`}

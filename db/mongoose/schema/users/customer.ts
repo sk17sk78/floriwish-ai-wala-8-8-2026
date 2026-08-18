@@ -116,11 +116,13 @@ export const customerSchema = new Schema<CustomerDocument, CustomerModel>(
     },
     createdBy: {
       type: String,
-      required: true
+      required: false,
+      default: "Customer"
     },
     updatedBy: {
       type: String,
-      required: true
+      required: false,
+      default: "Customer"
     }
   },
   { timestamps: true }

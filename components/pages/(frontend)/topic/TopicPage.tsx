@@ -207,6 +207,8 @@ function TopicPage({
       <CategoryReviewSection
         categoryId={String(topic._id)}
         reviews={topic?.personalizedReviews}
+        rating={topic._page?.averageRating}
+        ratingCount={topic._page?.ratingCount}
       />
       <CategoryBottomContentSection
         bottomContent={topic?.info?.bottomContent}

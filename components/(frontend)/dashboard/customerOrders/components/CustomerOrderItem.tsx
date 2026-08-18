@@ -70,40 +70,32 @@ export default function CustomerOrderItem({
         </span>
 
         {/* STATUS ---------------- */}
-        <div className="flex items-center justify-start gap-1">
+        <div className="flex items-center justify-start gap-1 mt-0.5">
           {item.status === "completed" ? (
-            <>
-              <Check
-                className="text-green-600 translate-y-px"
-                width={14}
-                height={14}
-              />
-              <span className="text-green-600 text-xs font-medium">
-                Delivered
-              </span>
-            </>
+            <div className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
+              <Check className="w-3.5 h-3.5" />
+              <span className="text-[11px] font-semibold">Delivered</span>
+            </div>
+          ) : item.status === "on-the-way" ? (
+            <div className="flex items-center gap-1 text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md">
+              <Truck className="w-3.5 h-3.5 animate-pulse" />
+              <span className="text-[11px] font-semibold">Out for Delivery</span>
+            </div>
+          ) : item.status === "preparing" ? (
+            <div className="flex items-center gap-1 text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md">
+              <Sprout className="w-3.5 h-3.5 animate-bounce" />
+              <span className="text-[11px] font-semibold">Being Prepared</span>
+            </div>
           ) : item.status === "cancelled" ? (
-            <>
-              <X
-                className="text-red-500"
-                width={14}
-                height={14}
-              />
-              <span className="text-red-500 text-xs font-medium">
-                Cancelled
-              </span>
-            </>
+            <div className="flex items-center gap-1 text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md">
+              <X className="w-3.5 h-3.5" />
+              <span className="text-[11px] font-semibold">Cancelled</span>
+            </div>
           ) : (
-            <>
-              <Truck
-                className="text-purple-500"
-                width={14}
-                height={14}
-              />
-              <span className="text-purple-500 text-xs font-medium">
-                Upcoming
-              </span>
-            </>
+            <div className="flex items-center gap-1 text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md">
+              <Check className="w-3.5 h-3.5" />
+              <span className="text-[11px] font-semibold">Order Confirmed</span>
+            </div>
           )}
         </div>
       </section>

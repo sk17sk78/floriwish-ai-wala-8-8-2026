@@ -13,27 +13,28 @@ export const cartCheckoutSchema = new Schema<CartCheckoutDocument>(
   {
     name: {
       type: String,
-      required: true
+      required: false,
+      default: ""
     },
     contact: {
       type: cartCheckoutContactSchema,
-      required: true
+      required: false
     },
     location: {
       type: cartCheckoutLocationSchema,
-      required: true
+      required: false
     },
     note: {
       type: String,
       required: false
     },
     occasion: {
-      type: Schema.Types.ObjectId,
+      type: Schema.Types.Mixed,
       ref: "Occasion",
       required: false
     },
     venue: {
-      type: Schema.Types.ObjectId,
+      type: Schema.Types.Mixed,
       ref: "Venue",
       required: false
     },

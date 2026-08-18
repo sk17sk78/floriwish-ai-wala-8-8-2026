@@ -142,13 +142,16 @@ export const sendPushNotification = async (
           ...(imageUrl ? { image: imageUrl } : {})
         },
         webpush: {
+          headers: {
+            Urgency: "high"
+          },
           notification: {
             title,
             body,
-            icon: `${websiteUrl}/user.png`,
-            badge: `${websiteUrl}/user.png`,
+            icon: `${websiteUrl}/icons/icon-192x192.png`,
+            badge: `${websiteUrl}/icons/icon-192x192.png`,
             ...(imageUrl ? { image: imageUrl } : {}),
-            requireInteraction: false
+            requireInteraction: true
           },
           fcmOptions: {
             link: targetUrl

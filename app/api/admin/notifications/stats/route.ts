@@ -8,7 +8,7 @@ const { NotificationTokens, PushNotificationLogs } = models;
 
 /**
  * GET /api/admin/notifications/stats
- * Return subscriber metrics and recent campaign logs
+ * Returns subscriber metrics (with device breakdown) and recent campaign logs
  */
 export async function GET(req: NextRequest) {
   try {
@@ -16,13 +16,21 @@ export async function GET(req: NextRequest) {
 
     const [
       totalActive,
-      totalRegistered,
+      totalLoggedIn,
       totalGuests,
+      totalInactive,
+      totalMobile,
+      totalDesktop,
+      totalTablet,
       recentCampaigns
     ] = await Promise.all([
       NotificationTokens.countDocuments({ isActive: true }),
       NotificationTokens.countDocuments({ isActive: true, userId: { $ne: null } }),
       NotificationTokens.countDocuments({ isActive: true, userId: null }),
+      NotificationTokens.countDocuments({ isActive: false }),
+      NotificationTokens.countDocuments({ isActive: true, deviceType: "mobile" }),
+      NotificationTokens.countDocuments({ isActive: true, deviceType: "desktop" }),
+      NotificationTokens.countDocuments({ isActive: true, deviceType: "tablet" }),
       PushNotificationLogs.find().sort({ createdAt: -1 }).limit(20).lean()
     ]);
 
@@ -31,8 +39,12 @@ export async function GET(req: NextRequest) {
         success: true,
         stats: {
           totalActive,
-          totalRegistered,
-          totalGuests
+          totalLoggedIn,
+          totalGuests,
+          totalInactive,
+          totalMobile,
+          totalDesktop,
+          totalTablet
         },
         campaigns: recentCampaigns
       },
@@ -46,3 +58,4 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+

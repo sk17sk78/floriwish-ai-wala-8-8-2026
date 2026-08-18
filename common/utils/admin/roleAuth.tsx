@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { ADMIN_ROOT_ROUTE } from "@/common/utils/admin/sidebar";
 import { useRouter } from "next/navigation";
 import { useAdminAuth } from "@/hooks/auth/useAdminAuth";
@@ -23,12 +23,16 @@ export default function AdminRoleAuth({
   const targetSection = normalize(sectionSlug);
   const targetSubSection = normalize(subSectionSlug);
 
-  // Pick from authorizedSections (or fallback to SIDEBAR_SECTIONS for superAdmin)
-  const sectionsList = (authorizedSections && authorizedSections.length > 0)
-    ? authorizedSections
-    : isSuperAdmin
-    ? SIDEBAR_SECTIONS
-    : [];
+  // Memoize so the array reference is stable — prevents useEffect re-running on every render
+  const sectionsList = useMemo(
+    () =>
+      authorizedSections && authorizedSections.length > 0
+        ? authorizedSections
+        : isSuperAdmin
+        ? SIDEBAR_SECTIONS
+        : [],
+    [authorizedSections, isSuperAdmin]
+  );
 
   const relevantComponent = sectionsList.find(({ sectionName: name }) =>
     normalize(name) === targetSection

@@ -20,7 +20,7 @@ export default function ImageManagementWrapper({
       open={open}
       onOpenChange={setOpen}
     >
-      <DialogContent className="outline-none min-w-fit p-0 border-none bg-ivory-1 max-h-[95dvh] max-1200:max-w-[90dvw] max-w-1200 rounded-3xl overflow-hidden">
+      <DialogContent className="outline-none min-w-fit p-0 border-none bg-ivory-1 max-h-[95dvh] max-1200:max-w-[90dvw] max-w-1200 rounded-3xl overflow-hidden !z-[99999]">
         {children}
       </DialogContent>
     </Dialog>

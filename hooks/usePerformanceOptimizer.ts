@@ -22,7 +22,7 @@ export function usePerformanceOptimizer(componentName: string) {
         renderStartTime.current = performance.now();
     }, []);
 
-    // End performance measurement
+    // End performance measurement  
     const endMeasurement = useCallback(() => {
         const renderTime = performance.now() - renderStartTime.current;
         const metrics = metricsRef.current;
@@ -39,37 +39,42 @@ export function usePerformanceOptimizer(componentName: string) {
         // Log performance warnings in development
         if (process.env.NODE_ENV === 'development') {
             if (renderTime > 50) {
+                // slow render - no-op logging intentionally removed
             }
 
             if (metrics.renderCount % 100 === 0) {
+                // periodic metrics - no-op logging intentionally removed
             }
         }
-    }, [componentName]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Debounce function for expensive operations
+    // NOTE: uses plain closure ref instead of useRef (which can't be called in a callback)
     const debounce = useCallback(<T extends (...args: any[]) => any>(
         func: T,
         delay: number
     ): ((...args: Parameters<T>) => void) => {
-        const timeoutRef = useRef<NodeJS.Timeout>();
+        let timeoutId: NodeJS.Timeout | undefined;
 
         return (...args: Parameters<T>) => {
-            clearTimeout(timeoutRef.current);
-            timeoutRef.current = setTimeout(() => func(...args), delay);
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => func(...args), delay);
         };
     }, []);
 
     // Throttle function for frequent events
+    // NOTE: uses plain closure variable instead of useRef (which can't be called in a callback)
     const throttle = useCallback(<T extends (...args: any[]) => any>(
         func: T,
         delay: number
     ): ((...args: Parameters<T>) => void) => {
-        const lastCallRef = useRef<number>(0);
+        let lastCall = 0;
 
         return (...args: Parameters<T>) => {
             const now = Date.now();
-            if (now - lastCallRef.current >= delay) {
-                lastCallRef.current = now;
+            if (now - lastCall >= delay) {
+                lastCall = now;
                 func(...args);
             }
         };
@@ -108,6 +113,7 @@ export function usePerformanceOptimizer(componentName: string) {
         throttle,
         deduplicateRequest,
         startMeasurement,
-        endMeasurement
+        endMeasurement,
+        componentName
     };
 }

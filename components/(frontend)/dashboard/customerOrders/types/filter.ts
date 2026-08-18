@@ -1,1 +1,1 @@
-export type OrderFilter = "All" | "Upcoming" | "Delivered" | "Failed";
+export type OrderFilter = "All" | "Upcoming" | "Delivered" | "Cancelled" | "Failed";

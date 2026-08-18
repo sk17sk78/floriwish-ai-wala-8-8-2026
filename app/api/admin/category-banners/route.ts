@@ -82,6 +82,7 @@ export async function POST(req: NextRequest) {
       allCategories,
       autoApplyFuture,
       isActive,
+      targetDevice,
       priority,
       bannerType,
       autoScroll,
@@ -96,9 +97,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!desktopImage?.url || !mobileImage?.url) {
+    const effectiveDesktop = desktopImage?.url ? desktopImage : mobileImage;
+    const effectiveMobile = mobileImage?.url ? mobileImage : desktopImage;
+
+    if (!effectiveDesktop?.url && !effectiveMobile?.url) {
       return NextResponse.json(
-        { success: false, error: "Both Desktop and Mobile banner images are required." },
+        { success: false, error: "At least one banner image (Desktop or Mobile) is required." },
         { status: 400 }
       );
     }
@@ -114,21 +118,22 @@ export async function POST(req: NextRequest) {
       startDate: startDate ? new Date(startDate) : null,
       endDate: endDate ? new Date(endDate) : null,
       desktopImage: {
-        url: desktopImage.url,
-        alt: desktopImage.alt || altText || title,
-        width: desktopImage.width || 1200,
-        height: desktopImage.height || 400
+        url: effectiveDesktop.url,
+        alt: effectiveDesktop.alt || altText || title,
+        width: effectiveDesktop.width || 1200,
+        height: effectiveDesktop.height || 400
       },
       mobileImage: {
-        url: mobileImage.url,
-        alt: mobileImage.alt || altText || title,
-        width: mobileImage.width || 480,
-        height: mobileImage.height || 240
+        url: effectiveMobile.url,
+        alt: effectiveMobile.alt || altText || title,
+        width: effectiveMobile.width || 480,
+        height: effectiveMobile.height || 240
       },
       appliedCategories: Array.isArray(appliedCategories) ? appliedCategories : [],
       allCategories: !!allCategories,
       autoApplyFuture: autoApplyFuture !== undefined ? !!autoApplyFuture : true,
       isActive: isActive !== undefined ? !!isActive : true,
+      targetDevice: targetDevice || "all",
       priority: priority !== undefined ? Number(priority) : 10,
       bannerType: bannerType || "default",
       autoScroll: autoScroll !== undefined ? !!autoScroll : true,

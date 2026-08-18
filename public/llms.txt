@@ -1,0 +1,22 @@
+# Floriwish (https://floriwish.com)
+> India's Leading Online Flower, Cake, Hamper & Event Decoration Delivery Platform.
+
+## About
+Floriwish delivers farm-fresh flowers, designer artisan cakes, luxury gift hampers, balloon decorations, and personalized surprises across 400+ cities in India with express 2-hour, same-day, and midnight delivery options.
+
+## Core Categories & Services
+- Flowers: https://floriwish.com/flowers (Roses, Lilies, Orchids, Carnations, Mixed Bouquets, Luxury Floral Arrangements)
+- Cakes: https://floriwish.com/cakes (Fresh Cream, Fondant, Pinata, Pull-me-up, Photo Cakes, Eggless options)
+- Combos: https://floriwish.com/combos (Flowers with Cakes, Chocolates, Teddy Bears, Personalized Cards)
+- Decorations: https://floriwish.com/balloon-decorations (Birthdays, Anniversaries, Romantic Room Setups, Baby Showers, Corporate Events)
+- Plants: https://floriwish.com/plants (Indoor, Air-purifying, Bonsai, Succulents)
+- Occasions: Birthday, Anniversary, Valentine's Day, Mother's Day, Festivals
+
+## Business Programs
+- Vendor & Partner Onboarding: https://floriwish.com/vendor/register
+- Franchise Program: https://floriwish.com/franchise
+- Corporate Gifting: https://floriwish.com/corporate-gifting
+
+## Support & Inquiries
+- Customer Support: care@floriwish.com
+- Contact Us: https://floriwish.com/contact

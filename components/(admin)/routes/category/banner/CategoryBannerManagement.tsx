@@ -61,6 +61,7 @@ interface BannerCampaign {
   allCategories: boolean;
   autoApplyFuture: boolean;
   isActive: boolean;
+  targetDevice?: "all" | "desktop" | "mobile";
   priority: number;
   bannerType: string;
   autoScroll: boolean;
@@ -149,6 +150,7 @@ export default function CategoryBannerManagement() {
   const [formEndDate, setFormEndDate] = useState("");
   const [formPriority, setFormPriority] = useState<number>(10);
   const [formIsActive, setFormIsActive] = useState<boolean>(true);
+  const [formTargetDevice, setFormTargetDevice] = useState<"all" | "desktop" | "mobile">("all");
   const [formAllCategories, setFormAllCategories] = useState<boolean>(false);
   const [formAutoApplyFuture, setFormAutoApplyFuture] = useState<boolean>(true);
 
@@ -429,8 +431,11 @@ export default function CategoryBannerManagement() {
       return;
     }
 
-    if (!desktopImage?.url || !mobileImage?.url) {
-      showToast("Please select/upload both Laptop (1200×400) and Mobile (480×240) banners.", "error");
+    const finalDesktop = desktopImage?.url ? desktopImage : mobileImage;
+    const finalMobile = mobileImage?.url ? mobileImage : desktopImage;
+
+    if (!finalDesktop?.url && !finalMobile?.url) {
+      showToast("Please select or upload at least one banner image (Laptop or Mobile).", "error");
       return;
     }
 
@@ -451,10 +456,11 @@ export default function CategoryBannerManagement() {
         endDate: formEndDate || null,
         priority: formPriority,
         isActive: formIsActive,
+        targetDevice: formTargetDevice,
         allCategories: formAllCategories,
         autoApplyFuture: formAutoApplyFuture,
-        desktopImage,
-        mobileImage,
+        desktopImage: finalDesktop,
+        mobileImage: finalMobile,
         appliedCategories: selectedCategories.map((c) => ({
           categoryId: c.id,
           categoryType: c.type,
@@ -500,6 +506,7 @@ export default function CategoryBannerManagement() {
     setFormEndDate(b.endDate ? new Date(b.endDate).toISOString().slice(0, 16) : "");
     setFormPriority(b.priority || 10);
     setFormIsActive(b.isActive);
+    setFormTargetDevice(b.targetDevice || "all");
     setFormAllCategories(b.allCategories);
     setFormAutoApplyFuture(b.autoApplyFuture ?? true);
     setDesktopImage(b.desktopImage);
@@ -531,10 +538,10 @@ export default function CategoryBannerManagement() {
         showToast(`Banner campaign '${b.title}' ${newActive ? "activated" : "deactivated"}`);
         fetchDashboardData();
       } else {
-        showToast(data.error || "Update failed", "error");
+        showToast(data.error || "Failed to update banner", "error");
       }
-    } catch (err) {
-      showToast("Error updating status", "error");
+    } catch (err: any) {
+      showToast(err.message || "Failed to update banner", "error");
     }
   };
 
@@ -791,12 +798,14 @@ export default function CategoryBannerManagement() {
             <div className="lg:col-span-7 space-y-4">
               {/* Card 1: Banner Images (Desktop 3:1 & Mobile 2:1 matching Homepage) */}
               <div className="bg-white rounded-xl border border-zinc-200/90 p-4 sm:p-5 shadow-xs space-y-4">
-                <div className="flex items-center justify-between border-b border-zinc-100 pb-2.5">
+                <div className="flex items-center justify-between border-b border-zinc-100 pb-2.5 flex-wrap gap-2">
                   <h2 className="text-sm font-bold text-zinc-900 flex items-center gap-2">
                     <Upload width={16} height={16} className="text-[#5e1628]" />
                     Banner Creatives
                   </h2>
-                  <span className="text-xs text-zinc-500">Homepage Sizing (3:1 Desktop & 2:1 Mobile)</span>
+                  <span className="text-xs text-emerald-700 font-medium bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                    Upload 1 banner or both (Auto-adapts for all devices)
+                  </span>
                 </div>
 
                 {/* Laptop / Desktop Upload Box with Media Library Picker */}
@@ -806,11 +815,15 @@ export default function CategoryBannerManagement() {
                       <Monitor width={14} height={14} className="text-zinc-500" />
                       Laptop / Desktop Banner (1200 × 400 • 3:1 Ratio)
                     </span>
-                    {desktopImage && (
+                    {desktopImage ? (
                       <span className="text-emerald-700 text-[11px] font-medium flex items-center gap-1">
                         <CheckCircle2 width={13} height={13} /> Ready
                       </span>
-                    )}
+                    ) : mobileImage ? (
+                      <span className="text-amber-700 text-[11px] font-medium flex items-center gap-1 bg-amber-50 px-1.5 py-0.5 rounded">
+                        Auto-using Mobile banner
+                      </span>
+                    ) : null}
                   </div>
 
                   {desktopImage ? (
@@ -846,7 +859,7 @@ export default function CategoryBannerManagement() {
                       <span className="text-xs font-bold text-zinc-800">
                         {isUploadingDesktop ? "Uploading laptop banner..." : "Select or Upload Laptop Banner"}
                       </span>
-                      <span className="text-[11px] text-zinc-400 mt-0.5 mb-3">1200 × 400 pixels • 3:1 Ratio</span>
+                      <span className="text-[11px] text-zinc-400 mt-0.5 mb-3">1200 × 400 pixels • 3:1 Ratio (Auto-adapts to mobile if only desktop is uploaded)</span>
 
                       <div className="flex items-center gap-2">
                         <button
@@ -875,11 +888,15 @@ export default function CategoryBannerManagement() {
                       <Smartphone width={14} height={14} className="text-zinc-500" />
                       Mobile Phone Banner (480 × 240 • 2:1 Ratio)
                     </span>
-                    {mobileImage && (
+                    {mobileImage ? (
                       <span className="text-emerald-700 text-[11px] font-medium flex items-center gap-1">
                         <CheckCircle2 width={13} height={13} /> Ready
                       </span>
-                    )}
+                    ) : desktopImage ? (
+                      <span className="text-amber-700 text-[11px] font-medium flex items-center gap-1 bg-amber-50 px-1.5 py-0.5 rounded">
+                        Auto-using Desktop banner
+                      </span>
+                    ) : null}
                   </div>
 
                   {mobileImage ? (
@@ -915,7 +932,7 @@ export default function CategoryBannerManagement() {
                       <span className="text-xs font-bold text-zinc-800">
                         {isUploadingMobile ? "Uploading mobile banner..." : "Select or Upload Mobile Banner"}
                       </span>
-                      <span className="text-[11px] text-zinc-400 mt-0.5 mb-3">480 × 240 pixels • 2:1 Ratio</span>
+                      <span className="text-[11px] text-zinc-400 mt-0.5 mb-3">480 × 240 pixels • 2:1 Ratio (Optional - auto-adapts from laptop banner)</span>
 
                       <div className="flex items-center gap-2">
                         <button
@@ -1083,6 +1100,57 @@ export default function CategoryBannerManagement() {
                       <span>{formIsActive ? "Status: Active" : "Status: Inactive"}</span>
                     </button>
                   </div>
+                </div>
+
+                {/* Device Target Visibility Selection */}
+                <div className="pt-2.5 border-t border-zinc-100 space-y-1.5">
+                  <label className="block text-xs font-semibold text-zinc-700">
+                    Target Devices (Where to show this banner)
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setFormTargetDevice("all")}
+                      className={`py-2 px-2.5 rounded-lg border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                        formTargetDevice === "all"
+                          ? "bg-[#5e1628] text-white border-[#5e1628] shadow-xs"
+                          : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50"
+                      }`}
+                    >
+                      <span>🌐 All Devices</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormTargetDevice("desktop")}
+                      className={`py-2 px-2.5 rounded-lg border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                        formTargetDevice === "desktop"
+                          ? "bg-[#5e1628] text-white border-[#5e1628] shadow-xs"
+                          : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50"
+                      }`}
+                    >
+                      <Monitor width={14} height={14} />
+                      <span>Laptop Only</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormTargetDevice("mobile")}
+                      className={`py-2 px-2.5 rounded-lg border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                        formTargetDevice === "mobile"
+                          ? "bg-[#5e1628] text-white border-[#5e1628] shadow-xs"
+                          : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50"
+                      }`}
+                    >
+                      <Smartphone width={14} height={14} />
+                      <span>Phone / iPad</span>
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-zinc-500">
+                    {formTargetDevice === "all"
+                      ? "✨ This banner will be shown responsively on all devices (Laptops, Desktops, iPads and Phones)."
+                      : formTargetDevice === "desktop"
+                      ? "💻 This banner will only be visible on Laptop and Desktop PC screens."
+                      : "📱 This banner will only be visible on Mobile Phones and iPad/Tablet screens."}
+                  </p>
                 </div>
               </div>
 
@@ -1350,12 +1418,12 @@ export default function CategoryBannerManagement() {
                       </div>
 
                       <div className="relative w-full aspect-[3/1] rounded-lg overflow-hidden bg-zinc-200">
-                        {desktopImage?.url ? (
-                          <Image src={desktopImage.url} alt={formAltText || "Desktop Preview"} fill className="object-cover rounded-lg" />
+                        {desktopImage?.url || mobileImage?.url ? (
+                          <Image src={desktopImage?.url || mobileImage?.url || ""} alt={formAltText || "Desktop Preview"} fill className="object-cover rounded-lg" />
                         ) : (
                           <div className="w-full h-full flex flex-col items-center justify-center text-zinc-400 text-xs">
                             <Monitor width={20} height={20} className="mb-1" />
-                            <span>No Desktop Banner Selected</span>
+                            <span>No Banner Selected</span>
                           </div>
                         )}
                       </div>
@@ -1373,12 +1441,12 @@ export default function CategoryBannerManagement() {
                       <div className="text-[10px] font-bold text-zinc-700 pb-1 text-center">Floriwish Mobile</div>
 
                       <div className="relative w-full aspect-[2/1] rounded-lg overflow-hidden bg-zinc-100 my-1.5">
-                        {mobileImage?.url ? (
-                          <Image src={mobileImage.url} alt={formAltText || "Mobile Preview"} fill className="object-cover rounded-lg" />
+                        {mobileImage?.url || desktopImage?.url ? (
+                          <Image src={mobileImage?.url || desktopImage?.url || ""} alt={formAltText || "Mobile Preview"} fill className="object-cover rounded-lg" />
                         ) : (
                           <div className="w-full h-full flex flex-col items-center justify-center text-zinc-400 text-[10px]">
                             <Smartphone width={18} height={18} className="mb-1" />
-                            <span>No Mobile Banner Selected</span>
+                            <span>No Banner Selected</span>
                           </div>
                         )}
                       </div>
@@ -1472,8 +1540,13 @@ export default function CategoryBannerManagement() {
                         <td className="py-2.5 px-4">
                           <div className="font-bold text-zinc-900">{b.title}</div>
                           <div className="text-[11px] text-zinc-400 font-mono">{b.name}</div>
+                          <div className="flex items-center gap-1 mt-0.5">
+                            <span className="text-[9px] px-1.5 py-0.2 rounded font-medium border bg-zinc-50 text-zinc-600 border-zinc-200">
+                              {b.targetDevice === "desktop" ? "💻 Laptop Only" : b.targetDevice === "mobile" ? "📱 Phone & iPad" : "🌐 All Devices"}
+                            </span>
+                          </div>
                           {b.linkUrl && (
-                            <div className="text-[10px] text-[#5e1628] underline truncate max-w-[160px]">{b.linkUrl}</div>
+                            <div className="text-[10px] text-[#5e1628] underline truncate max-w-[160px] mt-0.5">{b.linkUrl}</div>
                           )}
                         </td>
 

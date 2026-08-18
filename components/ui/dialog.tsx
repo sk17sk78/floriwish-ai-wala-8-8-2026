@@ -35,8 +35,9 @@ const DialogContent = React.forwardRef<
     hideDefaultTitle?: boolean;
     hideDefaultDescription?: boolean;
     hideDefaultClose?: boolean;
+    overlayClassName?: string;
   }
->(({ className, children, hideDefaultTitle, hideDefaultDescription, hideDefaultClose, ...props }, ref) => {
+>(({ className, children, hideDefaultTitle, hideDefaultDescription, hideDefaultClose, overlayClassName, ...props }, ref) => {
   // Check if children already contain DialogTitle or DialogDescription
   const childrenArray = React.Children.toArray(children);
   const hasTitle = childrenArray.some(
@@ -48,7 +49,7 @@ const DialogContent = React.forwardRef<
 
   return (
     <DialogPortal>
-      <DialogOverlay />
+      <DialogOverlay className={overlayClassName || (className?.includes("!z-[99999]") ? "!z-[99998]" : undefined)} />
       <DialogPrimitive.Content
         ref={ref}
         className={cn(
