@@ -73,18 +73,39 @@ function SearchDesktop({
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const animatedPlaceholder = useTypewriterPlaceholder(PLACEHOLDER_ITEMS);
 
+  // Global Cmd+K / Ctrl+K shortcut listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setIsFocused((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   return (
     <>
       <div
-        className="z-20 hidden lg:flex flex-1 min-w-[200px] max-w-[320px] xl:max-w-[440px] 2xl:max-w-[500px] mx-2 lg:mx-3 xl:mx-6 cursor-pointer shrink"
+        role="button"
+        tabIndex={0}
+        aria-label="Search Products"
+        className="z-20 hidden lg:flex flex-1 min-w-[200px] max-w-[320px] xl:max-w-[440px] 2xl:max-w-[500px] mx-2 lg:mx-3 xl:mx-6 cursor-pointer shrink touch-manipulation select-none outline-none"
         onClick={() => {
           setIsFocused(true);
         }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setIsFocused(true);
+          }
+        }}
       >
         <section
-          className="w-full outline-none text-charcoal-3/90 backdrop-blur-md bg-white/90 rounded-full py-2 px-3.5 xl:px-5 text-base border border-charcoal-3/15 shadow-sm transition-all duration-300 hover:border-charcoal-3/25"
+          className="w-full outline-none text-charcoal-3/90 backdrop-blur-md bg-white/90 rounded-full py-2 px-3.5 xl:px-5 text-base border border-charcoal-3/15 shadow-sm transition-all duration-300 hover:border-charcoal-3/25 active:scale-[0.99]"
         >
-          <div className="flex items-center justify-between gap-2 xl:gap-3 text-charcoal-3/80 bg-transparent transition-all duration-300">
+          <div className="flex items-center justify-between gap-2 xl:gap-3 text-charcoal-3/80 bg-transparent transition-all duration-300 pointer-events-none">
             <Search
               width={17}
               height={17}

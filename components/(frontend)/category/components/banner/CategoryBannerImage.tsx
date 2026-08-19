@@ -1,15 +1,12 @@
-// config
-import { OPTIMIZE_IMAGE } from "@/config/image";
+"use client";
 
 // utils
-import { memo } from "react";
-
-// hooks
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 
 // components
 import NextImage from "@/components/custom/NextImage";
 import Link from "next/link";
+import { convertToCloudFrontUrl } from "@/common/utils/convertToCloudFrontUrl";
 
 // types
 import { type BannerImageDocument } from "@/common/types/documentation/nestedDocuments/bannerImage";
@@ -20,41 +17,32 @@ function CategoryBannerImage({
 }: {
   bannerImage: BannerImageDocument;
 }) {
-  const mobile = useMemo(
-    () => (bannerImage.mobile as ImageDocument) || (bannerImage.desktop as ImageDocument),
-    [bannerImage]
-  );
-  const desktop = useMemo(
-    () => (bannerImage.desktop as ImageDocument) || (bannerImage.mobile as ImageDocument),
-    [bannerImage]
-  );
+  const deskDoc = bannerImage.desktop as ImageDocument | undefined;
+  const mobDoc = bannerImage.mobile as ImageDocument | undefined;
+
+  const desktopUrl = convertToCloudFrontUrl(deskDoc?.url || mobDoc?.url || "");
+  const hasMobile = Boolean(mobDoc?.url && mobDoc.url.trim().length > 0);
+  const mobileUrl = hasMobile ? convertToCloudFrontUrl(mobDoc?.url || "") : desktopUrl;
+
+  const alt = deskDoc?.alt || deskDoc?.defaultAlt || mobDoc?.alt || mobDoc?.defaultAlt || "Category Banner";
 
   const content = (
-    <div className="relative w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden">
-      {/* Mobile Banner */}
-      <div className="sm:hidden w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden">
-        <NextImage
+    <div className="relative w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden bg-zinc-100">
+      <picture className="w-full h-full block">
+        {hasMobile && (
+          <source media="(max-width: 639px)" srcSet={mobileUrl} />
+        )}
+        <source media="(min-width: 640px)" srcSet={desktopUrl} />
+        <img
+          src={desktopUrl || mobileUrl}
+          alt={alt}
           className="object-cover object-center h-full w-full rounded-2xl sm:rounded-3xl"
-          src={mobile?.url || ""}
-          alt={mobile?.alt || mobile?.defaultAlt || "Banner Image"}
-          width={480}
-          height={240}
-          quality={75}
-          sizes="(max-width: 640px) 100vw, 480px"
-        />
-      </div>
-      {/* Desktop Banner */}
-      <div className="max-sm:hidden w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden">
-        <NextImage
-          className="object-cover object-center h-full w-full rounded-2xl sm:rounded-3xl"
-          src={desktop?.url || ""}
-          alt={desktop?.alt || desktop?.defaultAlt || "Banner Image"}
+          loading="lazy"
+          decoding="async"
           width={1200}
           height={400}
-          quality={75}
-          sizes="(min-width: 640px) 100vw, 1200px"
         />
-      </div>
+      </picture>
     </div>
   );
 

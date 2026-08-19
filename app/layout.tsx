@@ -97,7 +97,10 @@ export default function RootLayout({ children }: { children: Children }) {
         <link rel="preconnect" href="https://d3lno5tuwkddps.cloudfront.net" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://d22rebqllszdz8.cloudfront.net" />
-        <link rel="dns-prefetch" href="https://d3lno5tuwkddps.cloudfront.net" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/icons/icon-32x32.png" type="image/png" sizes="32x32" />
+        <link rel="icon" href="/icons/icon-192x192.png" type="image/png" sizes="192x192" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
 
         {/* ── PWA & iOS Meta Tags ─────────────────────────────────── */}
         {/* Tells iOS Safari this is a PWA-capable site */}

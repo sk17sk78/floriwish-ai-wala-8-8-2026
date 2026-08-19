@@ -59,7 +59,7 @@ export const getNavLinks = async (): Promise<HeaderNavLinkDocument[] | null> => 
 
     if (!documents) return null;
 
-    const result = documents as unknown as HeaderNavLinkDocument[];
+    const result = JSON.parse(JSON.stringify(documents)) as unknown as HeaderNavLinkDocument[];
     inMemoryHeaderCache = { data: result, timestamp: now };
 
     try {

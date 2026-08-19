@@ -18,9 +18,9 @@ function CityDialog({
   return (
     <Dialog open={showDialog} onOpenChange={onToggleShowDialog}>
       <DialogContent
-        className={`sm:max-w-[440px] w-full border-none outline-none gap-0 transition-all duration-300 p-0 rounded-3xl overflow-hidden [&>button]:hidden`}
+        className="sm:max-w-[460px] w-full border-none outline-none p-0 rounded-3xl overflow-hidden bg-white shadow-2xl [&>button]:hidden"
       >
-        <DialogTitle className="hidden"></DialogTitle>
+        <DialogTitle className="hidden">Select City</DialogTitle>
         <LocationProvider>
           <CityPopup
             closeDialog={() => {

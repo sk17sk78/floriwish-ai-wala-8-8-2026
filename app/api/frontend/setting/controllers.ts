@@ -42,7 +42,7 @@ export const getSetting = async (): Promise<SettingDocument | null> => {
       return null;
     }
 
-    const typedDoc = document as unknown as SettingDocument;
+    const typedDoc = JSON.parse(JSON.stringify(document)) as unknown as SettingDocument;
     inMemorySettingCache = { data: typedDoc, timestamp: now };
 
     try {

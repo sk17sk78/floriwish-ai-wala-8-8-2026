@@ -1,8 +1,10 @@
+"use client";
+
 // icons
-import { ArrowRight, ChevronDown, MapPinIcon } from "lucide-react";
+import { ChevronDown, MapPin } from "lucide-react";
 
 // utils
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useState, useCallback } from "react";
 
 // types
 import { type CityDocument } from "@/common/types/documentation/presets/city";
@@ -29,42 +31,55 @@ function SelectCityMobile({
     };
   }, []);
 
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      onClick();
+    },
+    [onClick]
+  );
+
   return (
     <div
-      className={`relative w-full lg:hidden px-4 py-1.5 z-20 transition-all duration-300 ${
+      role="button"
+      tabIndex={0}
+      onClick={handleClick}
+      aria-label="Select Delivery City"
+      className={`relative w-full lg:hidden px-4 py-2 z-20 transition-all duration-200 cursor-pointer select-none touch-manipulation active:opacity-90 ${
         shouldShake
           ? "animate-shake bg-red-50 text-red-500"
           : "bg-sienna-2/10 hover:bg-sienna-2/15 text-moss"
       }`}
     >
-      <div
-        className="relative flex items-center justify-start text-sm cursor-pointer w-full group"
-        onClick={onClick}
-      >
-        <div className={"flex items-center justify-start gap-2 w-full"}>
-          <MapPinIcon
-            width={14}
+      <div className="flex items-center justify-between gap-2 w-full pointer-events-none">
+        <div className="flex items-center gap-2 min-w-0">
+          <MapPin
+            className={`w-3.5 h-3.5 shrink-0 ${
+              shouldShake ? "text-red-500" : "text-moss"
+            }`}
             strokeWidth={2.5}
-            className={shouldShake ? "text-red-500" : "text-moss"}
           />
           <span
-            className={`text-[12px] text-left font-medium tracking-tight ${
+            className={`text-xs text-left font-medium tracking-tight truncate ${
               shouldShake ? "text-red-600" : "text-zinc-600"
             }`}
           >
             Deliver to{" "}
-            <span className={shouldShake ? "text-red-700 font-bold" : "text-moss font-bold"}>
+            <span
+              className={`font-bold ${
+                shouldShake ? "text-red-700" : "text-moss"
+              }`}
+            >
               {selectedCity ? selectedCity.name : "Choose city"}
             </span>
           </span>
-          <ChevronDown
-            width={14}
-            strokeWidth={2.5}
-            className={`ml-auto transition-colors ${
-              shouldShake ? "text-red-400" : "text-zinc-600 group-hover:text-moss"
-            }`}
-          />
         </div>
+        <ChevronDown
+          className={`w-3.5 h-3.5 shrink-0 transition-colors ${
+            shouldShake ? "text-red-400" : "text-zinc-600"
+          }`}
+          strokeWidth={2.5}
+        />
       </div>
     </div>
   );

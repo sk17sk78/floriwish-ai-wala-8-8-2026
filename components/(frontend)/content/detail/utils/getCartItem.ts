@@ -26,7 +26,7 @@ export const getCartItem = ({
   addons: CartItemAddonDocument[];
 }) =>
   ({
-    _id: new Types.ObjectId(),
+    _id: String(new Types.ObjectId()),
     status: "new",
     content,
     customVariant,
@@ -34,6 +34,6 @@ export const getCartItem = ({
     pricePerUnit,
     quantity: 1,
     delivery,
-    customization,
-    addons
-  }) as CartItemDocument;
+    customization: customization || {},
+    addons: Array.isArray(addons) ? addons : []
+  }) as unknown as CartItemDocument;

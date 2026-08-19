@@ -1,37 +1,46 @@
-// icons
-import { SearchIcon, X } from "lucide-react";
+"use client";
 
-// constants
+import { memo, useCallback, useEffect, useRef } from "react";
+import { SearchIcon, X, ArrowLeft } from "lucide-react";
 import { FRONTEND_LINKS } from "@/common/routes/frontend/staticLinks";
-
-// utils
-import { memo } from "react";
 import { toSlug } from "@/common/utils/slugOperations";
-
-// hooks
-import { useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-
-// types
 import { type ChangeEvent } from "react";
 
 function SearchBoxNew({
   keyword,
   onChangeKeyword,
   onChangeIsFocused,
-  saveContentsToLS
+  saveContentsToLS,
 }: {
   keyword: string;
   onChangeKeyword: (keyword: string) => void;
   onChangeIsFocused: (isFocused: boolean) => void;
   saveContentsToLS: () => void;
 }) {
-  // hooks
   const inputRef = useRef<HTMLInputElement>(null);
   const { push } = useRouter();
 
+  // Immediate 1-click focus on all devices without layout jump
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      if (inputRef.current) {
+        inputRef.current.focus({ preventScroll: true });
+      }
+    });
 
-  // event handlers
+    const timer = setTimeout(() => {
+      if (inputRef.current && document.activeElement !== inputRef.current) {
+        inputRef.current.focus({ preventScroll: true });
+      }
+    }, 120);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(timer);
+    };
+  }, []);
+
   const handleChange = useCallback(
     ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
       onChangeKeyword(value);
@@ -39,19 +48,9 @@ function SearchBoxNew({
     [onChangeKeyword]
   );
 
-  const handleFocus = useCallback(() => {
-    onChangeIsFocused(true);
-  }, [onChangeIsFocused]);
-
-  const handleBlur = useCallback(() => {
-    setTimeout(() => {
-      onChangeIsFocused(false);
-    }, 250);
-  }, [onChangeIsFocused]);
-
   const handleKeyDown = useCallback(
     ({ key }: { key: string }) => {
-      if (key === "Enter") {
+      if (key === "Enter" && keyword.trim()) {
         onChangeIsFocused(false);
         saveContentsToLS();
         push(`${FRONTEND_LINKS.SEARCH_PAGE}?key=${toSlug(keyword)}`);
@@ -61,44 +60,41 @@ function SearchBoxNew({
       if (key === "Escape") {
         onChangeIsFocused(false);
         onChangeKeyword("");
-        if (inputRef.current)
-          // @ts-ignore
-          inputRef.current.blur();
+        inputRef.current?.blur();
       }
     },
     [onChangeIsFocused, keyword, onChangeKeyword, push, saveContentsToLS]
   );
 
   return (
-    <section className="flex items-center justify-start gap-3.5 bg-white border border-charcoal-3/15 text-charcoal-3/80 lg:w-full lg:min-h-[54px] lg:px-4 max-lg:px-4 max-lg:py-3.5 lg:rounded-2xl max-lg:rounded-2xl transition-all duration-300 focus-within:border-charcoal-3/30 focus-within:shadow-premium max-lg:mb-1.5 group">
+    <section className="flex items-center gap-2.5 w-full bg-zinc-100 rounded-xl px-3.5 py-2 sm:py-2.5 border border-zinc-200/80 focus-within:border-[#b76e79] focus-within:bg-white focus-within:ring-2 focus-within:ring-rose-100 transition-all shrink-0">
       <SearchIcon
-        width={20}
-        height={20}
-        strokeWidth={1.5}
-        className="group-focus-within:text-charcoal-3/90 transition-colors duration-300"
+        className="w-4 h-4 text-zinc-400 shrink-0"
+        strokeWidth={2}
       />
       <input
         ref={inputRef}
-        autoFocus
-        className="w-full outline-none focus:outline-none bg-transparent text-[17px] placeholder:text-charcoal-3/50"
+        className="w-full outline-none bg-transparent text-[16px] sm:text-sm text-zinc-900 placeholder:text-zinc-400 font-normal"
         autoComplete="off"
+        autoCorrect="off"
+        spellCheck={false}
         type="text"
         name="search"
-        placeholder="Search for cakes, flowers, gifts..."
+        placeholder="Search cakes, flowers, balloon decor, gifts..."
         value={keyword}
         onChange={handleChange}
-        onFocus={handleFocus}
         onKeyDown={handleKeyDown}
       />
-      <X
-        className={`${keyword ? "opacity-100" : "opacity-0 pointer-events-none"} transition-all duration-200 cursor-pointer hover:bg-charcoal-3/5 rounded-full p-0.5`}
-        width={20}
-        height={20}
-        strokeWidth={1.5}
-        onClick={() => {
-          onChangeKeyword("");
-        }}
-      />
+      {keyword ? (
+        <button
+          type="button"
+          onClick={() => onChangeKeyword("")}
+          aria-label="Clear search"
+          className="p-1 rounded-full text-zinc-400 hover:text-zinc-700 cursor-pointer shrink-0"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      ) : null}
     </section>
   );
 }

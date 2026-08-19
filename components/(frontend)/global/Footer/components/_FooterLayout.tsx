@@ -12,6 +12,7 @@ import FooterBottomLeft from "./BottomLeft";
 import FooterBottomRight from "./BottomRight";
 import FooterTopLeft from "./TopLeft";
 import FooterTopRight from "./TopRight";
+import FooterAppInstall from "./FooterAppInstall";
 import MaxWidthWrapper from "../../_MaxWidthWrapper/MaxWidthWrapper";
 
 // type
@@ -38,9 +39,16 @@ export default function FrontendFooterLayout({
       <MaxWidthWrapper
         className={`z-20 ${(currPath || "").includes("/vendor/registration") ? "left-1/2 -translate-x-1/2 relative w-device max-w-1200" : ""}`}
       >
-        <div className="grid grid-rows-[auto_auto] grid-cols-1 sm:grid-cols-[1fr_3fr] md:grid-cols-[1fr_4fr] gap-1.5 sm:gap-x-6">
+        <div className="grid grid-cols-1 sm:grid-cols-[1fr_3fr] md:grid-cols-[1fr_4fr] gap-4 sm:gap-x-6">
           <FooterTopLeft />
           <FooterTopRight footerSections={footerSections} />
+        </div>
+
+        <div className="my-5 pt-5 pb-5 border-t border-zinc-700/50">
+          <FooterAppInstall />
+        </div>
+
+        <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-4 pt-3 border-t border-zinc-700/30">
           <FooterBottomLeft />
           <FooterBottomRight />
         </div>

@@ -63,7 +63,7 @@ export function HomepageBannerCarousel(config: BannerCarouselType) {
       <CarouselContent className="z-10 ml-0 -ml-0">
         {config.elements.map((el, index) => (
           <CarouselItem
-            className="overflow-hidden pl-0 rounded-2xl sm:rounded-3xl max-sm:aspect-[2/1]"
+            className="overflow-hidden pl-0 rounded-2xl sm:rounded-3xl aspect-[3/1]"
             key={index}
           >
             <Banner props={el} />

@@ -35,7 +35,7 @@ export const getCities = async (): Promise<CityDocument[] | null> => {
       .lean()
       .exec();
 
-    const result = (documents || []) as unknown as CityDocument[];
+    const result = JSON.parse(JSON.stringify(documents || [])) as unknown as CityDocument[];
     inMemoryLocationCache = { data: result, timestamp: now };
     return result;
   } catch (error: any) {

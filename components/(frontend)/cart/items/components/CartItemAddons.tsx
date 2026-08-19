@@ -23,13 +23,15 @@ export default function CartItemAddons({
     onChangeAddons(addons.filter(({ _id }) => String(_id) !== String(addonId)));
   };
 
-  if (!addons.length) {
+  const safeAddons = Array.isArray(addons) ? addons : [];
+
+  if (!safeAddons.length) {
     return <></>;
   }
 
   return (
     <div className="row-start-8 col-start-1 col-span-3 flex flex-col items-stretch justify-start gap-x-5 gap-y-1 px-4 max-sm:my-3 my-2 max-sm:text-sm text-charcoal-3/50 mt-2 sm:mt-4">
-      {addons.map((addon) => (
+      {safeAddons.map((addon) => (
         <CartItemAddon
           key={String(addon._id)}
           addon={addon}

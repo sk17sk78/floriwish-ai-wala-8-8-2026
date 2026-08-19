@@ -5,6 +5,7 @@ import FooterBottomLeft from "./BottomLeft";
 import FooterBottomRight from "./BottomRight";
 import FooterTopLeft from "./TopLeft";
 import FooterTopRight from "./TopRight";
+import FooterAppInstall from "./FooterAppInstall";
 import { FooterSectionDocument } from "../types";
 
 function FooterClient({
@@ -26,6 +27,11 @@ function FooterClient({
           <div className="md:col-span-7 lg:col-span-7">
             <FooterTopRight footerSections={footerSections} />
           </div>
+        </div>
+
+        {/* ── App Install Section (Google Play / App Store / Laptop) ── */}
+        <div className="border-t border-charcoal-3/15 py-6 my-2">
+          <FooterAppInstall />
         </div>
 
         {/* Bottom Symmetrical Divider */}

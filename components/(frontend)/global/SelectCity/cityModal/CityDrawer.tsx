@@ -19,7 +19,7 @@ function CityDrawer({
 }) {
   return (
     <Drawer open={showDrawer} onOpenChange={onToggleShowDrawer}>
-      <DrawerContent className="border-none outline-none p-0 rounded-t-3xl h-[85dvh] bg-ivory-1 z-[996]">
+      <DrawerContent className="border-none outline-none p-0 rounded-t-[28px] max-h-[88dvh] bg-white z-[996] overflow-hidden shadow-2xl">
         <LocationProvider>
           <CityPopup
             closeDialog={() => {

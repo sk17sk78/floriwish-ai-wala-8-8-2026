@@ -46,7 +46,7 @@ export const getFooterSections = async (): Promise<FooterSectionDocument[] | nul
 
     if (!documents) return null;
 
-    const result = documents as unknown as FooterSectionDocument[];
+    const result = JSON.parse(JSON.stringify(documents)) as unknown as FooterSectionDocument[];
     inMemoryFooterCache = { data: result, timestamp: now };
 
     try {

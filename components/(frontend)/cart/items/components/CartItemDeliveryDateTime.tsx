@@ -60,27 +60,37 @@ export default function CartItemDeliveryDateTime({
 
   // Compute time slots grouped by deliveryType
   const allSlotGroups = useMemo(() => {
-    return (contentDelivery?.slots as ContentDeliverySlotDocument[] || []).map((slot) => {
-      const dType = slot.type as DeliveryTypeDocument;
-      const slotItems = dType.timeSlots
-        .filter(({ _id }) => (slot.timeSlots as string[]).includes(String(_id)))
-        .map((tSlot) => {
-          let isAvailableSlot = true;
-          if (selectedDateState) {
-            const gap = getHoursGapFromDateAndTime(selectedDateState, tSlot.startTime);
-            isAvailableSlot = gap > orderProcessingTime;
-          }
-          return {
-            timeSlot: tSlot,
-            isAvailable: isAvailableSlot
-          };
-        });
+    const rawSlots = Array.isArray(contentDelivery?.slots) ? contentDelivery.slots : [];
 
-      return {
-        deliveryType: dType,
-        slotItems
-      };
-    }).filter((group) => group.slotItems.length > 0);
+    return rawSlots
+      .map((slot) => {
+        if (!slot) return null;
+        const dType = slot.type as DeliveryTypeDocument | undefined;
+        if (!dType || !Array.isArray(dType?.timeSlots)) return null;
+
+        const allowedSlotIds = Array.isArray(slot.timeSlots) ? slot.timeSlots : [];
+        const slotItems = dType.timeSlots
+          .filter(({ _id }) => allowedSlotIds.some((sId) => String(sId) === String(_id)))
+          .map((tSlot) => {
+            let isAvailableSlot = true;
+            if (selectedDateState) {
+              const gap = getHoursGapFromDateAndTime(selectedDateState, tSlot.startTime);
+              isAvailableSlot = gap > orderProcessingTime;
+            }
+            return {
+              timeSlot: tSlot,
+              isAvailable: isAvailableSlot
+            };
+          });
+
+        return {
+          deliveryType: dType,
+          slotItems
+        };
+      })
+      .filter((group): group is { deliveryType: DeliveryTypeDocument; slotItems: { timeSlot: TimeSlotDocument; isAvailable: boolean }[] } => 
+        Boolean(group && group.slotItems && group.slotItems.length > 0)
+      );
   }, [contentDelivery, selectedDateState, orderProcessingTime]);
 
   // Earliest slot text

@@ -63,13 +63,13 @@ export function Banners(config: BannerCarouselType) {
   const { ratioType: type } = config;
   const dimensions =
     type === "default" || type === undefined
-      ? "aspect-[2/1] sm:aspect-[3/1]"
+      ? "aspect-[3/1]"
       : type === "large"
         ? "aspect-[3/2]"
         : type === "micro"
           ? "h-[90px]"
           : type === "mini"
-            ? "h-[150px] scale-110"
+            ? "h-[150px]"
             : "aspect-[1/1]";
 
   if (filteredElements.length === 0) return <></>;

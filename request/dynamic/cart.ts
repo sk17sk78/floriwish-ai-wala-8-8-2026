@@ -42,6 +42,10 @@ export const addCart = (cart: CartDocument) => {
 };
 
 export const fetchCart = (cartId: string) => {
+  if (!cartId || cartId === "undefined" || cartId === "null") {
+    return Promise.resolve({ data: null, messages: [{ type: "error", message: "Invalid Cart ID" }] } as any);
+  }
+
   return new Promise<ResponseDataType<CartDocument>>(
     async (resolve, reject) => {
       try {
@@ -75,6 +79,10 @@ export const fetchCart = (cartId: string) => {
 };
 
 export const updateCart = (cartId: string, cart: CartDocument) => {
+  if (!cartId || cartId === "undefined" || cartId === "null") {
+    return Promise.resolve({ data: null, messages: [{ type: "error", message: "Invalid Cart ID" }] } as any);
+  }
+
   return new Promise<ResponseDataType<CartDocument>>(
     async (resolve, reject) => {
       try {

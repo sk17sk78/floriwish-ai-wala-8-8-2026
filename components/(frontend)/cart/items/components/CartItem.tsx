@@ -56,29 +56,32 @@ export default function CartItem({
   const [isDeleted, setIsDeleted] = useState<boolean>(false);
 
   // variables
-  const content = item.content as ContentDocument;
+  const content = (item?.content || {}) as ContentDocument;
 
-  const customVariant = item.customVariant
+  const customVariant = item?.customVariant
     ? getCustomVariant({ content, variantId: item.customVariant })
     : undefined;
 
-  const name = customVariant?.name || content.name;
+  const name = customVariant?.name || content?.name || "Product";
 
   const imageUrl =
-    customVariant?.image?.url || (content.media.primary as ImageDocument)?.url || "";
+    customVariant?.image?.url || (content?.media?.primary as ImageDocument)?.url || "";
 
-  const path = `${DOMAIN}${content.type === "product" ? FRONTEND_LINKS.PRODUCT_PAGE : FRONTEND_LINKS.SERVICE_PAGE}/${content.slug}`;
+  const path = content?.slug
+    ? `${DOMAIN}${content.type === "product" ? FRONTEND_LINKS.PRODUCT_PAGE : FRONTEND_LINKS.SERVICE_PAGE}/${content.slug}`
+    : "#";
 
   const cityPrice = content?.price?.cities?.find(
     ({ city }) => String(city) === String(selectedCity?._id)
   ) || content?.price?.base;
 
-  const itemPrice = item.pricePerUnit * item.quantity;
+  const itemPrice = (Number(item?.pricePerUnit) || 0) * (Number(item?.quantity) || 1);
   const itemMRP =
     ((customVariant?.price as any)?.mrp ||
       cityPrice?.mrp ||
       (item as any)?.mrp ||
-      0) * item.quantity;
+      itemPrice ||
+      0) * (Number(item?.quantity) || 1);
 
   // event handlers
   const handleChangeQuantity = (quantity: number) => {
@@ -189,7 +192,7 @@ export default function CartItem({
             </div>
 
             <CartItemAddons
-              addons={item.addons!}
+              addons={item?.addons || []}
               onChangeAddons={handleChangeAddons}
             />
 
@@ -213,18 +216,18 @@ export default function CartItem({
             </h3>
             <CartItemDeliveryDateTime
               isAvailableInAllIndia={
-                content.availability!.availableAt === "all-india"
+                content?.availability?.availableAt === "all-india"
               }
-              date={new Date(item.delivery.date)}
-              deliveryType={item.delivery.type as DeliveryTypeDocument}
-              timeSlot={item.delivery.slot as TimeSlotDocument}
-              contentDelivery={content.delivery as ContentDeliveryDocument}
+              date={item?.delivery?.date ? new Date(item.delivery.date) : new Date()}
+              deliveryType={item?.delivery?.type as DeliveryTypeDocument}
+              timeSlot={item?.delivery?.slot as TimeSlotDocument}
+              contentDelivery={content?.delivery as ContentDeliveryDocument}
               validationTriggered={validationTriggered}
               onChangeDate={handleChangeDate}
               onChangeTime={handleChangeTime}
             />
             
-            <CartItemCustomization customization={item.customization!} />
+            <CartItemCustomization customization={item?.customization!} />
           </div>
         </section>
 

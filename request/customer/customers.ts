@@ -22,7 +22,12 @@ export const fetchCustomer = ({
 }: {
   customerId: string;
   query?: Query<CustomerDocument>;
-}) => fetchDocument(customerId, query || {}, { ssr: true });
+}) => {
+  if (!customerId || customerId === "undefined" || customerId === "null") {
+    return Promise.resolve({ data: null, message: "Invalid customer ID", status: false, error: null } as any);
+  }
+  return fetchDocument(customerId, query || {}, { ssr: true });
+};
 
 export const updateCustomer = ({
   customerId,
@@ -32,4 +37,9 @@ export const updateCustomer = ({
   customerId: string;
   query?: Query<CustomerDocument>;
   data: Partial<CustomerDocument>;
-}) => updateDocument(customerId, query || {}, data, { ssr: true });
+}) => {
+  if (!customerId || customerId === "undefined" || customerId === "null") {
+    return Promise.resolve({ data: null, message: "Invalid customer ID", status: false, error: null } as any);
+  }
+  return updateDocument(customerId, query || {}, data, { ssr: true });
+};

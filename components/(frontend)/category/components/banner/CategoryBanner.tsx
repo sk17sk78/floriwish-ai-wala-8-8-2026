@@ -59,14 +59,14 @@ function CategoryBanner({
   const dimensions = useMemo(
     () =>
       type === "large"
-        ? "aspect-[2/1] sm:aspect-[3/2]"
+        ? "aspect-[3/2]"
         : type === "micro"
-          ? "aspect-[2/1] sm:h-[90px]"
+          ? "h-[90px]"
           : type === "mini"
-            ? "aspect-[2/1] sm:h-[150px] sm:scale-110"
+            ? "h-[150px]"
             : type === "square"
-              ? "aspect-[2/1] sm:aspect-[1/1]"
-              : "aspect-[2/1] sm:aspect-[3/1]",
+              ? "aspect-[1/1]"
+              : "aspect-[3/1]",
     [type]
   );
 

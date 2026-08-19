@@ -125,7 +125,7 @@ export const getHomepageLayoutsFromDB = async (): Promise<
       return null;
     }
 
-    return documents as unknown as HomepageLayoutDocument[];
+    return JSON.parse(JSON.stringify(documents)) as unknown as HomepageLayoutDocument[];
   } catch (error: any) {
     return null;
   }

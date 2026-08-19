@@ -138,9 +138,9 @@ export function CustomerProfileProvider({ children }: { children: ReactNode }) {
       "handleUpdateDetail"
     );
 
-    if (customer)
+    if (customer && customer._id && String(customer._id) !== "undefined")
       updateCustomer({
-        customerId: String(customer?._id),
+        customerId: String(customer._id),
         query: {
           select: ["name", "mobileNumber", "mail", "gender", "dateOfBirth"]
         },
@@ -183,6 +183,8 @@ export function CustomerProfileProvider({ children }: { children: ReactNode }) {
 
   // order
   const handleChangeOrders = () => {
+    if (!customerId || String(customerId) === "undefined") return;
+
     fetchCustomer({
       customerId: String(customerId),
       query: {
@@ -268,7 +270,7 @@ export function CustomerProfileProvider({ children }: { children: ReactNode }) {
       delete (validNewAddress as any)._id;
     }
 
-    if (customer)
+    if (customer && customer._id && String(customer._id) !== "undefined")
       updateCustomer({
         customerId: String(customer._id),
         query: {
@@ -319,8 +321,9 @@ export function CustomerProfileProvider({ children }: { children: ReactNode }) {
       "handleUpdateAddress"
     );
 
-    updateCustomer({
-      customerId: String(customer?._id),
+    if (customer && customer._id && String(customer._id) !== "undefined")
+      updateCustomer({
+        customerId: String(customer._id),
       query: {
         select: ["addresses"]
       },
@@ -382,8 +385,9 @@ export function CustomerProfileProvider({ children }: { children: ReactNode }) {
       "handleSetDefaultAddress"
     );
 
-    updateCustomer({
-      customerId: String(customer?._id),
+    if (customer && customer._id && String(customer._id) !== "undefined")
+      updateCustomer({
+        customerId: String(customer._id),
       query: {
         select: ["addresses"]
       },
@@ -440,8 +444,9 @@ export function CustomerProfileProvider({ children }: { children: ReactNode }) {
       "handleDeleteAddress"
     );
 
-    updateCustomer({
-      customerId: String(customer?._id),
+    if (customer && customer._id && String(customer._id) !== "undefined")
+      updateCustomer({
+        customerId: String(customer._id),
       query: {
         select: ["addresses"]
       },
@@ -497,8 +502,9 @@ export function CustomerProfileProvider({ children }: { children: ReactNode }) {
       delete (validNewReminder as any)._id;
     }
 
-    updateCustomer({
-      customerId: String(customer?._id),
+    if (customer && customer._id && String(customer._id) !== "undefined")
+      updateCustomer({
+        customerId: String(customer._id),
       query: {
         select: ["reminders"]
       },
@@ -547,8 +553,9 @@ export function CustomerProfileProvider({ children }: { children: ReactNode }) {
       "handleUpdateReminder"
     );
 
-    updateCustomer({
-      customerId: String(customer?._id),
+    if (customer && customer._id && String(customer._id) !== "undefined")
+      updateCustomer({
+        customerId: String(customer._id),
       query: {
         select: ["reminders"]
       },
@@ -601,8 +608,9 @@ export function CustomerProfileProvider({ children }: { children: ReactNode }) {
       "handleDeleteReminder"
     );
 
-    updateCustomer({
-      customerId: String(customer?._id),
+    if (customer && customer._id && String(customer._id) !== "undefined")
+      updateCustomer({
+        customerId: String(customer._id),
       query: {
         select: ["reminders"]
       },
@@ -647,8 +655,9 @@ export function CustomerProfileProvider({ children }: { children: ReactNode }) {
   ) => {
     const prevPassword = customerPassword;
 
-    updateCustomer({
-      customerId: String(customer?._id),
+    if (customer && customer._id && String(customer._id) !== "undefined")
+      updateCustomer({
+        customerId: String(customer._id),
       query: {
         select: ["password"]
       },
@@ -698,7 +707,7 @@ export function CustomerProfileProvider({ children }: { children: ReactNode }) {
       "handleUpdateCartId"
     );
 
-    if (customer)
+    if (customer && customer._id && String(customer._id) !== "undefined")
       updateCustomer({
         customerId: String(customer._id),
         query: {

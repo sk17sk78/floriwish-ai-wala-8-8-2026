@@ -390,12 +390,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
           ...((!detail?.name || detail.name === "User") && checkout.name
             ? { name: checkout.name }
             : {}),
-          ...(!detail?.mobileNumber
+          ...(!detail?.mobileNumber && checkout?.contact?.mobileNumber
             ? {
                 mobileNumber: checkout.contact.mobileNumber
               }
             : {}),
-          ...(!detail?.mail
+          ...(!detail?.mail && checkout?.contact?.mail
             ? {
                 mail: checkout.contact.mail
               }
@@ -403,14 +403,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
         } as CustomerDetail);
       }
 
-      if (checkout && !addresses.length) {
-        onAddAddress({
-          address: checkout.location.address,
-          city: checkout.location.city,
-          pincode: checkout.location.pincode,
-          type: "Default",
-          isDefault: true
-        } as CustomerAddressDocument);
+      if (checkout && checkout?.location && !addresses?.length) {
+        if (checkout.location.address && checkout.location.city && checkout.location.pincode) {
+          onAddAddress({
+            address: checkout.location.address,
+            city: checkout.location.city,
+            pincode: checkout.location.pincode,
+            type: "Default",
+            isDefault: true
+          } as CustomerAddressDocument);
+        }
       }
 
       setCart({
@@ -471,7 +473,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         coupon
       } as CartDocument);
 
-      if (isCloudReady) {
+      if (isCloudReady && id && id !== "undefined") {
         if (!isLoading) {
           setIsLoading(true);
 
@@ -662,7 +664,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (SHOW_LOGS) {
       }
 
-      if (isCloudReady && !isOrdered) {
+      if (isCloudReady && !isOrdered && id && id !== "undefined") {
         if (!isLoading) {
           setIsLoading(true);
 
@@ -692,7 +694,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (SHOW_LOGS) {
       }
 
-      if (isCloudReady && !isOrdered) {
+      if (isCloudReady && !isOrdered && id && id !== "undefined") {
         if (!isLoading) {
           setIsLoading(true);
 

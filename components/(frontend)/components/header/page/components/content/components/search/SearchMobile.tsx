@@ -4,10 +4,7 @@
 import { Search } from "lucide-react";
 
 // utils
-import { memo } from "react";
-
-// hooks
-import { useState } from "react";
+import { memo, useState, useCallback } from "react";
 
 // components
 import SearchContentDrawer from "./SearchContentDrawer";
@@ -22,16 +19,20 @@ function SearchMobile({
 }) {
   const [isFocused, setIsFocused] = useState<boolean>(false);
 
+  const handleOpen = useCallback(() => {
+    setIsFocused(true);
+  }, []);
+
   return (
-    <div className="lg:hidden">
-      <div
-        onClick={() => {
-          setIsFocused(true);
-        }}
-        className="flex flex-col items-center justify-center gap-0.5"
+    <div className="lg:hidden flex items-center">
+      <button
+        type="button"
+        aria-label="Search Products"
+        onClick={handleOpen}
+        className="relative flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200 cursor-pointer hover:bg-charcoal-3/5 active:scale-95 text-charcoal-3/70 hover:text-charcoal-3/90 touch-manipulation focus:outline-none select-none"
       >
-        <Search width={19} strokeWidth={1.5} height={19} />
-      </div>
+        <Search className="w-5 h-5 pointer-events-none" strokeWidth={1.75} />
+      </button>
       <SearchContentDrawer
         isFocused={isFocused}
         searchResults={searchResults}

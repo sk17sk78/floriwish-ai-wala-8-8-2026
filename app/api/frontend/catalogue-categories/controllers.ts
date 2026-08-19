@@ -62,13 +62,17 @@ export const getCatalogueCategories = async (): Promise<CatalogueCategoryDocumen
       ]);
     }
 
-    const catalogueCategoryResults = (catalogueCategories as unknown as CatalogueCategoryDocument[]).map(
-      (catalogueCategoryObject) => {
-        (catalogueCategoryObject as any)._catalogues =
-          catalogueCategoriesMap.get(String((catalogueCategoryObject as any)._id)) || [];
-        return catalogueCategoryObject;
-      }
-    );
+    const catalogueCategoryResults = JSON.parse(
+      JSON.stringify(
+        (catalogueCategories as unknown as CatalogueCategoryDocument[]).map(
+          (catalogueCategoryObject) => {
+            (catalogueCategoryObject as any)._catalogues =
+              catalogueCategoriesMap.get(String((catalogueCategoryObject as any)._id)) || [];
+            return catalogueCategoryObject;
+          }
+        )
+      )
+    ) as CatalogueCategoryDocument[];
 
     inMemoryCatalogueCache = { data: catalogueCategoryResults, timestamp: now };
 

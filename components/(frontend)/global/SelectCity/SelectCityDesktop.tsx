@@ -1,9 +1,7 @@
+"use client";
+
 import { ChevronDown, MapPin } from "lucide-react";
-
-// utils
-import { memo, useEffect, useState } from "react";
-
-// types
+import { memo, useEffect, useState, useCallback } from "react";
 import { type CityDocument } from "@/common/types/documentation/presets/city";
 
 function SelectCityDesktop({
@@ -28,56 +26,58 @@ function SelectCityDesktop({
     };
   }, []);
 
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      onClick();
+    },
+    [onClick]
+  );
+
   return (
-    <div
-      className={`relative text-charcoal-3/90 flex items-center justify-start text-sm cursor-pointer ${
-        shouldShake ? "animate-shake" : ""
+    <button
+      type="button"
+      onClick={handleClick}
+      aria-label="Select Delivery City"
+      className={`group relative text-charcoal-3/90 hidden sm:flex items-center gap-2 rounded-full border bg-white px-3 py-1.5 transition-all duration-200 hover:-translate-y-px hover:border-[#b76e79]/40 hover:bg-rose-50/20 active:scale-95 cursor-pointer touch-manipulation select-none outline-none ${
+        shouldShake ? "animate-shake border-red-500 shadow-md" : "border-zinc-200/80 shadow-2xs"
       }`}
-      onClick={onClick}
     >
       <div
-        className={`group ml-1 hidden cursor-pointer items-center gap-2 rounded-full border bg-white px-3 py-1.5 transition-all duration-200 hover:-translate-y-px hover:border-primary/30 hover:bg-primary/[0.03] hover:shadow-[0_2px_8px_rgba(109,40,217,0.08)] sm:flex ${
-          shouldShake ? "border-red-500 shadow-md" : "border-zinc-200/80"
+        className={`flex h-6 w-6 items-center justify-center rounded-full transition-colors duration-200 shrink-0 ${
+          shouldShake ? "bg-red-100" : "bg-rose-50 group-hover:bg-rose-100 text-[#b76e79]"
         }`}
       >
-        <div
-          className={`flex h-6 w-6 items-center justify-center rounded-full transition-colors duration-200 ${
-            shouldShake ? "bg-red-100" : "bg-sienna-1/10 group-hover:bg-sienna-1/15"
+        <MapPin
+          className={`w-3.5 h-3.5 ${shouldShake ? "text-red-500" : "text-[#b76e79]"}`}
+          strokeWidth={2}
+        />
+      </div>
+      <div className="flex flex-col text-left leading-tight pointer-events-none">
+        <span
+          className={`text-[10px] font-medium tracking-wide uppercase ${
+            shouldShake ? "text-red-400" : "text-zinc-400"
           }`}
         >
-          <MapPin
-            width={16}
-            height={16}
-            strokeWidth={2}
-            className={shouldShake ? "text-red-500" : "text-sienna-1"}
-          />
-        </div>
-        <div className="flex flex-col leading-tight">
+          Deliver to
+        </span>
+        <div className="flex items-center gap-1">
           <span
-            className={`text-[10px] font-medium tracking-wide uppercase ${
-              shouldShake ? "text-red-400" : "text-zinc-500"
+            className={`text-[13px] font-semibold tracking-tight ${
+              shouldShake ? "text-red-600" : "text-zinc-900"
             }`}
           >
-            Deliver to
+            {selectedCity ? selectedCity.name : "Select City"}
           </span>
-          <div className="flex items-center gap-1">
-            <span
-              className={`text-[13px] font-semibold ${
-                shouldShake ? "text-red-600" : "text-zinc-900"
-              }`}
-            >
-              {selectedCity ? selectedCity.name : "Select City"}
-            </span>
-            <ChevronDown
-              width={14}
-              height={14}
-              strokeWidth={2.5}
-              className={shouldShake ? "text-red-400" : "text-charcoal-3/85"}
-            />
-          </div>
+          <ChevronDown
+            className={`w-3.5 h-3.5 transition-transform duration-200 ${
+              shouldShake ? "text-red-400" : "text-zinc-400 group-hover:translate-y-0.5"
+            }`}
+            strokeWidth={2}
+          />
         </div>
       </div>
-    </div>
+    </button>
   );
 }
 

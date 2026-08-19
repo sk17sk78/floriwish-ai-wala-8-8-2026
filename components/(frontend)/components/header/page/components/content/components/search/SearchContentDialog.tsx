@@ -1,15 +1,16 @@
+"use client";
+
 // utils
-import { lazy, memo } from "react";
+import { memo } from "react";
 
 // components
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-const LazySearchContentUI = lazy(() => import("./SearchContentUI"));
-import { Suspense } from "react";
+import SearchContentUI from "./SearchContentUI";
 
 // types
 import { type SearchBarInitialContentsType } from "../../../../Header";
 
-function SearchContentDrawer({
+function SearchContentDialog({
   isFocused,
   searchResults,
   onChangeIsFocused
@@ -23,17 +24,15 @@ function SearchContentDrawer({
       open={isFocused}
       onOpenChange={onChangeIsFocused}
     >
-      <DialogContent className="flex flex-col items-start justify-start outline-none border-none shadow-premium z-[996] max-w-[440px] h-[560px] bg-white rounded-t-3xl sm:rounded-3xl px-6 pt-10 sm:pt-10 pb-5 gap-y-4 transition-all duration-300 max-sm:hidden overflow-hidden">
-        <Suspense fallback={<></>}>
-          <LazySearchContentUI
-            isFocused={isFocused}
-            searchResults={searchResults}
-            onChangeIsFocused={onChangeIsFocused}
-          />
-        </Suspense>
+      <DialogContent className="flex flex-col items-start justify-start outline-none border-none shadow-2xl z-[996] max-w-[520px] w-full max-h-[85vh] h-[620px] bg-white rounded-3xl p-6 transition-all duration-300 max-sm:hidden overflow-hidden [&>button]:hidden">
+        <SearchContentUI
+          isFocused={isFocused}
+          searchResults={searchResults}
+          onChangeIsFocused={onChangeIsFocused}
+        />
       </DialogContent>
     </Dialog>
   );
 }
 
-export default memo(SearchContentDrawer);
+export default memo(SearchContentDialog);

@@ -13,7 +13,7 @@ import { useAppStates } from "@/hooks/useAppState/useAppState";
 import { useSearch } from "@/hooks/useSearch/useSearch";
 
 // icons
-import { Sparkles } from "lucide-react";
+import { Sparkles, X } from "lucide-react";
 
 // components
 import SearchBoxNew from "./components/SearchBoxNew";
@@ -154,20 +154,22 @@ function SearchContentUI({
   }, [hasFocused, isFocused]);
 
   return (
-    <div className="flex flex-col w-full h-full gap-y-4">
-      <header className="flex items-center justify-start gap-3">
-        <div className="flex items-center justify-center p-2.5 rounded-xl border border-charcoal-3/10 bg-white shadow-premium">
-          <Sparkles
-            width={22}
-            height={22}
-            strokeWidth={1.5}
-            className="text-charcoal-3/80"
-          />
-        </div>
-        <h2 className="text-xl font-semibold text-charcoal-3/90 tracking-tight">
-          Search from 50K+ Products
+    <div className="flex flex-col w-full h-full gap-y-3 overscroll-contain select-none">
+      {/* Search Header */}
+      <div className="flex items-center justify-between shrink-0 pb-1">
+        <h2 className="text-[16px] font-bold text-zinc-900 tracking-tight">
+          Search Products
         </h2>
-      </header>
+        <button
+          type="button"
+          onClick={() => onChangeIsFocused(false)}
+          className="w-7 h-7 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-500 hover:text-zinc-800 flex items-center justify-center transition-colors cursor-pointer"
+          aria-label="Close search"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
       <SearchBoxNew
         keyword={keyword}
         onChangeKeyword={(updatedKeyword: string) => {
@@ -180,8 +182,9 @@ function SearchContentUI({
           setLocalStorage({ key: "items", value: contents });
         }}
       />
+
       {isFocused && (
-        <div className="flex-1 overflow-y-auto scrollbar-hide -mr-2 pr-2">
+        <div className="flex-1 overflow-y-auto overscroll-contain pb-6 scrollbar-thin scrollbar-thumb-zinc-200">
           <SearchResultsNew
             isLoading={isLoading}
             keyword={keyword}

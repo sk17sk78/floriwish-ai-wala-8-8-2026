@@ -84,13 +84,15 @@ export default function CartCheckoutDetail({
     )?.length;
 
   const canSave =
-    checkout.name &&
-    checkout.contact.mobileNumber &&
-    checkout.contact.mail &&
-    checkout.location.address &&
-    checkout.location.city &&
-    checkout.location.pincode &&
-    (!checkout.deliverToSomeoneElse || (checkout.receiverName && checkout.receiverMobileNumber));
+    Boolean(
+      checkout?.name &&
+      checkout?.contact?.mobileNumber &&
+      checkout?.contact?.mail &&
+      checkout?.location?.address &&
+      checkout?.location?.city &&
+      checkout?.location?.pincode &&
+      (!checkout?.deliverToSomeoneElse || (checkout?.receiverName && checkout?.receiverMobileNumber))
+    );
 
   // event handlers
   const handleSave = () => {
