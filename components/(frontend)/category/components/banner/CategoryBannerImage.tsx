@@ -21,7 +21,11 @@ function CategoryBannerImage({
   const mobDoc = bannerImage.mobile as ImageDocument | undefined;
 
   const desktopUrl = convertToCloudFrontUrl(deskDoc?.url || mobDoc?.url || "");
-  const hasMobile = Boolean(mobDoc?.url && mobDoc.url.trim().length > 0);
+  const hasMobile = Boolean(
+    mobDoc?.url &&
+    mobDoc.url.trim().length > 0 &&
+    mobDoc.url !== deskDoc?.url
+  );
   const mobileUrl = hasMobile ? convertToCloudFrontUrl(mobDoc?.url || "") : desktopUrl;
 
   const alt = deskDoc?.alt || deskDoc?.defaultAlt || mobDoc?.alt || mobDoc?.defaultAlt || "Category Banner";
@@ -34,13 +38,13 @@ function CategoryBannerImage({
         )}
         <source media="(min-width: 640px)" srcSet={desktopUrl} />
         <img
-          src={desktopUrl || mobileUrl}
+          src={hasMobile ? mobileUrl : (desktopUrl || mobileUrl)}
           alt={alt}
           className="object-cover object-center h-full w-full rounded-2xl sm:rounded-3xl"
           loading="lazy"
           decoding="async"
           width={1200}
-          height={400}
+          height={hasMobile ? 600 : 400}
         />
       </picture>
     </div>

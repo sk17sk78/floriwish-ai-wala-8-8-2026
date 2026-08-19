@@ -1,3 +1,5 @@
+"use client";
+
 // utils
 import { memo } from "react";
 

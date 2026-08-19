@@ -30,10 +30,19 @@ export const getCategoryData = async (slug: string) => {
 
   const LIMIT = 32;
 
-  // 1. FETCH CATEGORY DATA & ACTIVE GLOBAL BANNER
+  const trimmedSlug = (slug || "").trim();
   const [categoryRes, globalBanner] = await Promise.all([
     ContentCategories.aggregate([
-    { $match: { isActive: true, slug: slug } },
+    {
+      $match: {
+        isActive: true,
+        $or: [
+          { slug: slug },
+          { slug: trimmedSlug },
+          { slug: new RegExp(`^${trimmedSlug}\\s*$`, "i") }
+        ]
+      }
+    },
     // Lookup all images needed for this category in one go
     {
       $lookup: {

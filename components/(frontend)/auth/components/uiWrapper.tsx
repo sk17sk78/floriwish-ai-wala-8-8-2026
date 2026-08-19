@@ -1,3 +1,5 @@
+"use client";
+
 import { Children } from "@/common/types/reactTypes";
 
 export default function FrontendAuthUIWrapper({

@@ -17,10 +17,6 @@ import { INSTAGRAM_LINK } from "@/common/constants/companyDetails";
 
 import { SearchBarInitialContentsType } from "../header/page/Header";
 
-const LazyCustomerAuthDrawer = lazy(
-  () => import("@/components/(frontend)/auth/components/CustomerAuthDrawer")
-);
-
 function MobileNavbar({
   searchResults,
 }: {
@@ -142,14 +138,6 @@ function MobileNavbar({
           </div>
         )}
       </nav>
-
-      {/* Customer Auth Drawer for Login */}
-      <Suspense fallback={<></>}>
-        <LazyCustomerAuthDrawer
-          showDrawer={showAuth}
-          onChangeShowDrawer={onChangeShowAuth}
-        />
-      </Suspense>
     </>
   );
 }

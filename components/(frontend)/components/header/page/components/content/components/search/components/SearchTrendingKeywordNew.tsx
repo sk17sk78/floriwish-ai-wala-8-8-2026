@@ -1,11 +1,10 @@
+"use client";
+
 // icons
 import { TrendingUp } from "lucide-react";
 
 // utils
 import { memo } from "react";
-
-// components
-import Link from "next/link";
 
 function SearchTrendingKeywordNew({
   label,
@@ -17,18 +16,19 @@ function SearchTrendingKeywordNew({
   onClick: () => void;
 }) {
   return (
-    <article
-      className="text-sm font-medium bg-ivory-2 text-charcoal-3/80 border border-charcoal-3/10 px-4 py-2 rounded-2xl cursor-pointer transition-all duration-300 hover:bg-white hover:border-charcoal-3/20 hover:shadow-premium flex items-center justify-start gap-2"
+    <button
+      type="button"
+      className="text-xs font-semibold bg-white text-zinc-700 border border-zinc-200 hover:border-[#b76e79]/60 hover:bg-rose-50/40 px-3.5 py-2 rounded-full cursor-pointer transition-all duration-150 active:scale-95 flex items-center justify-start gap-1.5 shadow-2xs min-w-0 truncate"
       onClick={onClick}
     >
-      <span>{label}</span>
       <TrendingUp
-        width={14}
-        height={14}
-        strokeWidth={2}
-        className="text-charcoal-3/40"
+        width={13}
+        height={13}
+        strokeWidth={2.2}
+        className="text-[#b76e79] shrink-0"
       />
-    </article>
+      <span className="truncate">{label}</span>
+    </button>
   );
 }
 

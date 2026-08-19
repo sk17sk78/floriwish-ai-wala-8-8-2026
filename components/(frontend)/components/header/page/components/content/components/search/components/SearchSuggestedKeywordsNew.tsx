@@ -35,10 +35,10 @@ function SearchSuggestedKeywordsNew({
 
   if (items && items.length > 0)
     return (
-      <section className="flex flex-col gap-3 pb-2">
+      <section className="flex flex-col gap-2.5 pb-2">
         <div className="flex items-center justify-start gap-2">
-          <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">
-            Suggested Searches
+          <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+            Trending
           </span>
         </div>
         <section className="flex gap-2 items-start justify-start flex-wrap">

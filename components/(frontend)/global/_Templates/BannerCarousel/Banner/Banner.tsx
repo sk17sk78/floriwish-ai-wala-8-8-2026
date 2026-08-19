@@ -17,7 +17,11 @@ export default function Banner({
   isPriority?: boolean;
 }) {
   const desktopSrc = convertToCloudFrontUrl(props.image.desktop.url || props.image.mobile.url || "");
-  const hasMobileImage = Boolean(props.image.mobile.url && props.image.mobile.url.trim().length > 0);
+  const hasMobileImage = Boolean(
+    props.image.mobile.url &&
+    props.image.mobile.url.trim().length > 0 &&
+    props.image.mobile.url !== props.image.desktop.url
+  );
   const mobileSrc = hasMobileImage
     ? convertToCloudFrontUrl(props.image.mobile.url)
     : desktopSrc;
@@ -31,14 +35,14 @@ export default function Banner({
         )}
         <source media="(min-width: 640px)" srcSet={desktopSrc} />
         <img
-          src={desktopSrc || mobileSrc}
+          src={hasMobileImage ? mobileSrc : (desktopSrc || mobileSrc)}
           alt={alt}
           className="object-cover object-center h-full w-full rounded-2xl sm:rounded-3xl"
           loading={isPriority ? "eager" : "lazy"}
           fetchPriority={isPriority ? "high" : "low"}
           decoding="async"
           width={1200}
-          height={400}
+          height={hasMobileImage ? 600 : 400}
         />
       </picture>
     </div>

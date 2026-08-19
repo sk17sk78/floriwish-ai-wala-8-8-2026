@@ -55,6 +55,13 @@ function CategoryBanner({
   const [countManager, setCountManager] = useState<CarouselApi>();
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
+  const hasDedicatedMobileImages = (Array.isArray(images) ? images : []).some(
+    (img: any) =>
+      img?.mobile?.url &&
+      img.mobile.url.trim().length > 0 &&
+      img.mobile.url !== img?.desktop?.url
+  );
+
   // memoizes
   const dimensions = useMemo(
     () =>
@@ -66,8 +73,10 @@ function CategoryBanner({
             ? "h-[150px]"
             : type === "square"
               ? "aspect-[1/1]"
-              : "aspect-[3/1]",
-    [type]
+              : hasDedicatedMobileImages
+                ? "aspect-[2/1] sm:aspect-[3/1]"
+                : "aspect-[3/1]",
+    [type, hasDedicatedMobileImages]
   );
 
   // utils

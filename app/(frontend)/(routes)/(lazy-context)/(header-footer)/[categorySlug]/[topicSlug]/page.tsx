@@ -42,9 +42,10 @@ export async function generateStaticParams() {
       slugs = topics
         .slice(0, QUICK_BUILD ? 1 : topics.length)
         .map(({ slug, category }) => ({
-          categorySlug: (category as ContentCategoryDocument).slug,
-          topicSlug: slug
-        }));
+          categorySlug: ((category as ContentCategoryDocument)?.slug || "").trim(),
+          topicSlug: (slug || "").trim()
+        }))
+        .filter(({ categorySlug, topicSlug }) => categorySlug.length > 0 && topicSlug.length > 0);
 
       return slugs;
     } catch (error) {

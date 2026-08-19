@@ -12,9 +12,6 @@ import { memo, useCallback, useEffect, useState } from "react";
 import { useAppStates } from "@/hooks/useAppState/useAppState";
 import { useSearch } from "@/hooks/useSearch/useSearch";
 
-// icons
-import { Sparkles, X } from "lucide-react";
-
 // components
 import SearchBoxNew from "./components/SearchBoxNew";
 import SearchResultsNew from "./components/SearchResultsNew";
@@ -76,9 +73,9 @@ function SearchContentUI({
     url.searchParams.set("cityId", selectedCity === null ? "null" : (String(selectedCity._id)));
     if (searchKey) {
       url.searchParams.set("key", searchKey);
-      url.searchParams.set("limit", "100"); // Search results limit
+      url.searchParams.set("limit", "100");
     } else {
-      url.searchParams.set("limit", "40"); // Default popular items limit
+      url.searchParams.set("limit", "40");
     }
 
     setIsLoading(true);
@@ -93,7 +90,6 @@ function SearchContentUI({
         const newContents = data.data || [];
         setContents(() => newContents);
         
-        // If we fetched with a key, all results are matching
         if (searchKey) {
           setResults(() => newContents.map((_: any, i: number) => i));
         } else {
@@ -115,10 +111,9 @@ function SearchContentUI({
     if (keyword.length >= 2) {
       const timeoutId = setTimeout(() => {
         fetchCityWiseContentList(keyword);
-      }, 400); // 400ms debounce
+      }, 400);
       return () => clearTimeout(timeoutId);
     } else if (keyword.length === 0 && hasFocused) {
-      // Fetch default items when empty
       fetchCityWiseContentList();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -126,9 +121,8 @@ function SearchContentUI({
 
   useEffect(() => {
     if (hasFocused && keyword.length < 2) {
-      // fetch default contents from API here...
       fetchCityWiseContentList();
-      onLoadData(); // Lazy load global search metadata (AI tags, categories, etc.)
+      onLoadData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasFocused]);
@@ -154,22 +148,13 @@ function SearchContentUI({
   }, [hasFocused, isFocused]);
 
   return (
-    <div className="flex flex-col w-full h-full gap-y-3 overscroll-contain select-none">
-      {/* Search Header */}
-      <div className="flex items-center justify-between shrink-0 pb-1">
-        <h2 className="text-[16px] font-bold text-zinc-900 tracking-tight">
-          Search Products
-        </h2>
-        <button
-          type="button"
-          onClick={() => onChangeIsFocused(false)}
-          className="w-7 h-7 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-500 hover:text-zinc-800 flex items-center justify-center transition-colors cursor-pointer"
-          aria-label="Close search"
-        >
-          <X className="w-3.5 h-3.5" />
-        </button>
+    <div className="flex flex-col w-full min-w-0 max-w-full h-full max-h-[85dvh] sm:max-h-[620px] px-4 sm:px-5 pt-2.5 pb-6 overscroll-contain select-none bg-white overflow-hidden">
+      {/* Drag handle */}
+      <div className="sm:hidden flex justify-center pb-2.5 shrink-0">
+        <div className="w-12 h-1.5 rounded-full bg-zinc-200" />
       </div>
 
+      {/* Top Search Input with Cancel Button */}
       <SearchBoxNew
         keyword={keyword}
         onChangeKeyword={(updatedKeyword: string) => {
@@ -184,7 +169,7 @@ function SearchContentUI({
       />
 
       {isFocused && (
-        <div className="flex-1 overflow-y-auto overscroll-contain pb-6 scrollbar-thin scrollbar-thumb-zinc-200">
+        <div className="flex-1 overflow-y-auto min-h-0 pt-4 pb-4 overscroll-contain scrollbar-thin scrollbar-thumb-zinc-200">
           <SearchResultsNew
             isLoading={isLoading}
             keyword={keyword}

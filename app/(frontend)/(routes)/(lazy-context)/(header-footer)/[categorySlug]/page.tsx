@@ -36,8 +36,9 @@ export async function generateStaticParams() {
       const contentCategorySlugs: { categorySlug: string }[] = contentCategories
         .slice(0, QUICK_BUILD ? 1 : contentCategories.length)
         .map(({ slug }) => ({
-          categorySlug: slug
-        }));
+          categorySlug: (slug || "").trim()
+        }))
+        .filter(({ categorySlug }) => categorySlug.length > 0);
       return contentCategorySlugs;
     } catch (error) {
       return [];
@@ -105,10 +106,14 @@ async function fetchContentCategory(slug: string) {
 }
 
 export default async function page({
-  params: { categorySlug }
+  params
 }: {
-  params: { categorySlug: string };
+  params: Promise<{ categorySlug: string }> | { categorySlug: string };
 }) {
+  const resolvedParams = await Promise.resolve(params);
+  const rawSlug = resolvedParams?.categorySlug || "";
+  const categorySlug = decodeURIComponent(rawSlug).trim();
+
   let contentCategory = await fetchContentCategory(categorySlug);
 
   if (!contentCategory) {

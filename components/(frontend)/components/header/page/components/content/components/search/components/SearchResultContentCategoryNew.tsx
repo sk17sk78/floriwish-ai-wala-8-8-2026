@@ -1,3 +1,5 @@
+"use client";
+
 // utils
 import { memo } from "react";
 
@@ -15,7 +17,7 @@ function SearchResultContentCategoryNew({
 }) {
   return (
     <Link
-      className="text-sm font-medium bg-ivory-2 text-charcoal-3/80 border border-charcoal-3/10 px-4 py-2 rounded-2xl cursor-pointer transition-all duration-300 hover:bg-white hover:border-charcoal-3/20 hover:shadow-premium whitespace-nowrap"
+      className="text-xs font-semibold bg-white text-zinc-700 border border-zinc-200 hover:border-[#b76e79]/60 hover:bg-rose-50/40 px-3.5 py-2 rounded-full cursor-pointer transition-all duration-150 active:scale-95 whitespace-nowrap shadow-2xs"
       href={`/${slug}`}
       onClick={collapse}
       prefetch

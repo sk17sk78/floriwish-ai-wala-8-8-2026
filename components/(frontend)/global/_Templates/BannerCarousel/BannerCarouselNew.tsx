@@ -60,10 +60,19 @@ export function Banners(config: BannerCarouselType) {
 
   const showBubbles = config.showBubbles || false;
 
+  const hasDedicatedMobileBanners = filteredElements.some(
+    (el) =>
+      el.image?.mobile?.url &&
+      el.image.mobile.url.trim().length > 0 &&
+      el.image.mobile.url !== el.image?.desktop?.url
+  );
+
   const { ratioType: type } = config;
   const dimensions =
     type === "default" || type === undefined
-      ? "aspect-[3/1]"
+      ? hasDedicatedMobileBanners
+        ? "aspect-[2/1] sm:aspect-[3/1]"
+        : "aspect-[3/1]"
       : type === "large"
         ? "aspect-[3/2]"
         : type === "micro"

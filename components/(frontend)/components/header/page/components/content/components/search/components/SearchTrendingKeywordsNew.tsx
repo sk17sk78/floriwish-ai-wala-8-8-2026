@@ -1,16 +1,13 @@
-// icons
-import { Flame } from "lucide-react";
+"use client";
 
 // utils
-import { memo } from "react";
+import { memo, useMemo } from "react";
 
 // components
 import SearchTrendingKeywordNew from "./SearchTrendingKeywordNew";
 
 // types
 import { type SearchBarInitialContentsType } from "../../../../../Header";
-
-import { useMemo } from "react";
 
 function SearchTrendingKeywordsNew({
   trendingKeywords,
@@ -35,13 +32,10 @@ function SearchTrendingKeywordsNew({
 
   if (items && items.length > 0)
     return (
-      <section className="flex flex-col gap-3 pb-2">
-        <div className="flex items-center justify-start gap-1.5">
-          <Flame className="w-3.5 h-3.5 text-orange-500 fill-orange-500" />
-          <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">
-            Trending Searches
-          </span>
-        </div>
+      <section className="flex flex-col gap-2.5 pb-2">
+        <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+          Trending
+        </span>
         <section className="flex gap-2 items-start justify-start flex-wrap">
           {items.map(({ label, path }, index) => (
             <SearchTrendingKeywordNew

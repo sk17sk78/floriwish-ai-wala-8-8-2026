@@ -1,3 +1,5 @@
+"use client";
+
 // // icons
 // import { Mail, PhoneCall, Smartphone } from "lucide-react";
 // import { WhatsappSVG } from "@/common/svgs/svg";

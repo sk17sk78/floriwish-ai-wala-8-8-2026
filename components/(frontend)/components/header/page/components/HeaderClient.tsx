@@ -22,10 +22,7 @@ import SelectCityDesktop from "@/components/(frontend)/global/SelectCity/SelectC
 import WidthWrapper from "@/components/(frontend)/components/wrapper/WidthWrapper";
 import ContentHorizontalSpacing from "@/components/(frontend)/content/spacing/ContentHorizontalSpacing";
 
-// lazy components
-const LazyGoogleOnlyAuth = lazy(
-  () => import("@/components/(frontend)/auth/GoogleOnlyAuth"),
-);
+import GoogleOnlyAuth from "@/components/(frontend)/auth/GoogleOnlyAuth";
 
 // types
 import { type SearchBarInitialContentsType } from "../Header";
@@ -132,16 +129,14 @@ function HeaderClient({
         </div>
         <HeaderNavBar navLinks={navLinks} />
       </header>
-      <Suspense fallback={<></>}>
-        <LazyGoogleOnlyAuth
-          openAuth={showAuth}
-          setOpenAuth={(value) =>
-            onChangeShowAuth(
-              typeof value === "function" ? value(showAuth) : value,
-            )
-          }
-        />
-      </Suspense>
+      <GoogleOnlyAuth
+        openAuth={showAuth}
+        setOpenAuth={(value) =>
+          onChangeShowAuth(
+            typeof value === "function" ? value(showAuth) : value,
+          )
+        }
+      />
     </>
   );
 }

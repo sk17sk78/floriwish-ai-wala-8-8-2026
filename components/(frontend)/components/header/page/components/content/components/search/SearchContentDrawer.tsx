@@ -1,10 +1,10 @@
 "use client";
 
 // utils
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 // components
-import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import SearchContentUI from "./SearchContentUI";
 
 // types
@@ -19,22 +19,32 @@ function SearchContentDrawer({
   searchResults: SearchBarInitialContentsType | null;
   onChangeIsFocused: (isFocused: boolean) => void;
 }) {
-  return (
-    <Drawer
-      open={isFocused}
-      onOpenChange={onChangeIsFocused}
-    >
-      <DrawerContent className="outline-none border-none z-[996] max-h-[90dvh] h-[88dvh] bg-white rounded-t-[28px] px-4 pt-3 pb-6 flex flex-col transition-all duration-300 lg:hidden overflow-hidden shadow-2xl touch-manipulation">
-        <div className="flex justify-center pb-2 shrink-0">
-          <div className="w-10 h-1 rounded-full bg-zinc-300" />
-        </div>
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!isFocused || !mounted) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[99999] flex flex-col justify-end bg-black/60 backdrop-blur-xs animate-in fade-in duration-200 lg:hidden">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0"
+        onClick={() => onChangeIsFocused(false)}
+      />
+
+      {/* Sheet Container: Height 75dvh to match 7eventzz screenshot */}
+      <div className="relative w-full max-w-full min-w-0 h-[75dvh] max-h-[85dvh] bg-white rounded-t-[28px] flex flex-col overflow-hidden shadow-2xl z-10 animate-in slide-in-from-bottom duration-200">
         <SearchContentUI
           isFocused={isFocused}
           searchResults={searchResults}
           onChangeIsFocused={onChangeIsFocused}
         />
-      </DrawerContent>
-    </Drawer>
+      </div>
+    </div>,
+    document.body
   );
 }
 

@@ -1,3 +1,5 @@
+"use client";
+
 // constants
 import { GOOGLE_CLIENT_ID } from "@/common/constants/environmentVariables";
 

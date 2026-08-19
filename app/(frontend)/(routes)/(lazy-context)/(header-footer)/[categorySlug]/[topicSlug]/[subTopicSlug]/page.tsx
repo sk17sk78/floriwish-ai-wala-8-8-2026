@@ -47,10 +47,11 @@ export async function generateStaticParams() {
       slugs = subTopics
         .slice(0, QUICK_BUILD ? 1 : subTopics.length)
         .map(({ slug, category, topic }) => ({
-          categorySlug: (category as ContentCategoryDocument).slug,
-          topicSlug: (topic as TopicDocument).slug,
-          subTopicSlug: slug
-        }));
+          categorySlug: ((category as ContentCategoryDocument)?.slug || "").trim(),
+          topicSlug: ((topic as TopicDocument)?.slug || "").trim(),
+          subTopicSlug: (slug || "").trim()
+        }))
+        .filter(({ categorySlug, topicSlug, subTopicSlug }) => categorySlug.length > 0 && topicSlug.length > 0 && subTopicSlug.length > 0);
 
       return slugs;
     } catch (error) {
