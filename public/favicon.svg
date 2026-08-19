@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient: Brand Rose-Sienna -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c97e89"/>
+      <stop offset="50%" stop-color="#b76e79"/>
+      <stop offset="100%" stop-color="#8f4d57"/>
+    </linearGradient>
+
+    <!-- Flower Petal Gradient -->
+    <linearGradient id="petalGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#fff5f6"/>
+    </linearGradient>
+
+    <!-- Center Glow -->
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffeef0" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#b76e79" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Gold Sparkle Gradient -->
+    <linearGradient id="sparkleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff4cc"/>
+      <stop offset="50%" stop-color="#ffd166"/>
+      <stop offset="100%" stop-color="#f4a261"/>
+    </linearGradient>
+
+    <!-- Subtle Drop Shadow -->
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#5a222a" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Rounded App Icon Background -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)"/>
+  
+  <!-- Subtle Inner Ring Highlight -->
+  <rect x="12" y="12" width="488" height="488" rx="116" fill="none" stroke="#ffffff" stroke-width="4" stroke-opacity="0.25"/>
+
+  <!-- Main Flower / Bloom Icon (Floriwish Brand Symbol) -->
+  <g filter="url(#shadow)" transform="translate(0, 10)">
+    <!-- Bottom Center Stem/Leaf Accent -->
+    <path d="M256 360 C240 395 210 415 180 418 C205 385 235 370 256 360 Z" fill="#ffffff" fill-opacity="0.85"/>
+    <path d="M256 360 C272 395 302 415 332 418 C307 385 277 370 256 360 Z" fill="#ffffff" fill-opacity="0.85"/>
+
+    <!-- Outer Left Petal -->
+    <path d="M256 345 C175 340 115 275 130 195 C170 195 220 245 256 345 Z" fill="url(#petalGrad)" fill-opacity="0.92"/>
+
+    <!-- Outer Right Petal -->
+    <path d="M256 345 C337 340 397 275 382 195 C342 195 292 245 256 345 Z" fill="url(#petalGrad)" fill-opacity="0.92"/>
+
+    <!-- Mid Left Petal -->
+    <path d="M256 350 C200 320 160 230 195 155 C235 185 250 260 256 350 Z" fill="url(#petalGrad)" fill-opacity="0.97"/>
+
+    <!-- Mid Right Petal -->
+    <path d="M256 350 C312 320 352 230 317 155 C277 185 262 260 256 350 Z" fill="url(#petalGrad)" fill-opacity="0.97"/>
+
+    <!-- Center Main Blooming Heart Petal -->
+    <path d="M256 355 C225 285 215 190 256 120 C297 190 287 285 256 355 Z" fill="#ffffff"/>
+
+    <!-- Core Blooming Bud Detail -->
+    <circle cx="256" cy="235" r="28" fill="url(#sparkleGrad)" fill-opacity="0.9"/>
+  </g>
+
+  <!-- Wish Sparkle (Top Right) -->
+  <g transform="translate(365, 95)">
+    <path d="M0 -36 Q4 -8 36 0 Q4 8 0 36 Q-4 8 -36 0 Q-4 -8 0 -36 Z" fill="url(#sparkleGrad)"/>
+    <circle cx="0" cy="0" r="6" fill="#ffffff"/>
+  </g>
+
+  <!-- Mini Wish Sparkle (Left) -->
+  <g transform="translate(100, 160) scale(0.55)">
+    <path d="M0 -30 Q3 -6 30 0 Q3 6 0 30 Q-3 6 -30 0 Q-3 -6 0 -30 Z" fill="#ffffff" fill-opacity="0.9"/>
+  </g>
+</svg>

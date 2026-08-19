@@ -72,11 +72,30 @@ export default async function Home() {
   const mobileLcpUrl = convertToCloudFrontUrl((firstImage?.mobile as any)?.url);
 
   return (
-    <BodyWrapper fullWidth>
-      <main>
-        <h1 className="visually-hidden">{WEBSITE_NAME}</h1>
-        <BentoHomepage data={homepageLayouts} inFrontend />
-      </main>
-    </BodyWrapper>
+    <>
+      {/* LCP Preload: Tell browser to download hero image IMMEDIATELY — before JS/CSS parse */}
+      {desktopLcpUrl && (
+        <link
+          rel="preload"
+          as="image"
+          href={desktopLcpUrl}
+          // Mobile browsers get the mobile image version if available
+          imageSrcSet={
+            mobileLcpUrl && mobileLcpUrl !== desktopLcpUrl
+              ? `${mobileLcpUrl} 640w, ${desktopLcpUrl} 1200w`
+              : `${desktopLcpUrl} 1200w`
+          }
+          imageSizes="100vw"
+          // @ts-ignore
+          fetchPriority="high"
+        />
+      )}
+      <BodyWrapper fullWidth>
+        <main>
+          <h1 className="visually-hidden">{WEBSITE_NAME}</h1>
+          <BentoHomepage data={homepageLayouts} inFrontend />
+        </main>
+      </BodyWrapper>
+    </>
   );
 }

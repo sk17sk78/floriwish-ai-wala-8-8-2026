@@ -64,13 +64,13 @@ function SearchContentUI({
   const [results, setResults] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [prevCityId, setPrevCityId] = useState<string | null>(
-    selectedCity ? (String(selectedCity._id)) : null
+    selectedCity ? String(selectedCity._id) : null
   );
 
   // event handlers
   const fetchCityWiseContentList = useCallback((searchKey?: string) => {
     const url = new URL(API_SEARCH_CONTENTS);
-    url.searchParams.set("cityId", selectedCity === null ? "null" : (String(selectedCity._id)));
+    url.searchParams.set("cityId", selectedCity === null ? "null" : String(selectedCity._id));
     if (searchKey) {
       url.searchParams.set("key", searchKey);
       url.searchParams.set("limit", "100");
@@ -97,11 +97,11 @@ function SearchContentUI({
         }
         
         setPrevCityId(() =>
-          selectedCity ? (String(selectedCity._id)) : null
+          selectedCity ? String(selectedCity._id) : null
         );
         setIsLoading(false);
       })
-      .catch((err) => {
+      .catch(() => {
         setIsLoading(false);
       });
   }, [selectedCity]);
@@ -132,7 +132,7 @@ function SearchContentUI({
       hasFocused &&
       ((selectedCity !== null &&
         prevCityId !== null &&
-        (String(selectedCity._id)) !== prevCityId) ||
+        String(selectedCity._id) !== prevCityId) ||
         (selectedCity !== null && prevCityId === null) ||
         (selectedCity === null && prevCityId !== null))
     ) {
@@ -148,28 +148,26 @@ function SearchContentUI({
   }, [hasFocused, isFocused]);
 
   return (
-    <div className="flex flex-col w-full min-w-0 max-w-full h-full max-h-[85dvh] sm:max-h-[620px] px-4 sm:px-5 pt-2.5 pb-6 overscroll-contain select-none bg-white overflow-hidden">
-      {/* Drag handle */}
-      <div className="sm:hidden flex justify-center pb-2.5 shrink-0">
-        <div className="w-12 h-1.5 rounded-full bg-zinc-200" />
+    <div className="flex flex-col w-full h-full bg-white text-zinc-900 select-none overflow-hidden text-left">
+      {/* ── Fixed Search Header ─────────────────────── */}
+      <div className="px-4 sm:px-5 pt-[max(12px,env(safe-area-inset-top))] pb-3 sm:pt-4 sm:pb-3 border-b border-zinc-100 bg-white shrink-0 z-10 shadow-2xs">
+        <SearchBoxNew
+          keyword={keyword}
+          onChangeKeyword={(updatedKeyword: string) => {
+            setKeyword(() => updatedKeyword);
+          }}
+          onChangeIsFocused={(isFocused: boolean) => {
+            onChangeIsFocused(isFocused);
+          }}
+          saveContentsToLS={() => {
+            setLocalStorage({ key: "items", value: contents });
+          }}
+        />
       </div>
 
-      {/* Top Search Input with Cancel Button */}
-      <SearchBoxNew
-        keyword={keyword}
-        onChangeKeyword={(updatedKeyword: string) => {
-          setKeyword(() => updatedKeyword);
-        }}
-        onChangeIsFocused={(isFocused: boolean) => {
-          onChangeIsFocused(isFocused);
-        }}
-        saveContentsToLS={() => {
-          setLocalStorage({ key: "items", value: contents });
-        }}
-      />
-
+      {/* ── Scrollable Results Body ─────────────────── */}
       {isFocused && (
-        <div className="flex-1 overflow-y-auto min-h-0 pt-4 pb-4 overscroll-contain scrollbar-thin scrollbar-thumb-zinc-200">
+        <div className="flex-1 overflow-y-auto min-h-0 overscroll-contain px-4 sm:px-5 py-4 pb-[max(24px,env(safe-area-inset-bottom))]">
           <SearchResultsNew
             isLoading={isLoading}
             keyword={keyword}

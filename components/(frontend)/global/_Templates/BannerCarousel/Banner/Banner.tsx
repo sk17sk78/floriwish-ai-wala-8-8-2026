@@ -27,22 +27,47 @@ export default function Banner({
     : desktopSrc;
   const alt = props.image.desktop.alt || props.image.mobile.alt || "Banner Image";
 
+  // Correct aspect-ratio derived width/height pairs:
+  // Desktop (3:1)  → 1200×400
+  // Mobile  (2:1)  → 800×400  (matches aspect-[2/1] carousel container)
+  // Using explicit width+height tells the browser the intrinsic ratio BEFORE
+  // the image downloads → CLS = 0.
+  const desktopW = 1200;
+  const desktopH = 400;
+  const mobileW = 800;
+  const mobileH = 400;
+
   const content = (
     <div className="relative w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden bg-zinc-100">
       <picture className="w-full h-full block">
         {hasMobileImage && (
-          <source media="(max-width: 639px)" srcSet={mobileSrc} />
+          <source
+            media="(max-width: 639px)"
+            srcSet={mobileSrc}
+            width={mobileW}
+            height={mobileH}
+          />
         )}
-        <source media="(min-width: 640px)" srcSet={desktopSrc} />
+        <source
+          media="(min-width: 640px)"
+          srcSet={desktopSrc}
+          width={desktopW}
+          height={desktopH}
+        />
         <img
           src={hasMobileImage ? mobileSrc : (desktopSrc || mobileSrc)}
           alt={alt}
           className="object-cover object-center h-full w-full rounded-2xl sm:rounded-3xl"
           loading={isPriority ? "eager" : "lazy"}
           fetchPriority={isPriority ? "high" : "low"}
-          decoding="async"
-          width={1200}
-          height={hasMobileImage ? 600 : 400}
+          decoding={isPriority ? "sync" : "async"}
+          width={hasMobileImage ? mobileW : desktopW}
+          height={hasMobileImage ? mobileH : desktopH}
+          sizes={
+            hasMobileImage
+              ? "(max-width: 639px) 100vw, 100vw"
+              : "100vw"
+          }
         />
       </picture>
     </div>

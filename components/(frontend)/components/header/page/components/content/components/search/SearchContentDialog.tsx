@@ -24,7 +24,7 @@ function SearchContentDialog({
       open={isFocused}
       onOpenChange={onChangeIsFocused}
     >
-      <DialogContent className="flex flex-col items-start justify-start outline-none border-none shadow-2xl z-[996] max-w-[520px] w-full max-h-[85vh] h-[620px] bg-white rounded-3xl p-6 transition-all duration-300 max-sm:hidden overflow-hidden [&>button]:hidden">
+      <DialogContent className="flex flex-col items-start justify-start outline-none border-none shadow-2xl z-[996] max-w-[480px] w-full max-h-[75vh] h-[540px] bg-white rounded-2xl p-0 transition-all duration-200 max-sm:hidden overflow-hidden [&>button]:hidden">
         <SearchContentUI
           isFocused={isFocused}
           searchResults={searchResults}

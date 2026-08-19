@@ -1,44 +1,52 @@
-// icons
-import { ChevronRight } from "lucide-react";
+"use client";
 
-// constants
 import { CONTACT_LINKS } from "../constants/contactLinks";
-
-// utils
 import { memo } from "react";
-
-// components
-import BoxTheme from "@/components/(frontend)/content/theme/BoxTheme";
+import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 function HamburgerContact({ onClose }: { onClose?: () => void }) {
   return (
-    <section className="flex flex-col border-t border-black/10">
-      {CONTACT_LINKS.map(({ label, link, svg, rightSide }, index) => (
-        <Link
-          href={link}
-          prefetch={false}
-          onClick={onClose}
-          className="flex items-center justify-between px-4 py-4 transition-all duration-300 hover:bg-black/5 border-b border-black/10 group"
-          key={index}
-        >
-          <div className="flex items-center gap-4">
-            <div className="text-charcoal-3/80 group-hover:text-sienna transition-colors">
-              {svg}
+    <div className="py-2">
+      <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1 px-1">
+        Help & Support
+      </p>
+      <div className="divide-y divide-zinc-100">
+        {CONTACT_LINKS.map(({ label, link, svg, rightSide }, index) => (
+          <Link
+            href={link}
+            prefetch={false}
+            onClick={onClose}
+            className="flex items-center justify-between py-3 px-1 transition-colors hover:text-[#b76e79] cursor-pointer"
+            key={index}
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="text-zinc-500 shrink-0">
+                {svg}
+              </div>
+              <span className="text-[13.5px] font-medium text-zinc-700 truncate">
+                {label}
+              </span>
             </div>
-            <span className="text-[15px] font-medium text-charcoal-3">
-              {label}
-            </span>
-          </div>
-          {rightSide && (
-            <span className={cn("text-xs font-semibold uppercase tracking-wider", rightSide.color)}>
-              {rightSide.label}
-            </span>
-          )}
-        </Link>
-      ))}
-    </section>
+
+            <div className="flex items-center gap-2 shrink-0 ml-2">
+              {rightSide && (
+                <span
+                  className={cn(
+                    "text-[10px] font-medium px-2 py-0.5 rounded bg-zinc-100",
+                    rightSide.color
+                  )}
+                >
+                  {rightSide.label}
+                </span>
+              )}
+              <ChevronRight className="w-3.5 h-3.5 text-zinc-300" />
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 }
 

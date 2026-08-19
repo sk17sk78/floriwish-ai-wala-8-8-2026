@@ -37,14 +37,6 @@ export function Banners(config: BannerCarouselType) {
   );
   const [countManager, setCountManager] = useState<CarouselApi>();
   const [currIndex, setCurrIndex] = useState<number>(0);
-  const [isMobile, setIsMobile] = useState<boolean>(false);
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 640);
-    checkMobile();
-    window.addEventListener("resize", checkMobile, { passive: true });
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
 
   useEffect(
     () => manageCarouselCount({ countManager, setCurrIndex }),

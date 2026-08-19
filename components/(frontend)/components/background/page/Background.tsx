@@ -1,8 +1,14 @@
 // components
-import StickyButtons from "../components/StickyButtons";
+import dynamic from "next/dynamic";
 
 // types
 import { type ReactNode } from "react";
+
+// Defer StickyButtons (usePathname + regex + WhatsApp logic) out of critical JS bundle
+const StickyButtons = dynamic(
+  () => import("../components/StickyButtons"),
+  { ssr: false }
+);
 
 export default async function Background({
   children,

@@ -17,7 +17,7 @@ function SearchResultContentCategoryNew({
 }) {
   return (
     <Link
-      className="text-xs font-semibold bg-white text-zinc-700 border border-zinc-200 hover:border-[#b76e79]/60 hover:bg-rose-50/40 px-3.5 py-2 rounded-full cursor-pointer transition-all duration-150 active:scale-95 whitespace-nowrap shadow-2xs"
+      className="text-xs font-medium bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200/80 px-3 py-1.5 rounded-full cursor-pointer transition-colors active:scale-95 whitespace-nowrap"
       href={`/${slug}`}
       onClick={collapse}
       prefetch

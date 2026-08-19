@@ -1,24 +1,29 @@
 import "@/app/globals.css";
 import { type Children } from "@/common/types/reactTypes";
 import { type Metadata, type Viewport } from "next";
-import { Montserrat, Roboto } from "next/font/google";
+import { Roboto } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import Script from "next/script";
+import dynamic from "next/dynamic";
 import { GOOGLE_ANALYTICS_ID } from "@/common/constants/environmentVariables";
+
+// Defer Firebase + Notification SDK out of critical JS bundle
+const NotificationPrompt = dynamic(
+  () => import("@/components/(frontend)/notifications/NotificationPrompt"),
+  { ssr: false }
+);
+
+const Toaster = dynamic(
+  () => import("@/components/ui/toaster").then((m) => m.Toaster),
+  { ssr: false }
+);
 
 const roboto = Roboto({
   subsets: ["latin"],
   weight: ["400", "500", "700"],
   display: "swap",
   variable: "--font-roboto",
-  adjustFontFallback: true,
-});
-
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-montserrat",
-  display: "swap",
+  preload: true,
   adjustFontFallback: true,
 });
 
@@ -71,6 +76,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
       { url: "/favicon.ico", sizes: "any" },
       { url: "/icons/icon-32x32.png", sizes: "32x32", type: "image/png" },
       { url: "/icons/icon-96x96.png", sizes: "96x96", type: "image/png" },
@@ -86,17 +92,16 @@ export const metadata: Metadata = {
   }
 };
 
-import NotificationPrompt from "@/components/(frontend)/notifications/NotificationPrompt";
-
 export default function RootLayout({ children }: { children: Children }) {
   return (
-    <html lang="en" className={`${roboto.variable} ${montserrat.variable}`}>
+    <html lang="en" className={`${roboto.variable}`}>
        <head>
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://d22rebqllszdz8.cloudfront.net" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://d3lno5tuwkddps.cloudfront.net" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://d22rebqllszdz8.cloudfront.net" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/icons/icon-32x32.png" type="image/png" sizes="32x32" />
         <link rel="icon" href="/icons/icon-192x192.png" type="image/png" sizes="192x192" />
@@ -157,6 +162,7 @@ export default function RootLayout({ children }: { children: Children }) {
         />
         <NotificationPrompt />
         {children}
+        <Toaster />
         {/* GA deferred — page load block nahi karega */}
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_ID}`}

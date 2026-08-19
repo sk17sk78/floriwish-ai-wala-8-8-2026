@@ -21,22 +21,12 @@ function SearchBoxNew({
   const inputRef = useRef<HTMLInputElement>(null);
   const { push } = useRouter();
 
-  // Immediate 1-click focus with preventScroll
+  // Auto focus input cleanly
   useEffect(() => {
-    const frame = requestAnimationFrame(() => {
+    const t = setTimeout(() => {
       inputRef.current?.focus({ preventScroll: true });
-    });
-
-    const timer = setTimeout(() => {
-      if (inputRef.current && document.activeElement !== inputRef.current) {
-        inputRef.current.focus({ preventScroll: true });
-      }
     }, 100);
-
-    return () => {
-      cancelAnimationFrame(frame);
-      clearTimeout(timer);
-    };
+    return () => clearTimeout(t);
   }, []);
 
   const handleChange = useCallback(
@@ -65,20 +55,18 @@ function SearchBoxNew({
   );
 
   return (
-    <div className="flex items-center gap-2.5 w-full min-w-0 shrink-0">
-      <div className="flex-1 min-w-0 flex items-center rounded-2xl bg-[#f4f4f5] px-2.5 py-1.5 border border-transparent focus-within:border-[#b76e79]/30 focus-within:bg-white focus-within:ring-2 focus-within:ring-rose-100/80 transition-all">
-        <div className="w-8 h-8 rounded-xl bg-rose-50 flex items-center justify-center text-[#b76e79] mr-2 shrink-0">
-          <Search className="w-4 h-4 text-[#b76e79]" strokeWidth={2.2} />
-        </div>
+    <div className="flex items-center gap-3 w-full min-w-0 shrink-0">
+      <div className="flex-1 min-w-0 flex items-center bg-zinc-100 rounded-xl px-3.5 py-2.5 transition-all focus-within:bg-zinc-100/90 focus-within:ring-2 focus-within:ring-zinc-300">
+        <Search className="w-4 h-4 text-zinc-400 mr-2.5 shrink-0" />
         <input
           ref={inputRef}
-          className="w-full min-w-0 outline-none bg-transparent text-[15px] text-zinc-900 placeholder:text-zinc-400 font-normal"
+          className="w-full min-w-0 outline-none bg-transparent text-[15px] sm:text-sm text-zinc-900 placeholder:text-zinc-400 font-normal"
           autoComplete="off"
           autoCorrect="off"
           spellCheck={false}
           type="text"
           name="search"
-          placeholder="Search decorations, occasions, gifts..."
+          placeholder="Search decorations, cakes, flowers..."
           value={keyword}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
@@ -88,9 +76,9 @@ function SearchBoxNew({
             type="button"
             onClick={() => onChangeKeyword("")}
             aria-label="Clear search"
-            className="w-5 h-5 rounded-full bg-zinc-200 hover:bg-zinc-300 text-zinc-600 flex items-center justify-center cursor-pointer shrink-0 ml-1.5"
+            className="w-4.5 h-4.5 rounded-full bg-zinc-300 hover:bg-zinc-400 text-white flex items-center justify-center cursor-pointer shrink-0 ml-1.5 transition-colors"
           >
-            <X className="w-3 h-3" />
+            <X className="w-2.5 h-2.5" />
           </button>
         )}
       </div>
@@ -98,7 +86,7 @@ function SearchBoxNew({
       <button
         type="button"
         onClick={() => onChangeIsFocused(false)}
-        className="text-sm font-semibold text-[#b76e79] hover:text-[#96555f] px-1 py-1 cursor-pointer transition-colors shrink-0 whitespace-nowrap active:scale-95"
+        className="text-sm font-medium text-zinc-600 hover:text-zinc-900 px-1 py-1 cursor-pointer transition-colors shrink-0 whitespace-nowrap active:scale-95"
       >
         Cancel
       </button>

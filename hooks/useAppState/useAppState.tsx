@@ -43,13 +43,6 @@ import {
   setLocalStorageSortBy
 } from "./utils/localStorageSortBy";
 
-// components
-const LazyToaster = lazy(() =>
-  import("@/components/ui/toaster").then(({ Toaster }) => ({
-    default: Toaster
-  }))
-);
-
 const LazyCityDrawer = lazy(() =>
   import("@/components/(frontend)/global/SelectCity/cityModal/CityDrawer")
 );
@@ -562,23 +555,11 @@ export function AppStatesProvider({ children }: { children: ReactNode }) {
     <AppStates.Provider value={contextValue}>
       {children}
       <Suspense>
-        <LazyToaster />
+        <LazyCityDrawer
+          showDrawer={showCitySelector}
+          onToggleShowDrawer={setShowCitySelector}
+        />
       </Suspense>
-      {isTablet ? (
-        <Suspense>
-          <LazyCityDrawer
-            showDrawer={showCitySelector}
-            onToggleShowDrawer={setShowCitySelector}
-          />
-        </Suspense>
-      ) : (
-        <Suspense>
-          <LazyCityDialog
-            showDialog={showCitySelector}
-            onToggleShowDialog={setShowCitySelector}
-          />
-        </Suspense>
-      )}
     </AppStates.Provider>
   );
 }

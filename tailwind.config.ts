@@ -107,9 +107,10 @@ const config = {
     },
     extend: {
       fontFamily: {
-        sans: ["var(--font-roboto)"],
-        poppins: ["var(--font-montserrat)"],
-        montserrat: ["var(--font-montserrat)"],
+        sans: ["var(--font-roboto)", "system-ui", "sans-serif"],
+        // Montserrat removed to save ~25KB — fallback to Roboto/system-ui
+        poppins: ["var(--font-roboto)", "system-ui", "sans-serif"],
+        montserrat: ["var(--font-roboto)", "system-ui", "sans-serif"],
       },
       screens: {
         "1200": "1280px",

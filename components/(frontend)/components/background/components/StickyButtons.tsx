@@ -65,13 +65,18 @@ export default function StickyButtons() {
               `Hi, I'm looking for ${data?.name || "items"} in ${COMPANY_NAME}${data?.city ? `\nCity: ${data?.city || ""}` : ""}`
             : ""
         : "";
-    setMsg((prev) => whatsappMessage);
+    // Defer non-critical string update off main thread
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      (window as any).requestIdleCallback(() => setMsg(whatsappMessage));
+    } else {
+      setMsg(whatsappMessage);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   return (
     <div
-      className={`fixed bottom-28 right-4 lg:bottom-10 lg:right-6 flex flex-col justify-start gap-3 lg:gap-4 z-[9999]`}
+      className={`fixed bottom-20 right-3.5 sm:bottom-20 sm:right-4 lg:bottom-10 lg:right-6 flex flex-col justify-start gap-3 lg:gap-4 z-[9999]`}
     >
       <Link
         href={`tel:${COMPANY_NUMBER}`}

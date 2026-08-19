@@ -18,7 +18,7 @@ function CityDialog({
   return (
     <Dialog open={showDialog} onOpenChange={onToggleShowDialog}>
       <DialogContent
-        className="sm:max-w-[460px] w-full border-none outline-none p-0 rounded-3xl overflow-hidden bg-white shadow-2xl [&>button]:hidden"
+        className="sm:max-w-[430px] w-full sm:h-[530px] sm:max-h-[75vh] border-none outline-none p-0 rounded-2xl overflow-hidden bg-white shadow-2xl [&>button]:hidden flex flex-col"
       >
         <DialogTitle className="hidden">Select City</DialogTitle>
         <LocationProvider>

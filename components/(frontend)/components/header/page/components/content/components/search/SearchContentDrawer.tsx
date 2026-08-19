@@ -28,15 +28,21 @@ function SearchContentDrawer({
   if (!isFocused || !mounted) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[99999] flex flex-col justify-end bg-black/60 backdrop-blur-xs animate-in fade-in duration-200 lg:hidden">
+    <div className="fixed inset-0 z-[99999] flex flex-col sm:items-center sm:justify-center justify-end bg-black/60 backdrop-blur-xs animate-in fade-in duration-200 lg:hidden">
       {/* Backdrop */}
       <div
         className="absolute inset-0"
         onClick={() => onChangeIsFocused(false)}
       />
 
-      {/* Sheet Container: Height 75dvh to match 7eventzz screenshot */}
-      <div className="relative w-full max-w-full min-w-0 h-[75dvh] max-h-[85dvh] bg-white rounded-t-[28px] flex flex-col overflow-hidden shadow-2xl z-10 animate-in slide-in-from-bottom duration-200">
+      {/* Mobile (<640px): 100% full-screen app view | Tablet / iPad (640px-1024px): responsive centered modal */}
+      <div className="
+        relative z-10 flex flex-col overflow-hidden shadow-2xl
+        animate-in slide-in-from-bottom duration-250
+        bg-white
+        w-full h-[100dvh] max-h-[100dvh] rounded-none
+        sm:w-[540px] sm:h-[82dvh] sm:max-h-[750px] sm:rounded-3xl sm:mx-auto
+      ">
         <SearchContentUI
           isFocused={isFocused}
           searchResults={searchResults}

@@ -26,15 +26,21 @@ function CityDrawer({
   if (!showDrawer || !mounted) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[99999] flex flex-col justify-end bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[99999] flex flex-col sm:items-center sm:justify-center justify-end bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
       {/* Backdrop */}
       <div
         className="absolute inset-0"
         onClick={() => onToggleShowDrawer(false)}
       />
 
-      {/* Sheet Container: Height 75dvh to match 7eventzz screenshot */}
-      <div className="relative w-full max-w-full min-w-0 h-[75dvh] max-h-[85dvh] bg-white rounded-t-[28px] flex flex-col overflow-hidden shadow-2xl z-10 animate-in slide-in-from-bottom duration-200">
+      {/* Full screen on mobile (100dvh, w-full, rounded-none), sleek compact modal on laptop/desktop */}
+      <div className="
+        relative z-10 flex flex-col overflow-hidden shadow-2xl
+        animate-in slide-in-from-bottom duration-250
+        bg-white
+        w-full h-[100dvh] max-h-[100dvh] rounded-none
+        sm:w-[430px] sm:h-[530px] sm:max-h-[75vh] sm:rounded-2xl sm:mx-auto
+      ">
         <LocationProvider>
           <CityPopup
             closeDialog={() => {

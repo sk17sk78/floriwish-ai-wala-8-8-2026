@@ -1,26 +1,31 @@
 "use client";
 
 import { memo, useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { MapPin, Search, X, Check, TrendingUp, Flame } from "lucide-react";
+import {
+  ArrowLeft,
+  MapPin,
+  Search,
+  X,
+  Check,
+  LocateFixed,
+  Loader2
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStates } from "@/hooks/useAppState/useAppState";
 import { useLocation } from "@/hooks/useLocation/useLocation";
 import { type CityDocument } from "@/common/types/documentation/presets/city";
-import { TIER_ONE_CITIES } from "@/common/constants/cities";
+import { POPULAR_CITIES, TIER_ONE_CITIES } from "@/common/constants/cities";
 
-const TOP_METRO_CITIES = [
-  "Delhi",
-  "Mumbai",
-  "Bangalore",
-  "Hyderabad",
-  "Chennai",
-  "Kolkata",
-  "Pune",
+const POPULAR_METROS = [
   "Ahmedabad",
+  "Bangalore",
+  "Chennai",
+  "Delhi",
+  "Hyderabad",
   "Jaipur",
-  "Chandigarh",
-  "Lucknow",
-  "Noida",
+  "Kolkata",
+  "Mumbai",
+  "Pune",
 ];
 
 function CityPopup({ closeDialog }: { closeDialog?: () => void }) {
@@ -33,24 +38,15 @@ function CityPopup({ closeDialog }: { closeDialog?: () => void }) {
   const { cities } = useLocation();
 
   const [keyword, setKeyword] = useState<string>("");
+  const [isLocating, setIsLocating] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Immediate 1-click focus with preventScroll
+  // Auto-focus input smoothly
   useEffect(() => {
-    const frame = requestAnimationFrame(() => {
+    const t = setTimeout(() => {
       inputRef.current?.focus({ preventScroll: true });
-    });
-
-    const timer = setTimeout(() => {
-      if (inputRef.current && document.activeElement !== inputRef.current) {
-        inputRef.current.focus({ preventScroll: true });
-      }
     }, 100);
-
-    return () => {
-      cancelAnimationFrame(frame);
-      clearTimeout(timer);
-    };
+    return () => clearTimeout(t);
   }, []);
 
   const handleSelectCity = useCallback(
@@ -61,72 +57,98 @@ function CityPopup({ closeDialog }: { closeDialog?: () => void }) {
         const found = cities.find(
           (c) => c.name.toLowerCase() === cityName.toLowerCase()
         );
-        if (found) {
-          onChangeCity(found);
-        } else {
-          onChangeCity({ name: cityName } as CityDocument);
-        }
+        if (found) onChangeCity(found);
+        else onChangeCity({ name: cityName } as CityDocument);
       }
-      if (closeDialog) {
-        closeDialog();
-      }
+      closeDialog?.();
     },
     [cities, onChangeCity, closeDialog]
   );
 
-  const filteredCities = useMemo(() => {
-    const cityList =
-      cities.length > 0
-        ? cities
-        : TIER_ONE_CITIES.map(
-            (name, index) =>
-              ({
-                _id: `fallback-${index}`,
-                name,
-                isTopCity: true,
-                state: "",
-              }) as unknown as CityDocument
+  // Detect current location via browser GPS
+  const handleDetectLocation = useCallback(() => {
+    if (typeof window === "undefined" || !navigator.geolocation) return;
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`
           );
+          const json = await res.json();
+          const detected =
+            json?.address?.city ||
+            json?.address?.state_district ||
+            json?.address?.town ||
+            json?.address?.county ||
+            "";
 
+          if (detected) {
+            const found = cities.find(
+              (c) =>
+                c.name.toLowerCase().includes(detected.toLowerCase()) ||
+                detected.toLowerCase().includes(c.name.toLowerCase())
+            );
+            if (found) {
+              handleSelectCity(found.name, found);
+            } else {
+              handleSelectCity(detected);
+            }
+          }
+        } catch {
+          // ignore error
+        } finally {
+          setIsLocating(false);
+        }
+      },
+      () => {
+        setIsLocating(false);
+      },
+      { timeout: 8000 }
+    );
+  }, [cities, handleSelectCity]);
+
+  const allCityList = useMemo(() => {
+    if (cities.length > 0) return cities;
+    return POPULAR_CITIES.map(
+      (name, i) =>
+        ({ _id: `fallback-${i}`, name, isTopCity: true, state: "" }) as unknown as CityDocument
+    );
+  }, [cities]);
+
+  const filteredCities = useMemo(() => {
     if (!keyword.trim()) {
-      const tier1Set = new Set(TIER_ONE_CITIES.map((c) => c.toLowerCase()));
-      const tier1List = cityList.filter(
-        (city) => city.isTopCity || tier1Set.has(city.name.toLowerCase())
-      );
-
-      return (tier1List.length > 0 ? tier1List : cityList.slice(0, 20)).sort(
-        (a, b) => a.name.localeCompare(b.name)
-      );
+      return allCityList.slice().sort((a, b) => a.name.localeCompare(b.name));
     }
 
-    return cityList
+    return allCityList
       .filter((city) =>
         city.name.toLowerCase().includes(keyword.toLowerCase().trim())
       )
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [cities, keyword]);
+  }, [allCityList, keyword]);
+
+  const isSearching = keyword.trim().length > 0;
 
   return (
-    <div className="flex flex-col h-full max-h-[85dvh] sm:max-h-[620px] w-full min-w-0 max-w-full bg-white text-zinc-900 overscroll-contain select-none overflow-hidden">
-      {/* Drag handle for mobile */}
-      <div className="sm:hidden flex justify-center pt-2.5 pb-1 shrink-0">
-        <div className="w-12 h-1.5 rounded-full bg-zinc-200" />
-      </div>
-
-      {/* Top Header Bar */}
-      <div className="flex items-center justify-between px-4 sm:px-5 pt-2 pb-3 shrink-0">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-10 h-10 rounded-2xl bg-rose-50 text-[#b76e79] flex items-center justify-center shrink-0 border border-rose-100/80">
-            <MapPin className="w-5 h-5 text-[#b76e79]" />
-          </div>
-          <div className="min-w-0">
-            <h3 className="text-base font-bold text-zinc-900 leading-tight truncate">
-              Select Delivery City
-            </h3>
-            <p className="text-xs text-zinc-400 leading-tight mt-0.5 truncate">
-              Instant delivery across 500+ cities in India
-            </p>
-          </div>
+    <div className="flex flex-col h-full w-full bg-white text-zinc-900 select-none overflow-hidden text-left font-sans">
+      {/* ── Top Header ─────────────────────────────── */}
+      <div className="flex items-center justify-between px-5 pt-[max(12px,env(safe-area-inset-top))] pb-3 sm:pt-4 sm:pb-3 border-b border-zinc-100 shrink-0 bg-white">
+        <div className="flex items-center gap-3 min-w-0">
+          {closeDialog && (
+            <button
+              type="button"
+              onClick={closeDialog}
+              aria-label="Back"
+              className="sm:hidden w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 active:scale-95 text-zinc-700 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+          )}
+          <h2 className="text-[17px] sm:text-base font-bold text-zinc-900 leading-tight truncate">
+            Select City
+          </h2>
         </div>
 
         {closeDialog && (
@@ -134,24 +156,24 @@ function CityPopup({ closeDialog }: { closeDialog?: () => void }) {
             type="button"
             onClick={closeDialog}
             aria-label="Close"
-            className="w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-500 hover:text-zinc-800 flex items-center justify-center transition-colors cursor-pointer shrink-0 ml-2"
+            className="w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-500 hover:text-zinc-800 flex items-center justify-center transition-colors cursor-pointer shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
         )}
       </div>
 
-      {/* Search Input Box */}
-      <div className="px-4 sm:px-5 pb-3 shrink-0 w-full min-w-0">
-        <div className="relative flex items-center w-full min-w-0 rounded-2xl border-2 border-rose-100 bg-white px-3 py-2.5 focus-within:border-[#b76e79] focus-within:ring-2 focus-within:ring-rose-100 transition-all shadow-2xs">
-          <Search className="w-4 h-4 text-zinc-400 mr-2.5 shrink-0" />
+      {/* ── Search Input ───────────────────────────── */}
+      <div className="px-5 py-3 shrink-0 border-b border-zinc-100 bg-white space-y-2.5">
+        <div className="flex items-center gap-2.5 bg-zinc-100/80 rounded-xl px-3.5 py-2.5 transition-all focus-within:bg-white focus-within:ring-2 focus-within:ring-zinc-300">
+          <Search className="w-4 h-4 text-zinc-400 shrink-0" />
           <input
             ref={inputRef}
             type="text"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
-            placeholder="Type city name (e.g. Delhi, Mumbai, Pune)..."
-            className="w-full min-w-0 bg-transparent text-[16px] sm:text-sm text-zinc-900 placeholder:text-zinc-400 outline-none font-normal"
+            placeholder="Search for your city..."
+            className="flex-1 bg-transparent text-[15px] sm:text-sm text-zinc-900 placeholder:text-zinc-400 outline-none"
             autoComplete="off"
             autoCorrect="off"
             spellCheck={false}
@@ -161,28 +183,43 @@ function CityPopup({ closeDialog }: { closeDialog?: () => void }) {
               type="button"
               onClick={() => setKeyword("")}
               aria-label="Clear search"
-              className="w-5 h-5 rounded-full bg-zinc-200 hover:bg-zinc-300 text-zinc-600 flex items-center justify-center cursor-pointer shrink-0 ml-1.5"
+              className="w-5 h-5 rounded-full bg-zinc-200 hover:bg-zinc-300 text-zinc-600 flex items-center justify-center cursor-pointer shrink-0 transition-colors"
             >
               <X className="w-3 h-3" />
             </button>
           )}
         </div>
+
+        {/* Detect Current Location */}
+        {!isSearching && (
+          <button
+            type="button"
+            onClick={handleDetectLocation}
+            disabled={isLocating}
+            className="flex items-center gap-2 text-xs font-semibold text-[#b76e79] hover:text-[#96555f] py-0.5 cursor-pointer transition-colors active:scale-[0.99]"
+          >
+            {isLocating ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-[#b76e79] shrink-0" />
+            ) : (
+              <LocateFixed className="w-3.5 h-3.5 text-[#b76e79] shrink-0" />
+            )}
+            <span>
+              {isLocating ? "Detecting location..." : "Use my current location"}
+            </span>
+          </button>
+        )}
       </div>
 
-      {/* Scrollable Body */}
-      <div className="flex-1 overflow-y-auto min-h-0 px-4 sm:px-5 pb-6 overscroll-contain w-full min-w-0">
-        {/* Popular Cities Chips (When search is empty) */}
-        {!keyword.trim() && (
-          <div className="mb-4">
-            <div className="flex items-center gap-1.5 mb-2.5">
-              <Flame className="w-3.5 h-3.5 text-[#b76e79] fill-[#b76e79]" />
-              <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
-                Popular Metro Cities
-              </span>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2">
-              {TOP_METRO_CITIES.map((cityName) => {
+      {/* ── Scrollable Body ────────────────────────── */}
+      <div className="flex-1 overflow-y-auto min-h-0 overscroll-contain px-5 py-4 pb-[max(20px,env(safe-area-inset-bottom))]">
+        {/* 1. POPULAR CITIES (3-Column Grid with Pink Circle Pin Icons) */}
+        {!isSearching && (
+          <div className="mb-6">
+            <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3">
+              POPULAR CITIES
+            </h3>
+            <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+              {POPULAR_METROS.map((cityName) => {
                 const isSelected =
                   selectedCity?.name?.toLowerCase() === cityName.toLowerCase();
                 return (
@@ -191,14 +228,25 @@ function CityPopup({ closeDialog }: { closeDialog?: () => void }) {
                     type="button"
                     onClick={() => handleSelectCity(cityName)}
                     className={cn(
-                      "flex items-center justify-center gap-1 py-2.5 px-2 rounded-xl text-xs font-semibold border transition-all active:scale-95 cursor-pointer text-center min-w-0",
+                      "flex flex-col items-center justify-center py-3.5 px-2 rounded-2xl border text-center transition-all active:scale-95 cursor-pointer min-h-[96px] gap-2.5",
                       isSelected
-                        ? "bg-rose-50 text-[#b76e79] border-[#b76e79] shadow-2xs font-bold"
-                        : "bg-white text-zinc-700 border-zinc-200 hover:border-[#b76e79]/40 hover:bg-rose-50/30"
+                        ? "bg-rose-50/50 border-[#b76e79] text-[#b76e79] shadow-2xs font-bold"
+                        : "bg-white hover:bg-zinc-50 border-zinc-200/80 text-zinc-800 font-semibold hover:border-zinc-300"
                     )}
                   >
-                    <span className="truncate">{cityName}</span>
-                    {isSelected && <Check className="w-3 h-3 text-[#b76e79] shrink-0" />}
+                    <div
+                      className={cn(
+                        "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors",
+                        isSelected
+                          ? "bg-rose-100 text-[#b76e79]"
+                          : "bg-rose-50 text-[#b76e79]"
+                      )}
+                    >
+                      <MapPin className="w-4 h-4 text-[#b76e79]" />
+                    </div>
+                    <span className="text-[13px] sm:text-xs leading-tight truncate max-w-full">
+                      {cityName}
+                    </span>
                   </button>
                 );
               })}
@@ -206,97 +254,67 @@ function CityPopup({ closeDialog }: { closeDialog?: () => void }) {
           </div>
         )}
 
-        {/* City List / Matches */}
+        {/* 2. ALL CITIES List */}
         <div>
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
-              {keyword.trim()
-                ? `${filteredCities.length} MATCHES`
-                : "ALL DELIVERING CITIES"}
-            </span>
-          </div>
+          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">
+            {isSearching ? `${filteredCities.length} CITIES FOUND` : "ALL CITIES"}
+          </h3>
 
           {filteredCities.length > 0 ? (
-            <div className="divide-y divide-zinc-100 rounded-2xl border border-zinc-100 bg-white overflow-hidden">
+            <div className="space-y-1">
               {filteredCities.map((city) => {
                 const isSelected =
                   String(selectedCity?._id) === String(city._id) ||
                   selectedCity?.name?.toLowerCase() === city.name.toLowerCase();
 
-                const isTrending =
-                  city.isTopCity ||
-                  TIER_ONE_CITIES.some(
-                    (c) => c.toLowerCase() === city.name.toLowerCase()
-                  );
-
                 return (
-                  <div
+                  <button
                     key={String(city._id)}
-                    role="button"
-                    tabIndex={0}
+                    type="button"
                     onClick={() => handleSelectCity(city.name, city)}
                     className={cn(
-                      "flex items-center justify-between px-3.5 py-3 transition-colors active:bg-zinc-100 hover:bg-rose-50/20 cursor-pointer min-w-0",
-                      isSelected && "bg-rose-50/60"
+                      "w-full flex items-center justify-between py-3 px-3 rounded-xl text-left transition-all active:scale-[0.99] cursor-pointer",
+                      isSelected
+                        ? "bg-rose-50/70 text-[#b76e79] font-bold"
+                        : "hover:bg-zinc-50 text-zinc-700"
                     )}
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <div
+                      <MapPin
                         className={cn(
-                          "w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors",
+                          "w-4 h-4 shrink-0",
+                          isSelected ? "text-[#b76e79]" : "text-zinc-400"
+                        )}
+                      />
+                      <span
+                        className={cn(
+                          "text-sm truncate",
                           isSelected
-                            ? "bg-[#b76e79] text-white"
-                            : "bg-zinc-100 text-zinc-400"
+                            ? "text-[#b76e79] font-bold"
+                            : "text-zinc-800 font-medium"
                         )}
                       >
-                        <MapPin className="w-4 h-4" />
-                      </div>
-                      <div className="flex flex-col min-w-0 flex-1">
-                        <span
-                          className={cn(
-                            "text-[14px] font-semibold truncate",
-                            isSelected ? "text-[#b76e79]" : "text-zinc-800"
-                          )}
-                        >
-                          {city.name}
-                        </span>
-                        {city.state && (
-                          <span className="text-[11px] text-zinc-400 truncate">
-                            {typeof city.state === "string"
-                              ? city.state
-                              : (city.state as any)?.name || ""}
-                          </span>
-                        )}
-                      </div>
+                        {city.name}
+                      </span>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0 ml-2">
-                      {isTrending && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200/60 px-2.5 py-0.5 text-[11px] font-bold text-amber-700">
-                          <TrendingUp className="w-3 h-3 text-amber-600 shrink-0" />
-                          <span>Trending</span>
-                        </span>
-                      )}
-
-                      {isSelected && (
-                        <div className="w-5 h-5 rounded-full bg-[#b76e79] text-white flex items-center justify-center shrink-0">
-                          <Check className="w-3 h-3" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                    {isSelected && (
+                      <Check className="w-4 h-4 text-[#b76e79] shrink-0 stroke-[2.5] ml-2" />
+                    )}
+                  </button>
                 );
               })}
             </div>
           ) : (
-            <div className="py-12 text-center text-zinc-400 flex flex-col items-center justify-center gap-2">
-              <Search className="w-8 h-8 opacity-30 text-[#b76e79]" />
-              <p className="text-sm font-medium text-zinc-600">No matching cities found</p>
-              <p className="text-xs text-zinc-400">Try searching for a different city</p>
+            <div className="py-12 text-center text-zinc-400 flex flex-col items-center justify-center">
+              <Search className="w-5 h-5 text-zinc-300 mb-2" />
+              <p className="text-sm font-semibold text-zinc-700">
+                No cities found matching &ldquo;{keyword}&rdquo;
+              </p>
               <button
                 type="button"
                 onClick={() => setKeyword("")}
-                className="mt-2 px-3 py-1.5 text-xs font-semibold text-[#b76e79] bg-rose-50 rounded-lg hover:bg-rose-100 cursor-pointer"
+                className="mt-3 px-3.5 py-1.5 text-xs font-semibold text-[#b76e79] bg-rose-50 rounded-lg hover:bg-rose-100 transition-colors cursor-pointer"
               >
                 Clear Search
               </button>

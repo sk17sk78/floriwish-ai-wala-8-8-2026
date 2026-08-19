@@ -32,9 +32,14 @@ export const GET = async (
   }>
 > => {
   try {
-    await connectRedis();
+    let cachedData: string | null = null;
+    try {
+      await connectRedis();
+      cachedData = await redisClient.get("search");
+    } catch (redisError) {
+      // Graceful fallback to direct DB queries
+    }
 
-    let cachedData = await redisClient.get("search");
     if (!cachedData) {
       const [aiTags, categories, contents] = await Promise.all([
         getAITags(),
@@ -50,10 +55,14 @@ export const GET = async (
         }>(notFoundErrorResponse);
       }
 
-      await redisClient.set(
-        "search",
-        JSON.stringify({ aiTags, categories, contents }),
-      );
+      try {
+        await redisClient.set(
+          "search",
+          JSON.stringify({ aiTags, categories, contents }),
+        );
+      } catch (redisSetError) {
+        // Ignore cache write error
+      }
 
       return Response(
         successData({

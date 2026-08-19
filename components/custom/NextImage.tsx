@@ -94,8 +94,8 @@ export default function NextImage({
         (mobileWidth && desktopWidth
           ? `(max-width: ${MOBILE_BREAKPOINT}px) ${mobileWidth}px, ${desktopWidth}px`
           : width
-          ? `(max-width: 640px) ${Math.min(width, 360)}px, (max-width: 1024px) ${Math.min(width, 480)}px, ${width}px`
-          : `(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw`)
+            ? `(max-width: 640px) ${Math.min(width, 360)}px, (max-width: 1024px) ${Math.min(width, 480)}px, ${width}px`
+            : `(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw`)
       }
       placeholder={placeholder}
       blurDataURL={blurDataURL}

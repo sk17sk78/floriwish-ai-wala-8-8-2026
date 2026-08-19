@@ -1,17 +1,11 @@
-// icons
-import { ExternalLink } from "lucide-react";
+"use client";
 
-// hooks
 import { memo, useMemo } from "react";
-
-// components
-import { DrawerClose } from "@/components/ui/drawer";
+import { ChevronRight, User } from "lucide-react";
 import Link from "next/link";
-
-// types
 import { type CustomerDocument } from "@/common/types/documentation/users/customer";
 import { FRONTEND_LINKS } from "@/common/routes/frontend/staticLinks";
-import { COMPANY_NAME } from "@/common/constants/companyDetails";
+import { useAppStates } from "@/hooks/useAppState/useAppState";
 
 function HamburgerHeader({
   customerName,
@@ -22,37 +16,59 @@ function HamburgerHeader({
   customer: CustomerDocument | null;
   close: () => void;
 }) {
-  // variables
+  const {
+    auth: {
+      method: { onChangeShowAuth }
+    }
+  } = useAppStates();
+
   const username = useMemo(() => customerName || "Guest", [customerName]);
-  const secondaryData = useMemo(
-    () =>
-      customer
-        ? customer.mail || customer.mobileNumber || "Go to Dashboard"
-        : ("Welcome to " + COMPANY_NAME),
-    [customer]
-  );
+  const isGuest = !customerName && !customer;
+
+  if (isGuest) {
+    return (
+      <div className="py-4 border-b border-zinc-100 flex items-center justify-between">
+        <div className="min-w-0 pr-2">
+          <p className="text-sm font-semibold text-zinc-900">Welcome, Guest</p>
+          <p className="text-xs text-zinc-400 mt-0.5">Sign in to track orders & wishlist</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            close();
+            onChangeShowAuth(true);
+          }}
+          className="px-3.5 py-1.5 rounded-lg border border-[#b76e79] text-[#b76e79] hover:bg-rose-50 text-xs font-semibold shrink-0 cursor-pointer transition-colors active:scale-95"
+        >
+          Sign In
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="pb-4 grid items-start justify-start grid-cols-[auto_1fr] grid-rows-[repeat(3,auto)]  gap-x-3.5">
-      <div className="-translate-y-1.5 row-span-3 justify-self-center text-xl font-medium aspect-square rounded-full bg-gradient-to-r from-sienna-3/40 to-white border-[2px] border-sienna text-sienna flex items-center justify-center w-14">
-        {username[0].toUpperCase()}
-      </div>
-      {/* <DrawerClose asChild> */}
+    <div className="py-4 border-b border-zinc-100">
       <Link
         href={FRONTEND_LINKS.DASHBOARD + FRONTEND_LINKS.DASHBOARD_PROFILE}
         prefetch={false}
         onClick={close}
-        className="text-[22px] flex items-center gap-2 cursor-pointer"
+        className="flex items-center justify-between group cursor-pointer"
       >
-        <span>{username}</span>
-        <ExternalLink
-          strokeWidth={1.5}
-          width={18}
-          height={18}
-        />
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-200/80 text-[#b76e79] flex items-center justify-center font-bold text-sm shrink-0">
+            {username[0]?.toUpperCase() || <User className="w-4 h-4" />}
+          </div>
+          <div className="min-w-0">
+            <h3 className="text-sm font-semibold text-zinc-900 truncate group-hover:text-[#b76e79] transition-colors">
+              {username}
+            </h3>
+            <p className="text-xs text-zinc-400 truncate mt-0.5">
+              {customer?.mail || customer?.mobileNumber || "View Account"}
+            </p>
+          </div>
+        </div>
+        <ChevronRight className="w-4 h-4 text-zinc-400 group-hover:text-[#b76e79] transition-colors shrink-0" />
       </Link>
-      {/* </DrawerClose> */}
-      <div className="text-charcoal-3/70 text-sm">{secondaryData}</div>
     </div>
   );
 }

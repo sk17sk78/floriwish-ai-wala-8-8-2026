@@ -1,12 +1,9 @@
-// constants
-import { DASHBOARD_LINKS } from "../constants/dashboardLinks";
+"use client";
 
-// utils
 import { memo } from "react";
-
-// components
-import BoxTheme from "@/components/(frontend)/content/theme/BoxTheme";
+import { DASHBOARD_LINKS } from "../constants/dashboardLinks";
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 
 function HamburgerDashboard({
   isAuthenticated,
@@ -15,26 +12,27 @@ function HamburgerDashboard({
   isAuthenticated: boolean;
   onClose: () => void;
 }) {
-  if (isAuthenticated) {
-    return (
-      <section className="mb-4 gap-2 grid grid-cols-2">
-        {DASHBOARD_LINKS.map(({ label, link, svg }, index) => (
-          <Link
-            key={index}
-            href={link}
-            prefetch={false}
-            className="flex justify-center flex-col text-sm text-center border rounded-xl shadow-sm items-center gap-x-3 px-3 py-4 gap-1.5 transition-all duration-300 hover:text-sienna bg-white"
-            onClick={onClose}
-          >
-            {svg}
-            <span>{label}</span>
-          </Link>
-        ))}
-      </section>
-    );
-  }
+  if (!isAuthenticated) return null;
 
-  return <></>;
+  return (
+    <div className="py-2 border-b border-zinc-100">
+      {DASHBOARD_LINKS.map(({ label, link, svg }, index) => (
+        <Link
+          key={index}
+          href={link}
+          prefetch={false}
+          onClick={onClose}
+          className="flex items-center justify-between py-2.5 px-1 text-sm font-medium text-zinc-700 hover:text-zinc-950 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="text-[#b76e79]">{svg}</div>
+            <span>{label}</span>
+          </div>
+          <ChevronRight className="w-4 h-4 text-zinc-300" />
+        </Link>
+      ))}
+    </div>
+  );
 }
 
 export default memo(HamburgerDashboard);

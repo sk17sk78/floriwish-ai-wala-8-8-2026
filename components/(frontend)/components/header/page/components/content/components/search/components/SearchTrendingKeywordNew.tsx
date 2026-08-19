@@ -18,14 +18,13 @@ function SearchTrendingKeywordNew({
   return (
     <button
       type="button"
-      className="text-xs font-semibold bg-white text-zinc-700 border border-zinc-200 hover:border-[#b76e79]/60 hover:bg-rose-50/40 px-3.5 py-2 rounded-full cursor-pointer transition-all duration-150 active:scale-95 flex items-center justify-start gap-1.5 shadow-2xs min-w-0 truncate"
+      className="text-xs font-medium bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200/80 px-3 py-1.5 rounded-full cursor-pointer transition-colors active:scale-95 flex items-center justify-start gap-1.5 min-w-0"
       onClick={onClick}
     >
       <TrendingUp
-        width={13}
-        height={13}
-        strokeWidth={2.2}
-        className="text-[#b76e79] shrink-0"
+        width={12}
+        height={12}
+        className="text-zinc-400 shrink-0"
       />
       <span className="truncate">{label}</span>
     </button>
