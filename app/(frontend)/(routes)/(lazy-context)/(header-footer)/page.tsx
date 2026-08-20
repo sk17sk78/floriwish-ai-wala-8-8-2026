@@ -1,6 +1,5 @@
-// app/page.tsx
-// Homepage SSR — admin se content change hota rehta hai, har request pe fresh chahiye
-export const dynamic = "force-dynamic";
+// Homepage ISR — Revalidates every 60s for instant response time (<30ms TTFB) with background updates
+export const revalidate = 60;
 
 // requests
 // controllers

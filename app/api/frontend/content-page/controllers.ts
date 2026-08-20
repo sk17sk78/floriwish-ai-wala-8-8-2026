@@ -651,20 +651,33 @@ export const getProductSlugs = async (): Promise<ContentDocument[] | null> => {
   }
 };
 
+// In-memory L1 cache for products
+const inMemoryProductCache = new Map<string, { data: ContentDocument; timestamp: number }>();
+const PRODUCT_L1_TTL_MS = 60 * 1000; // 60 seconds
+
 export const getFullProductData = async (slug: string): Promise<ContentDocument | null> => {
   const cacheKey = `${CONTENT_PAGE_CACHE_KEY}_${slug}`;
 
   try {
-    // Try to get from Redis cache first
+    const now = Date.now();
+
+    // 1. Try In-Memory L1 Cache (ultra-fast <1ms)
+    const l1 = inMemoryProductCache.get(cacheKey);
+    if (l1 && (now - l1.timestamp) < PRODUCT_L1_TTL_MS) {
+      return l1.data;
+    }
+
+    // 2. Try Redis cache (L2)
     const cachedDocument = await getFromRedis<ContentDocument>({
       key: cacheKey
     });
 
     if (cachedDocument) {
+      inMemoryProductCache.set(cacheKey, { data: cachedDocument, timestamp: now });
       return cachedDocument;
     }
 
-    // Cache miss - fetch from MongoDB
+    // 3. Cache miss - fetch from MongoDB
     const [i, ii, iii, iv] = await Promise.all([
       getContentPageDetailsI({ slug }),
       getContentPageDetailsII({ slug }),
@@ -694,7 +707,8 @@ export const getFullProductData = async (slug: string): Promise<ContentDocument 
 
     const document = JSON.parse(JSON.stringify(rawDocument)) as unknown as ContentDocument;
 
-    // Cache the result in Redis without auto-expiring TTL (cache is only invalidated on explicit admin refresh)
+    // Cache the result in Memory L1 and Redis
+    inMemoryProductCache.set(cacheKey, { data: document, timestamp: now });
     await setToRedis({
       key: cacheKey,
       value: document

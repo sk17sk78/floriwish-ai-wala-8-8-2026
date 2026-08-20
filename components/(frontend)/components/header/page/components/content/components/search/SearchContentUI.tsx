@@ -8,7 +8,7 @@ import { XApiKey } from "@/common/constants/apiKey";
 import { setLocalStorage } from "@/common/utils/storage/local";
 
 // hooks
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useAppStates } from "@/hooks/useAppState/useAppState";
 import { useSearch } from "@/hooks/useSearch/useSearch";
 
@@ -40,6 +40,25 @@ export function createKeywordRegex(keyword: string) {
   return new RegExp(escapedKeyword, "i");
 }
 
+function filterMatchingIndices(items: SearchContentsType[], query: string): number[] {
+  if (!query.trim() || items.length === 0) return [];
+  const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const matchingIndices: number[] = [];
+
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    if (!item) continue;
+    const name = (item.name || "").toLowerCase();
+    const slug = (item.slug || "").toLowerCase();
+    const isMatch = terms.every((t) => name.includes(t) || slug.includes(t));
+    if (isMatch) {
+      matchingIndices.push(i);
+    }
+  }
+
+  return matchingIndices;
+}
+
 function SearchContentUI({
   isFocused,
   searchResults,
@@ -67,60 +86,131 @@ function SearchContentUI({
     selectedCity ? String(selectedCity._id) : null
   );
 
-  // event handlers
-  const fetchCityWiseContentList = useCallback((searchKey?: string) => {
-    const url = new URL(API_SEARCH_CONTENTS);
-    url.searchParams.set("cityId", selectedCity === null ? "null" : String(selectedCity._id));
-    if (searchKey) {
-      url.searchParams.set("key", searchKey);
-      url.searchParams.set("limit", "100");
-    } else {
-      url.searchParams.set("limit", "40");
+  // Master product pool & client cache for instant 0ms responses
+  const masterPoolRef = useRef<SearchContentsType[]>([]);
+  const searchCacheRef = useRef<Map<string, SearchContentsType[]>>(new Map());
+
+  // Helper to merge items into master pool without duplicates
+  const mergeIntoMasterPool = useCallback((newItems: SearchContentsType[]) => {
+    const existingSlugs = new Set(masterPoolRef.current.map((item) => item.slug));
+    const toAdd = newItems.filter((item) => !existingSlugs.has(item.slug));
+    if (toAdd.length > 0) {
+      masterPoolRef.current = [...masterPoolRef.current, ...toAdd];
     }
+  }, []);
 
-    setIsLoading(true);
-    fetch(url.toString(), {
-      cache: "no-store",
-      headers: {
-        "x-api-key": XApiKey
+  // Fetch from API
+  const fetchCityWiseContentList = useCallback(
+    async (searchKey?: string) => {
+      const cityId = selectedCity === null ? "null" : String(selectedCity._id);
+      const url = new URL(API_SEARCH_CONTENTS);
+      url.searchParams.set("cityId", cityId);
+
+      const trimmedKey = (searchKey || "").trim();
+      const cacheKey = `${cityId}_${trimmedKey.toLowerCase()}`;
+
+      if (trimmedKey) {
+        url.searchParams.set("key", trimmedKey);
+        url.searchParams.set("limit", "100");
+      } else {
+        url.searchParams.set("limit", "60");
       }
-    })
-      .then(async (res) => await res.json())
-      .then((data) => {
-        const newContents = data.data || [];
-        setContents(() => newContents);
-        
-        if (searchKey) {
-          setResults(() => newContents.map((_: any, i: number) => i));
-        } else {
-          setResults(() => []);
-        }
-        
-        setPrevCityId(() =>
-          selectedCity ? String(selectedCity._id) : null
-        );
-        setIsLoading(false);
-      })
-      .catch(() => {
-        setIsLoading(false);
-      });
-  }, [selectedCity]);
 
-  // Debounced Search Logic
+      // Check client memory cache
+      if (searchCacheRef.current.has(cacheKey)) {
+        const cached = searchCacheRef.current.get(cacheKey) || [];
+        setContents(cached);
+        setResults(cached.map((_, i) => i));
+        setIsLoading(false);
+        return;
+      }
+
+      // Only show loading if we don't have instant results already visible
+      if (masterPoolRef.current.length === 0 || !trimmedKey) {
+        setIsLoading(true);
+      }
+
+      try {
+        const res = await fetch(url.toString(), {
+          headers: {
+            "x-api-key": XApiKey
+          }
+        });
+        const data = await res.json();
+        const newContents: SearchContentsType[] = data.data || [];
+
+        searchCacheRef.current.set(cacheKey, newContents);
+        mergeIntoMasterPool(newContents);
+
+        if (trimmedKey) {
+          setContents(newContents);
+          setResults(newContents.map((_, i) => i));
+        } else {
+          setContents(newContents);
+          setResults([]);
+        }
+
+        setPrevCityId(selectedCity ? String(selectedCity._id) : null);
+      } catch (err) {
+        // Fallback to local pool filtering
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [selectedCity, mergeIntoMasterPool]
+  );
+
+  // Instant real-time search on keyword change
+  const handleKeywordChange = useCallback(
+    (newKeyword: string) => {
+      setKeyword(newKeyword);
+
+      const trimmed = newKeyword.trim();
+      if (!trimmed) {
+        setResults([]);
+        setIsLoading(false);
+        return;
+      }
+
+      const cityId = selectedCity === null ? "null" : String(selectedCity._id);
+      const cacheKey = `${cityId}_${trimmed.toLowerCase()}`;
+
+      // 1. Instant Cache Hit (0ms)
+      if (searchCacheRef.current.has(cacheKey)) {
+        const cached = searchCacheRef.current.get(cacheKey) || [];
+        setContents(cached);
+        setResults(cached.map((_, i) => i));
+        return;
+      }
+
+      // 2. Instant Client-Side Pool Filter (0ms)
+      if (masterPoolRef.current.length > 0) {
+        const matchedIndices = filterMatchingIndices(masterPoolRef.current, trimmed);
+        if (matchedIndices.length > 0) {
+          setContents(masterPoolRef.current);
+          setResults(matchedIndices);
+        }
+      }
+    },
+    [selectedCity]
+  );
+
+  // Fast 120ms Debounced API fetch for deeper results
   useEffect(() => {
-    if (keyword.length >= 2) {
+    const trimmed = keyword.trim();
+    if (trimmed.length > 0) {
       const timeoutId = setTimeout(() => {
-        fetchCityWiseContentList(keyword);
-      }, 400);
+        fetchCityWiseContentList(trimmed);
+      }, 120);
       return () => clearTimeout(timeoutId);
-    } else if (keyword.length === 0 && hasFocused) {
+    } else if (trimmed.length === 0 && hasFocused) {
       fetchCityWiseContentList();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keyword]);
 
   useEffect(() => {
-    if (hasFocused && keyword.length < 2) {
+    if (hasFocused && keyword.length === 0) {
       fetchCityWiseContentList();
       onLoadData();
     }
@@ -136,7 +226,8 @@ function SearchContentUI({
         (selectedCity !== null && prevCityId === null) ||
         (selectedCity === null && prevCityId !== null))
     ) {
-      fetchCityWiseContentList(keyword.length >= 2 ? keyword : undefined);
+      searchCacheRef.current.clear();
+      fetchCityWiseContentList(keyword.length > 0 ? keyword : undefined);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCity]);
@@ -153,9 +244,7 @@ function SearchContentUI({
       <div className="px-4 sm:px-5 pt-[max(12px,env(safe-area-inset-top))] pb-3 sm:pt-4 sm:pb-3 border-b border-zinc-100 bg-white shrink-0 z-10 shadow-2xs">
         <SearchBoxNew
           keyword={keyword}
-          onChangeKeyword={(updatedKeyword: string) => {
-            setKeyword(() => updatedKeyword);
-          }}
+          onChangeKeyword={handleKeywordChange}
           onChangeIsFocused={(isFocused: boolean) => {
             onChangeIsFocused(isFocused);
           }}

@@ -46,12 +46,13 @@ export default function CartPage() {
     }
   } = useAppStates();
 
-  // Prompt login immediately on landing in cart if not logged in
+  // Preload auth chunk & prompt login immediately on landing in cart if not logged in
   useEffect(() => {
+    import("@/components/(frontend)/auth/CustomerAuth");
     if (isReady && items && items.length > 0 && !isAuthenticated) {
       const timer = setTimeout(() => {
         onChangeShowAuth(true);
-      }, 350);
+      }, 50);
       return () => clearTimeout(timer);
     }
   }, [isReady, items, isAuthenticated, onChangeShowAuth]);

@@ -126,9 +126,10 @@ const getController = <
     try {
       await connectDB();
 
-      const document = await Model.findOne(filter)
+      const document = (await Model.findOne(filter)
         .select(select as any)
-        .populate(populate);
+        .populate(populate)
+        .lean()) as unknown as DocumentT;
 
       if (!document) {
         return notFoundErrorResponse;
@@ -144,7 +145,7 @@ const getController = <
         return notFoundErrorResponse;
       }
 
-      return successData<DocumentT>(responseDocument);
+      return successData<DocumentT>(responseDocument as DocumentT);
     } catch (error: any) {
       const errorMsg = error?.message || String(error);
       const isTransient =

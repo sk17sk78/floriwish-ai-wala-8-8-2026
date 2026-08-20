@@ -42,7 +42,7 @@ function SearchResultContentsNew({
               onClick={collapse}
               className="flex items-center gap-3 p-3 transition-colors active:bg-zinc-100 hover:bg-rose-50/20 cursor-pointer min-w-0"
               href={href}
-              prefetch={false}
+              prefetch={true}
             >
               <div className="relative overflow-hidden w-14 h-14 rounded-xl bg-zinc-100 shrink-0 border border-zinc-200/50">
                 {imgSrc ? (

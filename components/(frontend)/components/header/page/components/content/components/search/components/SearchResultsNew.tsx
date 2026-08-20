@@ -28,7 +28,7 @@ function SearchResultsNew({
   onKeywordClick: (keyword: string) => void;
   collapse: () => void;
 }) {
-  if (isLoading && keyword.length >= 2) {
+  if (isLoading && keyword.trim().length > 0 && indices.length === 0) {
     return (
       <div className="flex flex-col gap-4 py-4 animate-pulse">
         <div className="h-6 w-32 bg-gray-200 rounded" />

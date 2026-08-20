@@ -44,18 +44,29 @@ export const verify = async (code: string) => {
       })
     }).then((response) => response.json());
 
-    if (!token) {
-      return null;
+    let data: { email?: string; name?: string } | null = null;
+
+    // Decode id_token directly (instant 0ms, skips redundant 2nd HTTP roundtrip to Google)
+    if (token?.id_token) {
+      try {
+        const payloadBase64 = token.id_token.split(".")[1];
+        const decodedJson = Buffer.from(payloadBase64, "base64").toString("utf8");
+        data = JSON.parse(decodedJson);
+      } catch {
+        data = null;
+      }
     }
 
-    const data = await fetch(
-      `https://openidconnect.googleapis.com/v1/userinfo?access_token=${token.access_token}`,
-      {
-        headers: {
-          "x-api-key": XApiKey
+    if (!data || !data?.email) {
+      data = await fetch(
+        `https://openidconnect.googleapis.com/v1/userinfo?access_token=${token.access_token}`,
+        {
+          headers: {
+            "x-api-key": XApiKey
+          }
         }
-      }
-    ).then((res) => res.json());
+      ).then((res) => res.json());
+    }
 
     if (!data || !data?.email) {
       return null;

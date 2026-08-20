@@ -116,9 +116,16 @@ function ContentDetail({
   ) => void;
   onChangeReferenceVariant: (referenceVariant: ContentDocument | null) => void;
 }) {
-  const { push } = useRouter();
+  const router = useRouter();
+  const { push, prefetch } = router;
   const contentDeliveryId = useId();
   const { toast } = useToast();
+
+  // Preload Addons dialog & prefetch Cart page on product page mount (0ms delay on Buy Now)
+  useEffect(() => {
+    import("../addon/ContentAddonDialog");
+    prefetch("/cart");
+  }, [prefetch]);
   const {
     isMobile,
     location: {

@@ -5,6 +5,7 @@ import { RENDERING_STRATEGY } from "@/config/renderingStrategy";
 // vercel
 export const dynamic =
   RENDERING_STRATEGY === "SSR" ? "force-dynamic" : undefined;
+export const revalidate = 60;
 
 // controllers (Slugs and Meta)
 import { getContentCategoryPageSlugs, getMeta } from "@/app/api/frontend/content-category-page/controllers";
