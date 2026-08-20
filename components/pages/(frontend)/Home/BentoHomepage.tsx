@@ -1,4 +1,6 @@
-"use client";
+// Server Component — NO "use client"
+// Critical: Removing "use client" ensures the banner renders in SSR HTML
+// so Googlebot/PageSpeed detects the LCP element without waiting for JS.
 
 import React from "react";
 // constants
@@ -97,17 +99,27 @@ export default function BentoHomepage(
         const { type, layout, _id, tag, customBG } = slice;
 
         if (type === "title")
-          return (
+          return useIds ? (
             <BentoHomepageTitleSpacing
               title={slice.data}
               subtitle={slice.subtitle}
               leftAlign={slice.leftAlign || false}
               key={index}
-              id={useIds ? _id : undefined}
-              showActions={useIds || false}
-              onClickEdit={useIds ? props.onClickEdit : () => {}}
-              onClickDisable={useIds ? props.onClickDisable : () => {}}
-              onClickDelete={useIds ? props.onClickDelete : () => {}}
+              id={_id}
+              showActions={true}
+              onClickEdit={props.onClickEdit}
+              onClickDisable={props.onClickDisable}
+              onClickDelete={props.onClickDelete}
+              layoutNumber={index + 1}
+              customBG={customBG}
+            />
+          ) : (
+            <BentoHomepageTitleSpacing
+              title={slice.data}
+              subtitle={slice.subtitle}
+              leftAlign={slice.leftAlign || false}
+              key={index}
+              showActions={false}
               layoutNumber={index + 1}
               customBG={customBG}
             />
@@ -120,50 +132,93 @@ export default function BentoHomepage(
                 <HomeReviewsSection />
               </HomePageContentSpacing>
             )}
-            <HomePageContentSpacing
-              extraSpacing={slice.extraSpacing || false}
-              id={useIds ? _id : undefined}
-              showActions={useIds || false}
-              onClickEdit={useIds ? props.onClickEdit : () => {}}
-              onClickDisable={useIds ? props.onClickDisable : () => {}}
-              onClickDelete={useIds ? props.onClickDelete : () => {}}
-              layoutNumber={index + 1}
-              isContent={tag === "content" ? true : false}
-              excludeBox={tag === "banner" || index === finalFirstCategoryIndex ? true : false}
-              categoryShape={tag === "category" ? layout.category?.shape : undefined}
-              noPadding={
-                (tag === "category" &&
-                  layout.category &&
-                  (layout.category.scrollable ||
-                    index === finalFirstCategoryIndex || // FORCE no padding for top category grid
-                    layout.category.images?.some(
-                      (img: any) =>
-                        img.label === "Car Decor" ||
-                        img.label === "Anniversary" ||
-                        img.label === "Baby Shower"
-                    ))) ||
-                tag === "collage"
-                  ? true
-                  : false
-              }
-              customBG={customBG}
-            >
-              <>
-                {tag === "faq" && (
-                  <>
-                    <WhyChooseUsSection />
-                  </>
-                )}
-                <RenderHomepageLayout
-                  layout={layout}
-                  type={tag === "title" ? "text" : tag}
-                  inAdmin={useIds ? true : false}
-                  isFirstCategory={index === finalFirstCategoryIndex}
-                  scrollable={(slice as any).scrollable}
-                  layoutId={_id}
-                />
-              </>
-            </HomePageContentSpacing>
+            {useIds ? (
+              <HomePageContentSpacing
+                extraSpacing={slice.extraSpacing || false}
+                id={_id}
+                showActions={true}
+                onClickEdit={props.onClickEdit}
+                onClickDisable={props.onClickDisable}
+                onClickDelete={props.onClickDelete}
+                layoutNumber={index + 1}
+                isContent={tag === "content" ? true : false}
+                excludeBox={tag === "banner" || index === finalFirstCategoryIndex ? true : false}
+                categoryShape={tag === "category" ? layout.category?.shape : undefined}
+                noPadding={
+                  (tag === "category" &&
+                    layout.category &&
+                    (layout.category.scrollable ||
+                      index === finalFirstCategoryIndex ||
+                      layout.category.images?.some(
+                        (img: any) =>
+                          img.label === "Car Decor" ||
+                          img.label === "Anniversary" ||
+                          img.label === "Baby Shower"
+                      ))) ||
+                  tag === "collage"
+                    ? true
+                    : false
+                }
+                customBG={customBG}
+              >
+                <>
+                  {tag === "faq" && (
+                    <>
+                      <WhyChooseUsSection />
+                    </>
+                  )}
+                  <RenderHomepageLayout
+                    layout={layout}
+                    type={tag === "title" ? "text" : tag}
+                    inAdmin={true}
+                    isFirstCategory={index === finalFirstCategoryIndex}
+                    scrollable={(slice as any).scrollable}
+                    layoutId={_id}
+                  />
+                </>
+              </HomePageContentSpacing>
+            ) : (
+              <HomePageContentSpacing
+                extraSpacing={slice.extraSpacing || false}
+                showActions={false}
+                layoutNumber={index + 1}
+                isContent={tag === "content" ? true : false}
+                excludeBox={tag === "banner" || index === finalFirstCategoryIndex ? true : false}
+                categoryShape={tag === "category" ? layout.category?.shape : undefined}
+                noPadding={
+                  (tag === "category" &&
+                    layout.category &&
+                    (layout.category.scrollable ||
+                      index === finalFirstCategoryIndex ||
+                      layout.category.images?.some(
+                        (img: any) =>
+                          img.label === "Car Decor" ||
+                          img.label === "Anniversary" ||
+                          img.label === "Baby Shower"
+                      ))) ||
+                  tag === "collage"
+                    ? true
+                    : false
+                }
+                customBG={customBG}
+              >
+                <>
+                  {tag === "faq" && (
+                    <>
+                      <WhyChooseUsSection />
+                    </>
+                  )}
+                  <RenderHomepageLayout
+                    layout={layout}
+                    type={tag === "title" ? "text" : tag}
+                    inAdmin={false}
+                    isFirstCategory={index === finalFirstCategoryIndex}
+                    scrollable={(slice as any).scrollable}
+                    layoutId={_id}
+                  />
+                </>
+              </HomePageContentSpacing>
+            )}
           </React.Fragment>
         );
       })}

@@ -87,18 +87,36 @@ export function getDatabaseReadyCartDocument(cart: CartDocument): CartDocument {
   let readyCart = cart;
 
   // items
-  let updatedItems = cart.items.map((item) => {
+  let updatedItems = (cart.items || []).map((item) => {
+    const contentId =
+      typeof item.content === "string"
+        ? item.content
+        : (item.content as ContentDocument)?._id
+        ? String((item.content as ContentDocument)._id)
+        : "";
+
+    const typeId =
+      typeof item.delivery?.type === "string"
+        ? item.delivery.type
+        : (item.delivery?.type as DeliveryTypeDocument)?._id
+        ? String((item.delivery.type as DeliveryTypeDocument)._id)
+        : "";
+
+    const slotId =
+      typeof item.delivery?.slot === "string"
+        ? item.delivery.slot
+        : (item.delivery?.slot as TimeSlotDocument)?._id
+        ? String((item.delivery.slot as TimeSlotDocument)._id)
+        : "";
+
     let updatedItem = {
       ...item,
-      content: String((item.content as ContentDocument)._id),
+      content: contentId || item.content,
       delivery: {
-        ...item.delivery,
-        type: String((item.delivery.type as DeliveryTypeDocument)._id),
-        slot:
-          typeof item.delivery.slot === "string"
-            ? item.delivery.slot
-            : String((item.delivery.slot as TimeSlotDocument)._id),
-        date: item.delivery.date
+        ...(item.delivery || {}),
+        type: typeId || item.delivery?.type,
+        slot: slotId || item.delivery?.slot,
+        date: item.delivery?.date
       }
     } as CartItemDocument;
 
@@ -107,7 +125,12 @@ export function getDatabaseReadyCartDocument(cart: CartDocument): CartDocument {
         (adn) =>
           ({
             ...adn,
-            addon: String((adn.addon as AddonDocument)._id)
+            addon:
+              typeof adn.addon === "string"
+                ? adn.addon
+                : (adn.addon as AddonDocument)?._id
+                ? String((adn.addon as AddonDocument)._id)
+                : ""
           }) as CartItemAddonDocument
       )
       : undefined;
@@ -118,37 +141,48 @@ export function getDatabaseReadyCartDocument(cart: CartDocument): CartDocument {
         flavour: item.customization.flavour
           ? {
             ...item.customization.flavour,
-            flavour: String(
-              (item.customization.flavour.flavour as FlavourDocument)._id
-            )
+            flavour:
+              typeof item.customization.flavour.flavour === "string"
+                ? item.customization.flavour.flavour
+                : (item.customization.flavour.flavour as FlavourDocument)?._id
+                ? String((item.customization.flavour.flavour as FlavourDocument)._id)
+                : ""
           }
           : undefined,
         upgrade: item.customization.upgrade
           ? {
             ...item.customization.upgrade,
-            flavour: String(
-              (item.customization.upgrade.upgrade as UpgradeDocument)._id
-            )
+            upgrade:
+              typeof item.customization.upgrade.upgrade === "string"
+                ? item.customization.upgrade.upgrade
+                : (item.customization.upgrade.upgrade as UpgradeDocument)?._id
+                ? String((item.customization.upgrade.upgrade as UpgradeDocument)._id)
+                : ""
           }
           : undefined,
         uploadedImage: item.customization.uploadedImage
           ? {
             ...item.customization.uploadedImage,
-            images: (
-              item.customization.uploadedImage
-                .images as CustomizationImageDocument[]
-            ).map(({ _id }) => String(_id))
+            images: Array.isArray(item.customization.uploadedImage.images)
+              ? (
+                item.customization.uploadedImage
+                  .images as CustomizationImageDocument[]
+              ).map((img) => (typeof img === "string" ? img : String((img as any)?._id || "")))
+              : []
           }
           : undefined,
         enhancement: item.customization.enhancement
           ? {
             ...item.customization.enhancement,
-            items: item.customization.enhancement.items.map(
+            items: (item.customization.enhancement.items || []).map(
               ({ price, enhancement }) => ({
                 price,
-                enhancement: String(
-                  (enhancement as EnhancementDocument)._id
-                )
+                enhancement:
+                  typeof enhancement === "string"
+                    ? enhancement
+                    : (enhancement as EnhancementDocument)?._id
+                    ? String((enhancement as EnhancementDocument)._id)
+                    : ""
               })
             )
           }
@@ -173,7 +207,11 @@ export function getDatabaseReadyCartDocument(cart: CartDocument): CartDocument {
 
   // coupon
   let updatedCoupon = cart.coupon
-    ? String((cart.coupon as CouponDocument)._id)
+    ? typeof cart.coupon === "string"
+      ? cart.coupon
+      : (cart.coupon as CouponDocument)?._id
+      ? String((cart.coupon as CouponDocument)._id)
+      : undefined
     : undefined;
 
   // checkout
@@ -181,10 +219,18 @@ export function getDatabaseReadyCartDocument(cart: CartDocument): CartDocument {
     ? ({
       ...cart.checkout,
       occasion: cart.checkout.occasion
-        ? String((cart.checkout.occasion as OccasionDocument)._id)
+        ? typeof cart.checkout.occasion === "string"
+          ? cart.checkout.occasion
+          : (cart.checkout.occasion as OccasionDocument)?._id
+          ? String((cart.checkout.occasion as OccasionDocument)._id)
+          : undefined
         : undefined,
       venue: cart.checkout.venue
-        ? String((cart.checkout.venue as VenueDocument)._id)
+        ? typeof cart.checkout.venue === "string"
+          ? cart.checkout.venue
+          : (cart.checkout.venue as VenueDocument)?._id
+          ? String((cart.checkout.venue as VenueDocument)._id)
+          : undefined
         : undefined
     } as CartCheckoutDocument)
     : undefined;

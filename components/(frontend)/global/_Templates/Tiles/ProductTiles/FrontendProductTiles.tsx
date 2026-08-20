@@ -80,28 +80,17 @@ export default function FrontendProductTilesUI({
   const [products, setProducts] = useState<ContentDocument[]>(
     productList || [],
   );
-  const [screenW, setScreenW] = useState<number>(0);
-  const [isMounted, setIsMounted] = useState(false);
 
   const useIdId = useId();
   const trayId = id || useIdId;
-
-  useEffect(() => {
-    setIsMounted(true);
-    const updateWindowWidth = () => {
-      setScreenW(window.innerWidth);
-    };
-    updateWindowWidth();
-    window.addEventListener("resize", updateWindowWidth);
-    return () => window.removeEventListener("resize", updateWindowWidth);
-  }, []);
 
   const handleScroll = (dir: "left" | "right") => {
     const tray = document.getElementById(trayId) as HTMLElement;
     if (!tray) return;
 
+    const width = typeof window !== "undefined" ? window.innerWidth : 300;
     const currOffset = tray.scrollLeft;
-    const scrollAmount = screenW > 0 ? screenW * 0.65 : 300;
+    const scrollAmount = width > 0 ? width * 0.65 : 300;
 
     tray.scrollTo({
       left: currOffset + (dir === "left" ? -1 : 1) * scrollAmount,

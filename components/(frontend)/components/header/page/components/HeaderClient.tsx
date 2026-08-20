@@ -120,7 +120,7 @@ function HeaderClient({
           </div>
         </WidthWrapper>
         {/* min-h reserves space in SSR → prevents CLS when city bar appears after hydration */}
-        <div className="sm:hidden min-h-[36px]">
+        <div className="lg:hidden min-h-[40px] w-full">
           <SelectCityMobile
             selectedCity={selectedCity}
             onClick={() => {

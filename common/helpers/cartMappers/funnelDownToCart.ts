@@ -51,12 +51,12 @@ export const extractCartItems = ({
       customVariant,
       titleIfCustomVariant,
     }) => {
-      const content = ct as ContentDocument;
-      const img = content.media.primary as ImageDocument;
+      const content = (typeof ct === "object" && ct !== null ? ct : {}) as ContentDocument;
+      const img = (content?.media?.primary || {}) as ImageDocument;
 
       const variantPriceDocument =
         customVariant && customVariant.length > 0
-          ? content.variants &&
+          ? content?.variants &&
             content.variants.filter(({ type }) => type === "custom").length > 0
             ? content.variants
                 .filter(({ type }) => type === "custom")
@@ -76,7 +76,7 @@ export const extractCartItems = ({
 
       const { price, mrp } =
         variantPriceDocument === undefined
-          ? content.price
+          ? content?.price
             ? getCityWiseContentPrices({ city: selectedCity, content })
             : { mrp: 0, price: 0 }
           : getCityWisePrices({
@@ -86,9 +86,9 @@ export const extractCartItems = ({
 
       return {
         _id: String(_id),
-        contentId: String(content._id),
+        contentId: String(content?._id || (typeof ct === "string" ? ct : "")),
         addons:
-          content.addons && content.addons.length
+          content?.addons && content.addons.length
             ? content.addons
                 .slice()
                 .sort(
@@ -96,20 +96,20 @@ export const extractCartItems = ({
                     (a.isPopular ? -1 : 0) - (b.isPopular ? -1 : 0),
                 )
                 .map(({ addon: ad }) => {
-                  const addon = ad as AddonDocument;
-                  const image = addon.image as ImageDocument;
+                  const addon = (ad || {}) as AddonDocument;
+                  const image = (addon.image || {}) as ImageDocument;
                   return {
-                    _id: String(addon._id),
+                    _id: String(addon._id || ""),
                     image: {
-                      alt: image.alt || image.defaultAlt,
-                      url: image.url,
+                      alt: image.alt || image.defaultAlt || "",
+                      url: image.url || "",
                     },
-                    name: addon.name,
-                    pricePerUnit: addon.price,
+                    name: addon.name || "",
+                    pricePerUnit: addon.price || 0,
                   };
                 })
             : [],
-        image: { alt: img.alt || img.defaultAlt, url: img.url },
+        image: { alt: img.alt || img.defaultAlt || "", url: img.url || "" },
         mrp,
         name:
           customVariant && customVariant.length > 0
@@ -290,17 +290,18 @@ export const filterRelevantCoupons = ({
 }): CouponDocument[] => {
   const applicableCategories = itemsInCart
     .map(({ content }) => {
-      const thisContentCategories = (content as ContentDocument).category;
+      const thisContentCategories = (content as ContentDocument)?.category;
+      if (!thisContentCategories) return [];
       const primaryId =
         typeof thisContentCategories.primary === "string"
           ? thisContentCategories.primary
           : String(
-              (thisContentCategories.primary as ContentCategoryDocument)._id
+              (thisContentCategories.primary as ContentCategoryDocument)?._id || ""
             );
-      const relatedIds = thisContentCategories.related.map((related) =>
+      const relatedIds = (thisContentCategories.related || []).map((related) =>
         typeof related === "string"
           ? related
-          : String((related as ContentCategoryDocument)._id),
+          : String((related as ContentCategoryDocument)?._id || ""),
       );
 
       return [primaryId, ...relatedIds];

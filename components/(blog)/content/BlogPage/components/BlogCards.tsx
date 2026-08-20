@@ -1,5 +1,5 @@
-// libraries
-import { v4 as uuid } from "uuid";
+
+
 
 // utils
 import { extractBlogCoverImage } from "../utils/extractBlogCoverImage";
@@ -60,10 +60,11 @@ export default async function BlogCards({
       <div
         className={`grid ${atSideSection ? "grid-cols-1 gap-6" : "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-5"} `}
       >
-        {cards.map((card) => (
+        {cards.map((card, idx) => (
           <BlogCard
-            key={uuid()}
+            key={card.path}
             card={card}
+            priority={idx < 3}
           />
         ))}
       </div>

@@ -14,10 +14,11 @@ import {
 
 // components
 import NextImage from "@/components/custom/NextImage";
+import { Gift } from "lucide-react";
 
 // types
 import { type CartItemAddonDocument } from "@/common/types/documentation/nestedDocuments/cartItemAddon";
-import { OPTIMIZE_IMAGE } from "@/config/image";
+import { INRSymbol } from "@/common/constants/symbols";
 
 export default function CartItemAddon({
   itemAddon: { addon: addonId, pricePerUnit, quantity, customizationOption }
@@ -27,15 +28,24 @@ export default function CartItemAddon({
   const dispatch = useDispatch();
 
   const addonStatus = useSelector(selectAddon.status);
-
   const { documents: addons } = useSelector(selectAddon.documentList);
 
   const imageStatus = useSelector(selectImage.status);
-
   const { documents: images } = useSelector(selectImage.documentList);
 
-  const addon = addons.find(({ _id }) => String(_id) === String(addonId));
-  const image = images.find(({ _id }) => String(_id) === String(addon?.image));
+  const isPopulatedAddon = typeof addonId === "object" && addonId !== null;
+  const addon = isPopulatedAddon
+    ? (addonId as any)
+    : addons.find(({ _id }) => String(_id) === String(addonId));
+
+  const addonName = addon?.name || (addonId as any)?.name || "Addon Item";
+  const imageUrl =
+    addon?.image?.url ||
+    (addonId as any)?.image?.url ||
+    (typeof addon?.image === "string"
+      ? images.find(({ _id }) => String(_id) === String(addon.image))?.url
+      : "") ||
+    "";
 
   useEffect(() => {
     if (imageStatus === "idle") {
@@ -49,29 +59,32 @@ export default function CartItemAddon({
     }
   }, [addonStatus, dispatch]);
 
-  if (!addon) return <></>;
-
   return (
-    <section className="p-2 border border-charcoal-3/20 rounded-xl grid grid-cols-[45px_1fr] gap-x-2.5">
-      <div className="relative overflow-hidden aspect-square bg-charcoal-3/20 rounded-xl">
-        <NextImage
-          className="w-full h-full object-cover object-center"
-          src={image?.url || ""}
-          alt={image?.alt || image?.defaultAlt || ""}
-          width={80}
-          height={80}
-          draggable={false}
-        />
+    <section className="p-2 bg-zinc-50 border border-zinc-200 rounded-xl grid grid-cols-[40px_1fr] gap-x-2.5 items-center my-1">
+      <div className="relative overflow-hidden aspect-square bg-zinc-200 rounded-lg flex items-center justify-center">
+        {imageUrl ? (
+          <NextImage
+            className="w-full h-full object-cover object-center"
+            src={imageUrl}
+            alt={addonName}
+            width={60}
+            height={60}
+            draggable={false}
+          />
+        ) : (
+          <Gift className="w-4 h-4 text-zinc-400" />
+        )}
       </div>
       <div className="flex flex-col">
-        <span className="flex gap-1 text-sm text-charcoal-3">
-          <span className="font-medium">{addon.name}</span>
-          <span className="font-bold">
-            {quantity > 1 ? `x${quantity}` : ""}
-          </span>
+        <span className="flex items-center gap-1.5 text-xs text-zinc-800 font-semibold">
+          <span>{addonName}</span>
+          {quantity > 1 && (
+            <span className="text-zinc-500 font-normal">×{quantity}</span>
+          )}
         </span>
-        <span className="font-medium text-charcoal-3">{`₹ ${pricePerUnit}`}</span>
-        {/* {customizationOption && <span>{customizationOption || ""}</span>} */}
+        <span className="text-[11px] font-bold text-zinc-600">
+          {INRSymbol}{pricePerUnit} {quantity > 1 ? `(${INRSymbol}${Number(pricePerUnit) * Number(quantity)})` : ""}
+        </span>
       </div>
     </section>
   );

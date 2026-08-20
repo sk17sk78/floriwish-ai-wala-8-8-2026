@@ -7,9 +7,11 @@ import { type OrderDocument } from "@/common/types/documentation/dynamic/order";
 import { type OrderPaymentGatewayDocument } from "@/common/types/documentation/nestedDocuments/orderPaymentGateway";
 
 export const getRazorpayOrderId = ({
-  cartId
+  cartId,
+  amount
 }: {
   cartId: string;
+  amount?: number;
 }): Promise<string | null> => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -17,25 +19,29 @@ export const getRazorpayOrderId = ({
 
       const response: Response = await fetch(url, {
         method: "POST",
-        headers: { "x-api-key": XApiKey },
+        headers: {
+          "x-api-key": XApiKey,
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
-          cartId
+          cartId,
+          amount
         })
       });
 
       const responseData: {
         orderId: string | null;
+        message?: string;
       } = await response.json();
 
-      if (response.ok) {
-        console.log({ orderId: responseData.orderId })
+      if (response.ok && responseData.orderId) {
         resolve(responseData.orderId);
       } else {
+        console.error("[getRazorpayOrderId] Response not ok:", responseData);
         reject(null);
       }
     } catch (error: any) {
       console.error("Error Getting OrderId", error);
-
       reject(null);
     }
   });

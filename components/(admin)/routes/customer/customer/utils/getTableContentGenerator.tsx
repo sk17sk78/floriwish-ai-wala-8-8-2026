@@ -145,12 +145,11 @@ const getTableContentGenerator =
           // },
           {
             value: {
-              label:
-                cart && carts.find(({ _id }) => String(_id) === String(cart))?.items?.length ? (
-                  <CartDetails cartId={String(cart)} />
-                ) : (
-                  <span>{"-"}</span>
-                ),
+              label: cart ? (
+                <CartDetails cartId={String(cart)} />
+              ) : (
+                <span>{"-"}</span>
+              ),
               type: "svg"
             },
             action: { action: () => {}, type: "none" }

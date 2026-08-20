@@ -342,90 +342,64 @@ const getMergedCheckout = (
   local: CartCheckoutDocument | undefined,
   api: CartCheckoutDocument | undefined,
 ): CartCheckoutDocument | undefined => {
+  if (local === undefined && api === undefined) return undefined;
   if (local === undefined) return api;
   if (api === undefined) return local;
 
-  let merged = api;
+  const localContact = local?.contact || ({} as CartCheckoutContactDocument);
+  const apiContact = api?.contact || ({} as CartCheckoutContactDocument);
 
-  merged = {
-    ...merged,
-    name: local.name && local.name.length > 0 ? local.name : api.name,
+  const localLocation = local?.location || ({} as CartCheckoutLocationDocument);
+  const apiLocation = api?.location || ({} as CartCheckoutLocationDocument);
+
+  const localMobile = localContact?.mobileNumber || "";
+  const apiMobile = apiContact?.mobileNumber || "";
+
+  const localMail = localContact?.mail || "";
+  const apiMail = apiContact?.mail || "";
+
+  const localAddress = localLocation?.address || "";
+  const apiAddress = apiLocation?.address || "";
+
+  const localCity = localLocation?.city || "";
+  const apiCity = apiLocation?.city || "";
+
+  const localPincode = localLocation?.pincode || "";
+  const apiPincode = apiLocation?.pincode || "";
+
+  let merged = {
+    ...(api || {}),
+    ...(local || {}),
+    name: local?.name && local.name.length > 0 ? local.name : (api?.name || ""),
     contact: {
-      ...merged.contact,
-      mobileNumber:
-        local.contact.mobileNumber.length > 0
-          ? local.contact.mobileNumber
-          : api.contact.mobileNumber,
-      mail:
-        local.contact.mail.length > 0 ? local.contact.mail : api.contact.mail,
+      ...(apiContact || {}),
+      ...(localContact || {}),
+      mobileNumber: localMobile.length > 0 ? localMobile : apiMobile,
+      mail: localMail.length > 0 ? localMail : apiMail,
+      alternateMobileNumber:
+        localContact?.alternateMobileNumber ||
+        apiContact?.alternateMobileNumber ||
+        "",
     },
     location: {
-      ...merged.location,
-      address:
-        local.location.address.length > 0
-          ? local.location.address
-          : api.location.address,
-      city:
-        local.location.city.length > 0
-          ? local.location.city
-          : api.location.city,
-      pincode:
-        local.location.pincode.length > 0
-          ? local.location.pincode
-          : api.location.pincode,
+      ...(apiLocation || {}),
+      ...(localLocation || {}),
+      address: localAddress.length > 0 ? localAddress : apiAddress,
+      city: localCity.length > 0 ? localCity : apiCity,
+      pincode: localPincode.length > 0 ? localPincode : apiPincode,
+      landmark: localLocation?.landmark || apiLocation?.landmark || "",
     },
     deliverToSomeoneElse:
-      local.deliverToSomeoneElse === undefined
-        ? api.deliverToSomeoneElse || false
-        : local.deliverToSomeoneElse,
+      local?.deliverToSomeoneElse !== undefined
+        ? local.deliverToSomeoneElse
+        : Boolean(api?.deliverToSomeoneElse),
+    note: local?.note || api?.note || "",
+    occasion: local?.occasion || api?.occasion,
+    venue: local?.venue || api?.venue,
+    receiverName: local?.receiverName || api?.receiverName || "",
+    receiverMobileNumber:
+      local?.receiverMobileNumber || api?.receiverMobileNumber || "",
   } as CartCheckoutDocument;
-
-  if (
-    local.contact.alternateMobileNumber &&
-    local.contact.alternateMobileNumber.length > 0
-  )
-    merged = {
-      ...merged,
-      contact: {
-        ...merged.contact,
-        alternateMobileNumber: local.contact.alternateMobileNumber,
-      } as CartCheckoutContactDocument,
-    } as CartCheckoutDocument;
-
-  if (local.location.landmark && local.location.landmark.length > 0)
-    merged = {
-      ...merged,
-      location: {
-        ...merged.location,
-        landmark: local.location.landmark,
-      } as CartCheckoutLocationDocument,
-    } as CartCheckoutDocument;
-
-  if (local.note && local.note.length > 0)
-    merged = {
-      ...merged,
-      note: local.note,
-    } as CartCheckoutDocument;
-
-  if (local.occasion)
-    merged = {
-      ...merged,
-      occasion: local.occasion,
-    } as CartCheckoutDocument;
-
-  if (local.venue)
-    merged = {
-      ...merged,
-      venue: local.venue,
-    } as CartCheckoutDocument;
-
-  if (merged.deliverToSomeoneElse)
-    merged = {
-      ...merged,
-      receiverName: local.receiverName || api.receiverName || "",
-      receiverMobileNumber:
-        local.receiverMobileNumber || api.receiverMobileNumber || "",
-    } as CartCheckoutDocument;
 
   return merged;
 };
@@ -434,24 +408,31 @@ const mergedCartItem = (
   local: CartItemDocument,
   api: CartItemDocument,
 ): CartItemDocument => {
-  // api will take preference
-  let merged = api;
+  const localDelivery = local?.delivery;
+  const apiDelivery = api?.delivery;
 
-  merged = {
-    ...merged,
-    // present price takes preference as price may have updated
-    pricePerUnit: local.pricePerUnit || merged.pricePerUnit,
-    // present timeslot will take preference over api one
+  let resolvedSlot = localDelivery?.slot || apiDelivery?.slot;
+
+  if (typeof localDelivery?.slot === "string" && localDelivery?.type) {
+    const timeSlots = (localDelivery.type as DeliveryTypeDocument)?.timeSlots;
+    if (Array.isArray(timeSlots)) {
+      const found = timeSlots.find(
+        (ts: any) => String(ts?._id) === String(localDelivery?.slot),
+      );
+      if (found) resolvedSlot = found;
+    }
+  }
+
+  const merged = {
+    ...(api || {}),
+    ...(local || {}),
+    pricePerUnit: local?.pricePerUnit || api?.pricePerUnit || 0,
     delivery: {
-      ...merged.delivery,
-      slot:
-        typeof local.delivery.slot === "string"
-          ? (local.delivery.type as DeliveryTypeDocument).timeSlots.find(
-              ({ _id }) => String(_id) === local.delivery.slot,
-            ) || local.delivery.slot
-          : local.delivery.slot,
+      ...(apiDelivery || {}),
+      ...(localDelivery || {}),
+      slot: resolvedSlot,
     },
-  } as CartItemDocument;
+  } as unknown as CartItemDocument;
 
   return merged;
 };
@@ -461,53 +442,57 @@ const getMergedItems = (
   api: CartItemDocument[],
 ): CartItemDocument[] => {
   if (
-    (local === undefined || local.length === 0) &&
-    (api === undefined || api.length === 0)
+    (!local || local.length === 0) &&
+    (!api || api.length === 0)
   )
     return [];
 
   // for api cart items, replace slot of delivery with relevant timeslot from its delivery.type
-  const updatedApi = api.map(
-    (item) =>
-      ({
-        ...item,
-        delivery: item.delivery
-          ? ({
-              ...item.delivery,
-              slot:
-                typeof item.delivery.slot === "string"
-                  ? (item.delivery.type as DeliveryTypeDocument).timeSlots.find(
-                      ({ _id }) => String(_id) === item.delivery.slot,
-                    )
-                  : item.delivery.slot,
-            } as CartItemDeliveryDocument)
-          : undefined,
-      }) as CartItemDocument,
-  );
+  const updatedApi = (api || []).map((item) => {
+    if (!item?.delivery) return item;
+    let slot = item.delivery.slot;
+    if (typeof slot === "string" && item.delivery.type) {
+      const timeSlots = (item.delivery.type as DeliveryTypeDocument)?.timeSlots;
+      if (Array.isArray(timeSlots)) {
+        const found = timeSlots.find(
+          (ts: any) => String(ts?._id) === String(slot),
+        );
+        if (found) slot = found;
+      }
+    }
+    return {
+      ...item,
+      delivery: {
+        ...item.delivery,
+        slot,
+      },
+    } as CartItemDocument;
+  });
 
-  if (local === undefined || local.length === 0) return updatedApi;
-  if (api === undefined || api.length === 0) return local;
+  if (!local || local.length === 0) return updatedApi;
+  if (!api || api.length === 0) return local;
 
   const localIds = local.map(({ content, delivery }) => ({
     contentId:
       typeof content === "string"
         ? content
-        : String((content as ContentDocument)._id),
-    date: new Date(delivery.date),
+        : String((content as ContentDocument)?._id || ""),
+    date: delivery?.date ? new Date(delivery.date) : new Date(),
   }));
 
   const apiIds = api.map(({ content, delivery }) => ({
     contentId:
       typeof content === "string"
         ? content
-        : String((content as ContentDocument)._id),
-    date: new Date(delivery.date),
+        : String((content as ContentDocument)?._id || ""),
+    date: delivery?.date ? new Date(delivery.date) : new Date(),
   }));
 
   const intersectingIds = localIds
     .filter(({ date, contentId }) =>
       apiIds.find(
-        (api) => api.contentId === contentId && moment(api.date).isSame(date),
+        (apiItem) =>
+          apiItem.contentId === contentId && moment(apiItem.date).isSame(date),
       ),
     )
     .filter((x) => x !== undefined);
@@ -518,10 +503,10 @@ const getMergedItems = (
     const isIntersecting = intersectingIds.find(
       ({ contentId, date }) =>
         contentId ===
-          (typeof local[i].content === "string"
+          (typeof local[i]?.content === "string"
             ? local[i].content
-            : String((local[i].content as ContentDocument)._id)) &&
-        moment(date).isSame(local[i].delivery.date),
+            : String((local[i]?.content as ContentDocument)?._id || "")) &&
+        moment(date).isSame(local[i]?.delivery?.date),
     );
 
     if (!isIntersecting) {
@@ -532,11 +517,11 @@ const getMergedItems = (
           local[i],
           api.find(
             ({ content, delivery }) =>
-              moment(delivery.date).isSame(isIntersecting.date) &&
+              moment(delivery?.date).isSame(isIntersecting.date) &&
               (typeof content === "string"
                 ? content === isIntersecting.contentId
                 : isIntersecting.contentId ===
-                  String((content as ContentDocument)._id)),
+                  String((content as ContentDocument)?._id || "")),
           ) || ({} as CartItemDocument),
         ),
       );
@@ -547,10 +532,10 @@ const getMergedItems = (
     const isIntersecting = intersectingIds.find(
       ({ contentId, date }) =>
         contentId ===
-          (typeof updatedApi[i].content === "string"
+          (typeof updatedApi[i]?.content === "string"
             ? updatedApi[i].content
-            : String((updatedApi[i].content as ContentDocument)._id)) &&
-        moment(date).isSame(updatedApi[i].delivery.date),
+            : String((updatedApi[i]?.content as ContentDocument)?._id || "")) &&
+        moment(date).isSame(updatedApi[i]?.delivery?.date),
     );
 
     if (!isIntersecting) {
@@ -568,15 +553,23 @@ export const mergeLocalAndAPICartData = ({
   local: CartDocument;
   fromAPI: CartDocument;
 }): [boolean, CartDocument] => {
+  if (!fromAPI && !local) return [false, {} as CartDocument];
+  if (!fromAPI) return [false, local || ({} as CartDocument)];
+  if (!local) return [true, fromAPI];
+
   // Customer IDs don't match then don't merge
+  const localCustomer = local.customer ? String(local.customer) : "";
+  const apiCustomer = fromAPI.customer ? String(fromAPI.customer) : "";
+
   if (
-    (local.customer as string).length > 0 &&
-    fromAPI.customer !== local.customer
+    localCustomer.length > 0 &&
+    apiCustomer.length > 0 &&
+    localCustomer !== apiCustomer
   )
     return [false, {} as CartDocument];
 
   let mergedCheckout = getMergedCheckout(local.checkout, fromAPI.checkout);
-  let mergedItems = getMergedItems(local.items, fromAPI.items);
+  let mergedItems = getMergedItems(local.items || [], fromAPI.items || []);
 
   let mergedCart: CartDocument = {
     ...fromAPI,

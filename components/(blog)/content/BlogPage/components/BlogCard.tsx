@@ -17,9 +17,11 @@ export default function BlogCard({
     authorName,
     authorPhoto,
     createdAt
-  }
+  },
+  priority = false
 }: {
   card: BlogCard;
+  priority?: boolean;
 }) {
   const initial = authorName ? authorName.charAt(0).toUpperCase() : "A";
   const formattedDate = createdAt ? moment(createdAt).format("D MMMM YYYY") : "";
@@ -33,8 +35,9 @@ export default function BlogCard({
           width={600}
           height={600}
           draggable={false}
-          quality={100}
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          priority={priority}
+          quality={75}
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           className="aspect-[2/1] bg-charcoal-3/20"
           imageClassName="w-full h-full object-cover object-center scale-105 group-hover:scale-100 transition-all duration-300"
         />

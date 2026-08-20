@@ -15,7 +15,6 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 // components
 import CacheInitializer from "@/components/CacheInitializer";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import NotificationPrompt from "@/components/(frontend)/notifications/NotificationPrompt";
 
 // types
 import { type ReactNode } from "react";
@@ -37,7 +36,6 @@ export default function ContextProvider({
                     <CartProvider>
                       <CacheInitializer />
                       {children}
-                      <NotificationPrompt />
                     </CartProvider>
                   </ErrorBoundary>
                 </SearchProvider>

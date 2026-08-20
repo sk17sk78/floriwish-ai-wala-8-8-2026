@@ -38,8 +38,8 @@ function CityDrawer({
         relative z-10 flex flex-col overflow-hidden shadow-2xl
         animate-in slide-in-from-bottom duration-250
         bg-white
-        w-full h-[100dvh] max-h-[100dvh] rounded-none
-        sm:w-[430px] sm:h-[530px] sm:max-h-[75vh] sm:rounded-2xl sm:mx-auto
+        w-full h-full max-h-[100dvh] rounded-none
+        sm:w-[430px] sm:h-[540px] sm:max-h-[85vh] sm:rounded-2xl sm:mx-auto
       ">
         <LocationProvider>
           <CityPopup

@@ -68,24 +68,41 @@ export default async function Home() {
   // Find the first banner for LCP Discovery
   const firstBanner = homepageLayouts.find((l) => l.type === "banner");
   const firstImage = firstBanner?.layout?.banner?.images?.[0];
-  const desktopLcpUrl = convertToCloudFrontUrl((firstImage?.desktop as any)?.url);
-  const mobileLcpUrl = convertToCloudFrontUrl((firstImage?.mobile as any)?.url);
+  const desktopLcpUrl = convertToCloudFrontUrl((firstImage?.desktop as any)?.url) || COMPANY_PRIMARY_BANNER;
+  const rawMobileUrl = convertToCloudFrontUrl((firstImage?.mobile as any)?.url);
+  // Use dedicated mobile URL only when it differs from desktop
+  const mobileLcpUrl = rawMobileUrl && rawMobileUrl !== desktopLcpUrl
+    ? rawMobileUrl
+    : desktopLcpUrl;
+  const hasDedicatedMobile = mobileLcpUrl !== desktopLcpUrl;
 
   return (
     <>
-      {/* LCP Preload: Tell browser to download hero image IMMEDIATELY — before JS/CSS parse */}
+      {/* LCP Preload for Desktop: Tell browser to download hero image IMMEDIATELY */}
       {desktopLcpUrl && (
         <link
           rel="preload"
           as="image"
           href={desktopLcpUrl}
-          // Mobile browsers get the mobile image version if available
-          imageSrcSet={
-            mobileLcpUrl && mobileLcpUrl !== desktopLcpUrl
-              ? `${mobileLcpUrl} 640w, ${desktopLcpUrl} 1200w`
-              : `${desktopLcpUrl} 1200w`
-          }
-          imageSizes="100vw"
+          // @ts-ignore
+          imageSrcSet={`${desktopLcpUrl} 1200w`}
+          imageSizes="(min-width: 640px) 100vw"
+          crossOrigin="anonymous"
+          // @ts-ignore
+          fetchPriority="high"
+        />
+      )}
+      {/* LCP Preload for Mobile (separate link with media query so mobile PageSpeed picks it up) */}
+      {hasDedicatedMobile && mobileLcpUrl && (
+        <link
+          rel="preload"
+          as="image"
+          href={mobileLcpUrl}
+          // @ts-ignore
+          imageSrcSet={`${mobileLcpUrl} 800w`}
+          imageSizes="(max-width: 639px) 100vw"
+          media="(max-width: 639px)"
+          crossOrigin="anonymous"
           // @ts-ignore
           fetchPriority="high"
         />

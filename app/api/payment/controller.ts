@@ -64,21 +64,45 @@ export const generateOrder = async (
 
       const order = await newOrder.save();
 
-      const customer = await Customers.findByIdAndUpdate(
-        cart?.customer as string,
-        {
-          $unset: {
-            cart: 1
-          },
-          $push: {
-            orders: order._id
+      let customerId: any = cart?.customer;
+      if (!customerId && (cart?.checkout?.contact?.mobileNumber || cart?.checkout?.contact?.mail)) {
+        try {
+          const mob = cart.checkout?.contact?.mobileNumber?.trim();
+          const mail = cart.checkout?.contact?.mail?.trim();
+          const existingCust = await Customers.findOne({
+            $or: [
+              ...(mob ? [{ mobileNumber: mob }] : []),
+              ...(mail ? [{ mail: mail }] : [])
+            ]
+          });
+          if (existingCust) {
+            customerId = existingCust._id;
           }
-        },
-        {
-          new: true,
-          // session
+        } catch (findErr) {
+          console.error("Error finding customer for order:", findErr);
         }
-      );
+      }
+
+      if (customerId) {
+        try {
+          await Customers.findByIdAndUpdate(
+            customerId,
+            {
+              $unset: {
+                cart: 1
+              },
+              $push: {
+                orders: order._id
+              }
+            },
+            {
+              new: true
+            }
+          );
+        } catch (custUpdateErr) {
+          console.error("Customer order link update error:", custUpdateErr);
+        }
+      }
 
       // await session.commitTransaction();
 

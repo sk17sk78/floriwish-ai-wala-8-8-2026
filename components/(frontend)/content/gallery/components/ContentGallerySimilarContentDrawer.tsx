@@ -66,9 +66,10 @@ function ContentGallerySimilarContentDrawer({
   // Fallback initial fetch if contents is empty
   useEffect(() => {
     if (showDrawer && allContents.length === 0) {
+      const cityQuery = selectedCity?._id ? `&cityId=${selectedCity._id}` : "";
       if (categoryId && categoryId.length === 24) {
         fetch(
-          `/api/frontend/v2/frontend/content-category/more-products/${categoryId}?offset=0`
+          `/api/frontend/v2/frontend/content-category/more-products/${categoryId}?offset=0${cityQuery}`
         )
           .then((res) => res.json())
           .then((data) => {
@@ -92,7 +93,7 @@ function ContentGallerySimilarContentDrawer({
           .catch(() => {});
       }
     }
-  }, [showDrawer, allContents.length, categoryId, productSlug]);
+  }, [showDrawer, allContents.length, categoryId, productSlug, selectedCity?._id]);
 
   // Infinite Scroll Handler: loads more products when scrolling near bottom
   const handleScroll = useCallback(() => {
@@ -102,8 +103,9 @@ function ContentGallerySimilarContentDrawer({
     if (el.scrollTop + el.clientHeight >= el.scrollHeight - 80) {
       setIsLoadingMore(true);
       const currentOffset = allContents.length;
+      const cityQuery = selectedCity?._id ? `&cityId=${selectedCity._id}` : "";
       fetch(
-        `/api/frontend/v2/frontend/content-category/more-products/${categoryId}?offset=${currentOffset}`
+        `/api/frontend/v2/frontend/content-category/more-products/${categoryId}?offset=${currentOffset}${cityQuery}`
       )
         .then((res) => res.json())
         .then((data) => {
@@ -129,7 +131,7 @@ function ContentGallerySimilarContentDrawer({
           setIsLoadingMore(false);
         });
     }
-  }, [allContents.length, categoryId, hasMore, isLoadingMore]);
+  }, [allContents.length, categoryId, hasMore, isLoadingMore, selectedCity?._id]);
 
   // Lock background scroll when modal is open
   useEffect(() => {
@@ -298,13 +300,17 @@ function ContentGallerySimilarContentDrawer({
                   price: item.price as any,
                   city: selectedCity
                 });
+                const rawPrice = Number((item as any)?.price?.price || (item as any)?.price || 0);
+                const rawMrp = Number((item as any)?.price?.mrp || (item as any)?.mrp || rawPrice);
+                const finalPrice = price > 0 ? price : (mrp > 0 ? mrp : rawPrice);
+                const finalMrp = mrp > 0 ? mrp : (rawMrp > 0 ? rawMrp : finalPrice);
                 const itemType = item.type === "service" ? "service" : "product";
                 const itemRating =
                   item.quality?.rating?.value || (4.7 + (index % 3) * 0.1).toFixed(1);
                 const ratingCount = item.quality?.rating?.count || (120 + (index * 23));
                 const primaryImage = item.media?.primary as ImageDocument | undefined;
                 const isVegan = item.edible?.isEdible ? (item.edible as EdibleDocument).type || "veg" : undefined;
-                const discountPct = mrp && price && mrp > price ? Math.ceil((1 - price / mrp) * 100) : 0;
+                const discountPct = finalMrp > finalPrice && finalPrice > 0 ? Math.ceil((1 - finalPrice / finalMrp) * 100) : 0;
 
                 return (
                   <Link
@@ -353,21 +359,23 @@ function ContentGallerySimilarContentDrawer({
                       </p>
 
                       {/* Price Row */}
-                      <div className="flex items-baseline gap-1.5 flex-wrap mt-0.5">
-                        <span className="text-[13.5px] sm:text-[15px] xl:text-[13.5px] font-bold text-zinc-900">
-                          ₹{price.toLocaleString("en-IN")}
-                        </span>
-                        {mrp > price && (
-                          <del className="text-[10.5px] sm:text-[11.5px] xl:text-[10.5px] text-zinc-400 font-normal">
-                            ₹{mrp.toLocaleString("en-IN")}
-                          </del>
-                        )}
-                        {discountPct > 0 && (
-                          <span className="text-[9.5px] xl:text-[8.5px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-1.5 py-[0.5px]">
-                            {discountPct}% OFF
+                      {finalPrice > 0 && (
+                        <div className="flex items-baseline gap-1.5 flex-wrap mt-0.5">
+                          <span className="text-[13.5px] sm:text-[15px] xl:text-[13.5px] font-bold text-zinc-900">
+                            ₹{finalPrice.toLocaleString("en-IN")}
                           </span>
-                        )}
-                      </div>
+                          {finalMrp > finalPrice && (
+                            <del className="text-[10.5px] sm:text-[11.5px] xl:text-[10.5px] text-zinc-400 font-normal">
+                              ₹{finalMrp.toLocaleString("en-IN")}
+                            </del>
+                          )}
+                          {discountPct > 0 && (
+                            <span className="text-[9.5px] xl:text-[8.5px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-1.5 py-[0.5px]">
+                              {discountPct}% OFF
+                            </span>
+                          )}
+                        </div>
+                      )}
 
                       {/* Rating Row */}
                       <div className="flex items-center gap-1 text-[11px] xl:text-[10.5px] text-zinc-500 mt-0.5">

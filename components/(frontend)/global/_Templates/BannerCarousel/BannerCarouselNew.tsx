@@ -28,9 +28,16 @@ const manageCarouselCount = ({
 };
 
 export function Banners(config: BannerCarouselType) {
+  /**
+   * TBT Optimisation: Don't initialise autoplay plugin on the first render.
+   * After the browser becomes idle (requestIdleCallback), we enable it so
+   * the main thread is free during initial page paint / TTI.
+   */
+  const [autoplayReady, setAutoplayReady] = useState(false);
+
   const plugin = useRef(
     Autoplay({
-      delay: 3000,
+      delay: (config as any).scrollAfter || 3000,
       stopOnInteraction: false,
       stopOnMouseEnter: true,
     }),
@@ -42,6 +49,21 @@ export function Banners(config: BannerCarouselType) {
     () => manageCarouselCount({ countManager, setCurrIndex }),
     [countManager],
   );
+
+  // Defer autoplay until browser is idle — reduces TBT on mobile
+  useEffect(() => {
+    if (!config.autoScroll) return;
+    const ric =
+      typeof window !== "undefined" && "requestIdleCallback" in window
+        ? (window as any).requestIdleCallback
+        : (cb: () => void) => setTimeout(cb, 300);
+    const handle = ric(() => setAutoplayReady(true));
+    return () => {
+      if (typeof window !== "undefined" && "cancelIdleCallback" in window) {
+        (window as any).cancelIdleCallback(handle);
+      }
+    };
+  }, [config.autoScroll]);
 
   const filteredElements = config.elements.filter((el) => {
     return (
@@ -77,7 +99,7 @@ export function Banners(config: BannerCarouselType) {
 
   return (
     <Carousel
-      plugins={config.autoScroll ? [plugin.current] : undefined}
+      plugins={config.autoScroll && autoplayReady ? [plugin.current] : undefined}
       className={`grid *:row-start-1 *:col-start-1 w-full ${dimensions}`}
       opts={{
         loop: true,

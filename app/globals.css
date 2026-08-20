@@ -8,8 +8,11 @@
 
 /* Prevent layout shifts (CLS=0) */
 img {
-  height: auto;
   max-width: 100%;
+}
+/* Prevent height:auto from collapsing banner/carousel images that use h-full */
+img:not([class*="h-full"]):not([class*="object-cover"]) {
+  height: auto;
 }
 
 /* Reduce layout shift */
@@ -27,14 +30,10 @@ html {
   }
 }
 
-/* TBT improve — below-fold sections browser defer karta hai */
-.below-fold-section {
-  content-visibility: auto;
-  contain-intrinsic-size: 0 500px;
-}
 
-/* Font rendering optimization */
-* {
+/* Font rendering optimization — scoped to body/headings only */
+body,
+h1, h2, h3, h4, h5, h6 {
   text-rendering: optimizeLegibility;
 }
 

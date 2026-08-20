@@ -11,6 +11,7 @@ import { QuickLinkDocument } from "@/common/types/documentation/presets/quickLin
 import { Banners } from "@/components/(frontend)/global/_Templates/BannerCarousel/BannerCarouselNew";
 import UpdatedCategoryTiles from "@/components/(frontend)/global/_Templates/Tiles/CategoryTiles/UpdatedCategoryTiles";
 import dynamic from "next/dynamic";
+import HeroBannerSSR from "./HeroBannerSSR";
 
 // Below-fold components — lazy load (TBT reduce)
 const CollageTiles = dynamic(
@@ -87,44 +88,35 @@ export const RenderHomepageLayout = ({
           });
 
         return (() => {
-          // First banner image - render statically in SSR so Lighthouse sees
-          // a visible LCP candidate in initial HTML before carousel JS mounts.
           const firstBanner = bannerElements[0];
           const firstDesktop = firstBanner?.image?.desktop?.url || "";
           const firstMobile = firstBanner?.image?.mobile?.url || firstDesktop;
-          const firstAlt = firstBanner?.image?.desktop?.alt || "Banner";
+          const firstAlt = firstBanner?.image?.desktop?.alt || firstBanner?.image?.mobile?.alt || "Banner";
           const hasMobileFirst = Boolean(
             firstMobile && firstMobile.trim().length > 0 && firstMobile !== firstDesktop
           );
           const hasFirstBanner = Boolean(firstDesktop || firstMobile);
+          const firstLink = firstBanner?.isLink ? firstBanner?.link : undefined;
 
           const aspectClass = hasMobileFirst ? "aspect-[2/1] sm:aspect-[3/1]" : "aspect-[3/1]";
 
           return (
             <div className={`relative w-full ${aspectClass}`}>
-              {/* Static SSR hero image → provides LCP candidate in initial HTML */}
+              {/*
+                HeroBannerSSR — pure Server Component, zero JS.
+                Renders the first hero image into initial HTML at z-[1].
+                PageSpeed/Googlebot detects it as the LCP element.
+              */}
               {hasFirstBanner && (
-                <div className="absolute inset-0 z-0 rounded-2xl sm:rounded-3xl overflow-hidden bg-zinc-100">
-                  <picture className="w-full h-full block">
-                    {hasMobileFirst && (
-                      <source media="(max-width: 639px)" srcSet={firstMobile} width={800} height={400} />
-                    )}
-                    <source media="(min-width: 640px)" srcSet={firstDesktop} width={1200} height={400} />
-                    <img
-                      src={hasMobileFirst ? firstMobile : firstDesktop}
-                      alt={firstAlt}
-                      width={hasMobileFirst ? 800 : 1200}
-                      height={400}
-                      loading="eager"
-                      fetchPriority="high"
-                      decoding="sync"
-                      sizes="100vw"
-                      className="w-full h-full object-cover object-center rounded-2xl sm:rounded-3xl"
-                    />
-                  </picture>
-                </div>
+                <HeroBannerSSR
+                  desktopUrl={firstDesktop}
+                  mobileUrl={hasMobileFirst ? firstMobile : undefined}
+                  alt={firstAlt}
+                  link={firstLink}
+                  hasDedicatedMobile={hasMobileFirst}
+                />
               )}
-              {/* Carousel overlays the static image once JS mounts */}
+              {/* Carousel progressively enhances on top once JS mounts (z-10) */}
               <div className="absolute inset-0 z-10">
                 <Banners
                   scrollAfter={scrollAfter}

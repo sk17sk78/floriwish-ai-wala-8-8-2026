@@ -54,7 +54,8 @@ const nextConfig = {
   // Performance optimizations
   poweredByHeader: false,
   staticPageGenerationTimeout: 300,
-  generateEtags: false,
+  generateEtags: true, // Enable ETags — 304 Not Modified for repeat visitors (faster)
+
   // Enable external server packages for Redis and Database drivers
   experimental: {
     serverComponentsExternalPackages: [
@@ -64,6 +65,10 @@ const nextConfig = {
       "bcrypt",
       "mongodb",
       "firebase-admin",
+    ],
+    optimizePackageImports: [
+      "lucide-react",
+      "@radix-ui/react-icons",
     ],
   },
   compiler: {

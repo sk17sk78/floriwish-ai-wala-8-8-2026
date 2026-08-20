@@ -33,12 +33,26 @@ export function SettingProvider({ children }: { children: ReactNode }) {
   // side effects
   useEffect(() => {
     if (status === "initial") {
-      fetchSetting()
-        .then(({ data: setting }) => {
-          setStatus("idle");
-          setSetting(setting as SettingDocument);
-        })
-        .catch(() => {});
+      const loadSettings = () => {
+        fetchSetting()
+          .then(({ data: setting }) => {
+            setStatus("idle");
+            setSetting(setting as SettingDocument);
+          })
+          .catch(() => {});
+      };
+
+      if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+        const idleId = (window as any).requestIdleCallback(loadSettings, { timeout: 2000 });
+        return () => {
+          if ("cancelIdleCallback" in window) {
+            (window as any).cancelIdleCallback(idleId);
+          }
+        };
+      } else {
+        const timer = setTimeout(loadSettings, 1000);
+        return () => clearTimeout(timer);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

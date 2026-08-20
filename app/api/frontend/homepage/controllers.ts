@@ -73,6 +73,7 @@ export const getHomepageLayoutsFromDB = async (): Promise<
   try {
     await connectDB();
 
+    // 15-second timeout prevents DB hangs from blocking SSR page render
     const documents = await HomepageLayouts.find({
       isActive: true,
     })
@@ -118,6 +119,7 @@ export const getHomepageLayoutsFromDB = async (): Promise<
       .sort({
         order: 1,
       })
+      .maxTimeMS(15000) // 15s DB timeout — SSR page won't hang indefinitely
       .lean()
       .exec();
 

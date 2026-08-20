@@ -23,10 +23,11 @@ import {
 import NextImage from "@/components/custom/NextImage";
 import CartItemAddons from "./CartItemAddons";
 import CartItemCustomization from "./CartItemCustomization";
+import Link from "next/link";
+import { ExternalLink, Package } from "lucide-react";
 
 // types
 import { type CartItemDocument } from "@/common/types/documentation/nestedDocuments/cartItem";
-import { OPTIMIZE_IMAGE } from "@/config/image";
 import { INRSymbol } from "@/common/constants/symbols";
 
 export default function CartItem({
@@ -48,27 +49,14 @@ export default function CartItem({
 
   // redux states
   const contentStatus = useSelector(selectContent.status);
-
   const { documents: contents } = useSelector(selectContent.documentList);
 
   const imageStatus = useSelector(selectImage.status);
-
   const { documents: images } = useSelector(selectImage.documentList);
 
   const deliveryTypeStatus = useSelector(selectDeliveryType.status);
-
   const { documents: deliveryTypes } = useSelector(
     selectDeliveryType.documentList
-  );
-
-  // variables
-  const content = contents.find(({ _id }) => String(_id) === String(contentId));
-  const primaryImage = images.find(
-    ({ _id }) => String(_id) === String(content?.media?.primary)
-  );
-  const deliveryType = deliveryTypes.find(({ _id }) => String(_id) === String(delivery.type));
-  const deliverySlot = deliveryType?.timeSlots.find(
-    ({ _id }) => String(_id) === String(delivery.slot)
   );
 
   // side effects
@@ -90,77 +78,150 @@ export default function CartItem({
     }
   }, [deliveryTypeStatus, dispatch]);
 
+  // Robust content resolution
+  const isPopulatedContent = typeof contentId === "object" && contentId !== null;
+  const content = isPopulatedContent
+    ? (contentId as any)
+    : contents.find(({ _id }) => String(_id) === String(contentId));
+
+  const contentName = content?.name || (contentId as any)?.name || "Floriwish Product";
+  const contentSlug = content?.slug || (contentId as any)?.slug || "";
+
+  // Robust image resolution
+  const primaryImageUrl =
+    content?.media?.primary?.url ||
+    (contentId as any)?.media?.primary?.url ||
+    (typeof content?.media?.primary === "string"
+      ? images.find(({ _id }) => String(_id) === String(content.media.primary))?.url
+      : "") ||
+    "";
+  const primaryImageAlt =
+    content?.media?.primary?.alt ||
+    content?.media?.primary?.defaultAlt ||
+    contentName;
+
+  // Robust delivery type resolution
+  const isPopulatedDeliveryType =
+    typeof delivery?.type === "object" && delivery?.type !== null;
+  const deliveryType = isPopulatedDeliveryType
+    ? (delivery.type as any)
+    : deliveryTypes.find(({ _id }) => String(_id) === String(delivery?.type));
+  const deliveryTypeName = deliveryType?.name || "";
+
+  // Robust delivery slot resolution
+  const isPopulatedDeliverySlot =
+    typeof delivery?.slot === "object" && delivery?.slot !== null;
+  const deliverySlot = isPopulatedDeliverySlot
+    ? (delivery.slot as any)
+    : (deliveryType as any)?.timeSlots?.find(
+        (ts: any) => String(ts?._id) === String(delivery?.slot)
+      );
+  const deliverySlotLabel =
+    deliverySlot?.label ||
+    (typeof delivery?.slot === "string" && delivery.slot.length > 2
+      ? delivery.slot
+      : "");
+
+  const deliveryDateFormatted = delivery?.date
+    ? moment(delivery.date).format("DD MMM YYYY")
+    : "";
+
   return (
-    <section
-      className={`flex flex-col gap-2 px-0 py-5 border-b border-dashed border-charcoal-3/40`}
-    >
-      {content && (
-        <section className="grid grid-cols-[60px_1fr] sm:grid-cols-[86px_1fr_auto_90px] auto-rows-min gap-x-4">
-          <div className="bg-charcoal-3/20 rounded-xl overflow-hidden relative aspect-square">
-            {primaryImage && (
-              <NextImage
-                className="w-full h-full object-cover object-center"
-                src={primaryImage.url}
-                alt={primaryImage.alt || primaryImage.defaultAlt || "Image"}
-                width={150}
-                height={150}
-                draggable={false}
-              />
+    <section className="flex flex-col gap-2 px-0 py-4 border-b border-zinc-200 last:border-b-0">
+      <section className="grid grid-cols-[64px_1fr] sm:grid-cols-[80px_1fr_auto_90px] auto-rows-min gap-x-3.5">
+        {/* Product Image */}
+        <div className="bg-zinc-100 rounded-xl overflow-hidden relative aspect-square border border-zinc-200 flex items-center justify-center">
+          {primaryImageUrl ? (
+            <NextImage
+              className="w-full h-full object-cover object-center"
+              src={primaryImageUrl}
+              alt={primaryImageAlt}
+              width={120}
+              height={120}
+              draggable={false}
+            />
+          ) : (
+            <Package className="w-6 h-6 text-zinc-400" />
+          )}
+        </div>
+
+        {/* Product Details */}
+        <div className="flex flex-col justify-start gap-1 relative">
+          <div className="flex items-center gap-1.5">
+            <span className="font-bold text-[15px] text-zinc-900 leading-snug">
+              {contentName}
+            </span>
+            {contentSlug && (
+              <Link
+                href={`/product/${contentSlug}`}
+                target="_blank"
+                className="text-zinc-400 hover:text-rose-600 transition-colors"
+                title="View product on website"
+              >
+                <ExternalLink size={13} />
+              </Link>
             )}
           </div>
-          <div className="flex flex-col justify-start gap-0 relative">
-            <span className="font-medium text-[17px] sm:py-1">
-              {content.name}
-            </span>
-            <span className="text-[17px] font-medium sm:hidden">
+
+          <div className="flex items-center gap-2 text-xs font-semibold text-zinc-700">
+            <span>
               {INRSymbol}
               {pricePerUnit}
-              {quantity >= 1 ? ` x${quantity}` : "x0"}
             </span>
-            <span className="text-sm text-charcoal-3 max-sm:hidden">
-              Quantity: {quantity >= 1 ? ` x${quantity}` : "x0"}
+            <span className="text-zinc-400">×</span>
+            <span>{quantity >= 1 ? `Qty: ${quantity}` : "Qty: 1"}</span>
+            <span className="text-zinc-400">|</span>
+            <span className="text-emerald-700 font-bold">
+              Total: {INRSymbol}{Number(pricePerUnit) * Number(quantity || 1)}
             </span>
-            <span className="text-sm text-charcoal-3 max-sm:hidden">
-              Booking for: {moment(delivery.date).format("DD MMM YYYY")} (
-              {deliverySlot?.label || ""})
-            </span>
-            <span className="text-sm text-charcoal-3 sm:hidden">
-              Date: {moment(delivery.date).format("DD MMM YYYY")}
-            </span>
-            <span className="text-sm text-charcoal-3 sm:hidden">
-              Time: {deliverySlot?.label || ""} (
-              {deliveryType?.name.split(" ")[0] || ""})
-            </span>
-            {/* CUSTOMIZATIONS IF ANY ------------------ */}
-            {customization && (
-              <CartItemCustomization customization={customization} />
-            )}
-            {/* INSTRUCTIONS IF ANY ------------------ */}
-            {instruction && instruction.length > 0 && (
-              <span className="text-sm text-charcoal-3">
-                Instruction: {instruction || ""}
-              </span>
-            )}
           </div>
 
-          {/* DELIVERY TYPE ----------------- */}
-          <div className="max-sm:hidden flex flex-col justify-start gap-y-3.5">
-            <div className="text-white text-[13px] mt-2 bg-sienna py-0.5 px-3 rounded-lg h-fit">
-              {deliveryType?.name || ""}
+          {/* Delivery Date & Time */}
+          {deliveryDateFormatted && (
+            <div className="text-xs text-zinc-600 flex flex-wrap items-center gap-1 mt-0.5">
+              <span className="font-semibold text-zinc-500">Delivery:</span>
+              <span className="font-medium text-zinc-800">{deliveryDateFormatted}</span>
+              {deliverySlotLabel && (
+                <span className="text-zinc-600">({deliverySlotLabel})</span>
+              )}
             </div>
-          </div>
+          )}
 
-          {/* PRICE PER UNIT ----------------- */}
-          <div className="font-medium text-right mt-2 max-sm:hidden">
-            {INRSymbol}
-            {pricePerUnit}
-          </div>
-        </section>
-      )}
+          {/* Customizations */}
+          {customization && (
+            <div className="mt-1">
+              <CartItemCustomization customization={customization} />
+            </div>
+          )}
 
-      {/* ADDONS IF ANY ---------------------- */}
+          {/* Special Instructions */}
+          {instruction && instruction.trim().length > 0 && (
+            <div className="text-xs text-zinc-600 bg-amber-50/70 border border-amber-100 rounded-lg p-1.5 mt-1">
+              <span className="font-semibold text-amber-900">Note:</span> {instruction}
+            </div>
+          )}
+        </div>
+
+        {/* Delivery Type Tag */}
+        <div className="max-sm:hidden flex flex-col justify-start">
+          {deliveryTypeName && (
+            <div className="text-rose-800 text-[11px] font-bold bg-rose-50 border border-rose-200 py-1 px-2.5 rounded-lg h-fit">
+              {deliveryTypeName}
+            </div>
+          )}
+        </div>
+
+        {/* Price Column */}
+        <div className="font-bold text-right text-zinc-900 text-sm max-sm:hidden">
+          {INRSymbol}{Number(pricePerUnit) * Number(quantity || 1)}
+        </div>
+      </section>
+
+      {/* Addons List */}
       {itemAddons && Boolean(itemAddons.length) && (
-        <CartItemAddons itemAddons={itemAddons} />
+        <div className="mt-1 pl-2 sm:pl-4 border-l-2 border-rose-100">
+          <CartItemAddons itemAddons={itemAddons} />
+        </div>
       )}
     </section>
   );

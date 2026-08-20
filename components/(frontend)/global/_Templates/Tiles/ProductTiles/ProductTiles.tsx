@@ -16,8 +16,7 @@ import {
 } from "lucide-react";
 import NextImage from "@/components/custom/NextImage";
 import Link from "next/link";
-import { useEffect, useId, useState, memo, useCallback, useMemo } from "react";
-import { useProductPerformance } from "@/hooks/useProductPerformance";
+import { useId, memo, useCallback, useMemo } from "react";
 
 export type LocalProductDocument = {
   _id: string;
@@ -43,67 +42,26 @@ const ProductTiles = memo(function ProductTiles({
   type?: "list" | "scrollable";
   inCategoryPage?: boolean;
 }) {
-  const [screenW, setScreenW] = useState<number>(300);
-  const { preloadImages, batchPreloadProducts } = useProductPerformance();
-
   const useIdId = useId();
   const trayId = id || useIdId;
 
   // Memoize products to prevent unnecessary re-renders
   const products = useMemo(() => productList || [], [productList]);
 
-  // Memoize image URLs for preloading
-  const imageUrls = useMemo(() =>
-    products.map(product => product.image.url).filter(Boolean),
-    [products]
-  );
-
-  // Optimized scroll handler with throttling
+  // Optimized scroll handler
   const handleScroll = useCallback((dir: "left" | "right") => {
     const tray = document.getElementById(trayId) as HTMLElement;
     if (!tray) return;
 
+    const width = typeof window !== "undefined" ? window.innerWidth : 300;
     const currOffset = tray.scrollLeft;
-    const scrollAmount = screenW * 0.65;
+    const scrollAmount = width * 0.65;
 
     tray.scrollTo({
       left: currOffset + (dir === "left" ? -scrollAmount : scrollAmount),
       behavior: "smooth"
     });
-  }, [trayId, screenW]);
-
-  // Optimized resize handler
-  const updateWindowWidth = useCallback(() => {
-    setScreenW(window.innerWidth);
-  }, []);
-
-  useEffect(() => {
-    // Initial width
-    updateWindowWidth();
-
-    // Throttled resize listener
-    let timeoutId: NodeJS.Timeout;
-    const throttledResize = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(updateWindowWidth, 100);
-    };
-
-    window.addEventListener("resize", throttledResize);
-    return () => {
-      window.removeEventListener("resize", throttledResize);
-      clearTimeout(timeoutId);
-    };
-  }, [updateWindowWidth]);
-
-  // Preload images for better performance
-  useEffect(() => {
-    if (imageUrls.length > 0) {
-      // Delay preloading to not block initial render
-      setTimeout(() => {
-        preloadImages(imageUrls);
-      }, 500);
-    }
-  }, [imageUrls, preloadImages]);
+  }, [trayId]);
 
   // Memoize the grid classes to prevent recalculation
   const gridClasses = useMemo(() => {

@@ -211,7 +211,7 @@ function CityPopup({ closeDialog }: { closeDialog?: () => void }) {
       </div>
 
       {/* ── Scrollable Body ────────────────────────── */}
-      <div className="flex-1 overflow-y-auto min-h-0 overscroll-contain px-5 py-4 pb-[max(20px,env(safe-area-inset-bottom))]">
+      <div className="flex-1 overflow-y-auto min-h-0 overscroll-contain px-5 py-4 pb-[max(80px,calc(env(safe-area-inset-bottom)+50px))]">
         {/* 1. POPULAR CITIES (3-Column Grid with Pink Circle Pin Icons) */}
         {!isSearching && (
           <div className="mb-6">

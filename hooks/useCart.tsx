@@ -590,29 +590,36 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setUpdatePrice((prev) => true);
     }
 
-    // GET ALL COUPONS ----------------------------
-    fetchAllCoupons({
-      active: true,
-      orderBy: "asc",
-      sortBy: "applicableCategories",
-    })
-      .then((response) => {
-        const coupons = (response.data || []).filter((x) => x !== undefined);
-        setAllCoupons((prev) => coupons);
+    // GET ALL COUPONS & OCCASIONS (Deferred to idle to prevent TBT during initial page render)
+    const fetchDeferredData = () => {
+      fetchAllCoupons({
+        active: true,
+        orderBy: "asc",
+        sortBy: "applicableCategories",
       })
-      .catch((err) => {});
+        .then((response) => {
+          const coupons = (response.data || []).filter((x) => x !== undefined);
+          setAllCoupons((prev) => coupons);
+        })
+        .catch((err) => {});
 
-    // GET OCCASIONS PRESETS ---------------------------------
-    fetchOccasions({
-      active: true,
-      orderBy: "asc",
-      sortBy: "name",
-    })
-      .then((response) => {
-        const occasions = (response.data || []).filter((x) => x !== undefined);
-        setALlOccasions((prev) => occasions);
+      fetchOccasions({
+        active: true,
+        orderBy: "asc",
+        sortBy: "name",
       })
-      .catch((err) => {});
+        .then((response) => {
+          const occasions = (response.data || []).filter((x) => x !== undefined);
+          setALlOccasions((prev) => occasions);
+        })
+        .catch((err) => {});
+    };
+
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      (window as any).requestIdleCallback(fetchDeferredData, { timeout: 3000 });
+    } else {
+      setTimeout(fetchDeferredData, 1500);
+    }
   }, []);
 
   // API SYNCHRONIZATION ===============================================================
@@ -1157,21 +1164,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
           checkout: prev.checkout
             ? ({
                 ...prev.checkout,
-                name:
-                  prev.checkout.name && prev.checkout.name
-                    ? prev.checkout.name
-                    : name,
+                name: prev.checkout.name || name,
                 contact: {
-                  ...prev.checkout.contact,
+                  ...(prev.checkout.contact || {}),
                   mobileNumber:
-                    prev.checkout.contact.mobileNumber &&
-                    prev.checkout.contact.mobileNumber
-                      ? prev.checkout.contact.mobileNumber
-                      : mobileToUpdate,
-                  mail:
-                    prev.checkout.contact.mail && prev.checkout.contact.mail
-                      ? prev.checkout.contact.mail
-                      : mail,
+                    prev.checkout.contact?.mobileNumber || mobileToUpdate,
+                  mail: prev.checkout.contact?.mail || mail,
                 },
               } as CartCheckoutDocument)
             : ({

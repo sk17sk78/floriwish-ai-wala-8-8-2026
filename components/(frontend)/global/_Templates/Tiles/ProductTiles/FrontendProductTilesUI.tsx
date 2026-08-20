@@ -62,22 +62,16 @@ export default function FrontendProductTilesUI({
   selectedCity: CityDocument | null;
 }) {
   const [products, setProducts] = useState<ContentDocument[]>(productList || []);
-  const [screenW, setScreenW] = useState<number>(300);
 
   const useIdId = useId();
   const trayId = id || useIdId;
 
-  useEffect(() => {
-    const updateWindowWidth = () => setScreenW(innerWidth);
-    window.addEventListener("resize", updateWindowWidth);
-    updateWindowWidth();
-    return () => window.removeEventListener("resize", updateWindowWidth);
-  }, []);
-
   const handleScroll = (dir: "left" | "right") => {
     const tray = document.getElementById(trayId) as HTMLElement;
+    if (!tray) return;
+    const width = typeof window !== "undefined" ? window.innerWidth : 300;
     tray.scrollTo({
-      left: tray.scrollLeft + (dir === "left" ? -1 : 1) * (screenW * 0.65),
+      left: tray.scrollLeft + (dir === "left" ? -1 : 1) * (width * 0.65),
       behavior: "smooth",
     });
   };

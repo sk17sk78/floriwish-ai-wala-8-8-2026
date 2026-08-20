@@ -30,23 +30,42 @@ export default function CategoryRelatedCategories({
     });
   }, []);
 
-  // Auto slider when > 8 items on all devices
+  // Auto slider when > 8 items on all devices (deferred to idle)
   useEffect(() => {
     if (!isAutoSlider) return;
     const tray = trayRef.current;
     if (!tray) return;
 
-    const interval = setInterval(() => {
-      if (isHoveredRef.current) return;
-      const maxScroll = tray.scrollWidth - tray.clientWidth;
-      if (tray.scrollLeft >= maxScroll - 10) {
-        tray.scrollTo({ left: 0, behavior: "smooth" });
-      } else {
-        tray.scrollBy({ left: 220, behavior: "smooth" });
-      }
-    }, 3000);
+    let interval: NodeJS.Timeout | null = null;
+    let timerId: NodeJS.Timeout | null = null;
 
-    return () => clearInterval(interval);
+    const startSlider = () => {
+      interval = setInterval(() => {
+        if (isHoveredRef.current || !tray) return;
+        const maxScroll = tray.scrollWidth - tray.clientWidth;
+        if (tray.scrollLeft >= maxScroll - 10) {
+          tray.scrollTo({ left: 0, behavior: "smooth" });
+        } else {
+          tray.scrollBy({ left: 220, behavior: "smooth" });
+        }
+      }, 4000);
+    };
+
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      const idleId = (window as any).requestIdleCallback(startSlider, { timeout: 3000 });
+      return () => {
+        if ("cancelIdleCallback" in window) {
+          (window as any).cancelIdleCallback(idleId);
+        }
+        if (interval) clearInterval(interval);
+      };
+    } else {
+      timerId = setTimeout(startSlider, 2500);
+      return () => {
+        if (timerId) clearTimeout(timerId);
+        if (interval) clearInterval(interval);
+      };
+    }
   }, [isAutoSlider]);
 
   return (

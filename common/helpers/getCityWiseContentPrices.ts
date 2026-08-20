@@ -6,37 +6,15 @@ export const getCityWiseContentPrices = ({
   city,
   content
 }: {
-  content: ContentDocument;
+  content?: ContentDocument | any;
   city: CityDocument | null;
 }): { price: number; mrp: number } => {
-  if (content.price === undefined) {
+  if (!content) {
     return { mrp: 0, price: 0 };
   }
 
-  // ALL INDIA CASE -----------------------------------------
-  /* cases when its All India:
-        - if CityDocument is null/undefined 
-        - if CityDocument._id is null/undefined 
-   */
-  if (
-    city === undefined ||
-    city === null ||
-    city._id === null ||
-    city._id === undefined ||
-    content.price.cities === undefined ||
-    content.price.cities.length === 0
-  )
-    return { mrp: content.price?.base?.mrp || 0, price: content.price?.base?.price || 0 };
-
-  // CITY WISE CASE ----------------------------------------------
-  const targetCityPrices = content.price.cities.find(({ city: cityId }) => {
-    return String(cityId) === String(city._id);
-  });
-
-  if (!targetCityPrices)
-    return { mrp: content.price?.base?.mrp || 0, price: content.price?.base?.price || 0 };
-
-  return { mrp: targetCityPrices.mrp, price: targetCityPrices.price };
+  const priceObj = content.price || content;
+  return getCityWisePrices({ city, prices: priceObj });
 };
 
 export const getCityWisePrices = ({
@@ -44,33 +22,51 @@ export const getCityWisePrices = ({
   prices
 }: {
   city: CityDocument | null;
-  prices: ContentPriceDocument | null;
+  prices: ContentPriceDocument | any;
 }): { price: number; mrp: number } => {
   if (prices === undefined || prices === null) return { mrp: 0, price: 0 };
 
-  // ALL INDIA CASE -----------------------------------------
-  /* cases when its All India:
-        - if CityDocument is null/undefined 
-        - if CityDocument._id is null/undefined 
-   */
+  // Direct numeric
+  if (typeof prices === "number") {
+    return { mrp: prices, price: prices };
+  }
+
+  // City-wise match
   if (
-    city === undefined ||
-    city === null ||
-    city._id === null ||
-    city._id === undefined ||
-    prices.cities === undefined ||
-    prices.cities.length === 0
-  )
-    return { mrp: prices?.base?.mrp || 0, price: prices?.base?.price || 0 };
+    city?._id &&
+    Array.isArray(prices.cities) &&
+    prices.cities.length > 0
+  ) {
+    const targetCityPrices = prices.cities.find((c: any) => {
+      const cityId = c?.city?._id || c?.city;
+      return cityId && String(cityId) === String(city._id);
+    });
 
-  // CITY WISE CASE ----------------------------------------------
-  const targetCityPrices = prices.cities.find(
-    ({ city: cityDoc }) =>
-      String((cityDoc as CityDocument)._id) === String(city._id)
-  );
+    if (targetCityPrices) {
+      const p = Number(targetCityPrices.price ?? targetCityPrices.sellingPrice ?? 0);
+      const m = Number(targetCityPrices.mrp ?? targetCityPrices.regularPrice ?? p);
+      if (p > 0 || m > 0) {
+        return { mrp: m || p, price: p || m };
+      }
+    }
+  }
 
-  if (!targetCityPrices)
-    return { mrp: prices?.base?.mrp || 0, price: prices?.base?.price || 0 };
+  // Base object match
+  if (prices.base && typeof prices.base === "object") {
+    const baseP = Number(prices.base.price ?? prices.base.sellingPrice ?? 0);
+    const baseM = Number(prices.base.mrp ?? prices.base.regularPrice ?? baseP);
+    if (baseP > 0 || baseM > 0) {
+      return { mrp: baseM || baseP, price: baseP || baseM };
+    }
+  }
 
-  return { mrp: targetCityPrices.mrp, price: targetCityPrices.price };
+  // Direct flat price match { price, mrp }
+  const flatP = Number(prices.price ?? prices.sellingPrice ?? prices.amount ?? 0);
+  const flatM = Number(prices.mrp ?? prices.regularPrice ?? prices.originalPrice ?? flatP);
+
+  if (flatP > 0 || flatM > 0) {
+    return { mrp: flatM || flatP, price: flatP || flatM };
+  }
+
+  return { mrp: 0, price: 0 };
 };

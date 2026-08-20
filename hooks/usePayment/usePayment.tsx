@@ -219,7 +219,7 @@ export function PaymentProvider({ children }: { children: ReactNode }) {
       amount: amount * 100,
       currency: "INR",
       name: COMPANY_NAME,
-      order_id: await getRazorpayOrderId({ cartId }),
+      order_id: await getRazorpayOrderId({ cartId, amount }),
       allow_rotation: true,
       image: COMPANY_LOGO_URL,
       theme: {
@@ -456,8 +456,8 @@ export function PaymentProvider({ children }: { children: ReactNode }) {
         onInitiateRetryPayment: handleInitiateRetryPayment
       }}
     >
-      <Script src="https://checkout.razorpay.com/v1/checkout.js" />
-      <Script src="https://jssdk.payu.in/bolt/bolt.min.js" />
+      <Script strategy="lazyOnload" src="https://checkout.razorpay.com/v1/checkout.js" />
+      <Script strategy="lazyOnload" src="https://jssdk.payu.in/bolt/bolt.min.js" />
       {children}
       <OrderNotGenerated
         mode={mode}

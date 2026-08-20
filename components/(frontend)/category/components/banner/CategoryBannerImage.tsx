@@ -13,9 +13,11 @@ import { type BannerImageDocument } from "@/common/types/documentation/nestedDoc
 import { type ImageDocument } from "@/common/types/documentation/media/image";
 
 function CategoryBannerImage({
-  bannerImage
+  bannerImage,
+  isPriority = false
 }: {
   bannerImage: BannerImageDocument;
+  isPriority?: boolean;
 }) {
   const deskDoc = bannerImage.desktop as ImageDocument | undefined;
   const mobDoc = bannerImage.mobile as ImageDocument | undefined;
@@ -34,17 +36,22 @@ function CategoryBannerImage({
     <div className="relative w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden bg-zinc-100">
       <picture className="w-full h-full block">
         {hasMobile && (
-          <source media="(max-width: 639px)" srcSet={mobileUrl} />
+          <source media="(max-width: 639px)" srcSet={mobileUrl} width={800} height={400} />
         )}
-        <source media="(min-width: 640px)" srcSet={desktopUrl} />
+        <source media="(min-width: 640px)" srcSet={desktopUrl} width={1200} height={400} />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={hasMobile ? mobileUrl : (desktopUrl || mobileUrl)}
           alt={alt}
           className="object-cover object-center h-full w-full rounded-2xl sm:rounded-3xl"
-          loading="lazy"
-          decoding="async"
-          width={1200}
-          height={hasMobile ? 600 : 400}
+          // isPriority=true (first image) → eager load for LCP
+          loading={isPriority ? "eager" : "lazy"}
+          // @ts-ignore
+          fetchPriority={isPriority ? "high" : "auto"}
+          decoding={isPriority ? "sync" : "async"}
+          width={hasMobile ? 800 : 1200}
+          height={hasMobile ? 400 : 400}
+          sizes="100vw"
         />
       </picture>
     </div>

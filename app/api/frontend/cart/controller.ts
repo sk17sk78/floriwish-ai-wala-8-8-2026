@@ -246,7 +246,7 @@ export const getCart = async ({
   try {
     await connectDB();
 
-    const document = await Carts.findOne({ _id: id, isOrdered: false })
+    const document = await Carts.findById(id)
       .select(SELECT.cart)
       .populate([
         {
@@ -256,7 +256,11 @@ export const getCart = async ({
           strictPopulate: false
         },
         { path: "items.delivery.type", strictPopulate: false },
-        { path: "items.addons.addon", strictPopulate: false },
+        {
+          path: "items.addons.addon",
+          populate: { path: "image", select: SELECT.image },
+          strictPopulate: false
+        },
         {
           path: "items.customization.enhancement.items.enhancement",
           strictPopulate: false
@@ -278,23 +282,21 @@ export const getCart = async ({
 
     const docObj = document.toObject() as CartDocument;
 
-    const validItems = [...(docObj.items || [])]
-      .filter(({ delivery }) => !isDateExpired(delivery?.date || ""))
-      .map((item) => {
-        const validItem = { ...item } as CartItemDocument;
+    const mappedItems = [...(docObj.items || [])].map((item) => {
+      const validItem = { ...item } as CartItemDocument;
 
-        if (validItem.delivery?.type) {
-          validItem.delivery.slot = (
-            validItem.delivery.type as DeliveryTypeDocument
-          )?.timeSlots?.find(
-            ({ _id }) => String(_id) === String(validItem.delivery?.slot)
-          );
-        }
+      if (validItem.delivery?.type) {
+        validItem.delivery.slot = (
+          validItem.delivery.type as DeliveryTypeDocument
+        )?.timeSlots?.find(
+          ({ _id }) => String(_id) === String(validItem.delivery?.slot)
+        ) || validItem.delivery.slot;
+      }
 
-        return validItem;
-      });
+      return validItem;
+    });
 
-    docObj.items = validItems;
+    docObj.items = mappedItems;
 
     return docObj;
   } catch (error: any) {

@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-// Floriwish Firebase Cloud Messaging Service Worker
+// Floriwish Firebase Cloud Messaging Service Worker (Official Native Implementation)
 
 importScripts("https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js");
@@ -29,13 +29,13 @@ self.addEventListener("activate", function (event) {
   event.waitUntil(self.clients.claim());
 });
 
-// ─── Firebase Official Background Handler ──────────────────────────────────────
+// ─── Firebase Official Background Notification Handler ────────────────────────
 messaging.onBackgroundMessage(function (payload) {
   const notification = payload.notification || {};
   const data = payload.data || {};
 
   const title = notification.title || data.title || "Floriwish";
-  const body = notification.body || data.body || "New notification from Floriwish";
+  const body = notification.body || data.body || "You have a new update from Floriwish.";
   const image = notification.image || notification.imageUrl || data.image || data.imageUrl || "";
   const url = data.url || data.click_action || notification.click_action || "/";
   const icon = "/icons/icon-192x192.png";
@@ -50,7 +50,7 @@ messaging.onBackgroundMessage(function (payload) {
       ...data
     },
     requireInteraction: true,
-    tag: data.tag || "floriwish-" + Date.now(),
+    tag: data.tag || `floriwish-${data.timestamp || Date.now()}`,
     renotify: true
   };
 
@@ -59,45 +59,6 @@ messaging.onBackgroundMessage(function (payload) {
   }
 
   return self.registration.showNotification(title, options);
-});
-
-// ─── Fallback Background Push Handler ──────────────────────────────────────────
-self.addEventListener("push", function (event) {
-  if (!event.data) return;
-
-  try {
-    const payload = event.data.json();
-    const notification = payload.notification || {};
-    const data = payload.data || {};
-
-    const title = notification.title || data.title || "Floriwish";
-    const body = notification.body || data.body || "New update from Floriwish";
-    const image = notification.image || notification.imageUrl || data.image || data.imageUrl || "";
-    const url = data.url || data.click_action || notification.click_action || "/";
-    const icon = "/icons/icon-192x192.png";
-    const badge = "/icons/icon-192x192.png";
-
-    const options = {
-      body: body,
-      icon: icon,
-      badge: badge,
-      data: {
-        url: url,
-        ...data
-      },
-      requireInteraction: true,
-      tag: data.tag || "floriwish-push-" + Date.now(),
-      renotify: true
-    };
-
-    if (image) {
-      options.image = image;
-    }
-
-    event.waitUntil(self.registration.showNotification(title, options));
-  } catch (err) {
-    console.error("[FCM SW] Push event error:", err);
-  }
 });
 
 // ─── Notification Click Handler ────────────────────────────────────────────────
@@ -128,4 +89,3 @@ self.addEventListener("notificationclick", function (event) {
       })
   );
 });
-
