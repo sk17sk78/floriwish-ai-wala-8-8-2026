@@ -11,24 +11,21 @@ import { getSitemapData } from "./controllers";
 import { SITEMAP_SERVICES_CACHE_KEY } from "@/common/constants/cacheKeys";
 
 // utils
-import {
-  notFoundErrorResponse,
-  serverErrorResponse
-} from "@/common/utils/api/error";
+import { notFoundErrorResponse, serverErrorResponse } from "@/common/utils/api/error";
 import { Response } from "@/common/utils/api/next";
 import { successData } from "@/common/utils/api/data";
 
 // types
 import { type APIResponseType } from "@/common/types/apiTypes";
-import { type NextRequest } from "next/server";
 import { type SitemapData } from "@/common/types/sitemap";
+import { type NextRequest } from "next/server";
 
 export const GET = async (
   req: NextRequest
 ): Promise<APIResponseType<SitemapData[]>> => {
   try {
     const cachedSitemapData = await getFromRedis<SitemapData[]>({
-      key: SITEMAP_SERVICES_CACHE_KEY
+      key: SITEMAP_SERVICES_CACHE_KEY || "sitemap_services"
     });
 
     if (!cachedSitemapData) {
@@ -39,7 +36,7 @@ export const GET = async (
       }
 
       await setToRedis({
-        key: SITEMAP_SERVICES_CACHE_KEY,
+        key: SITEMAP_SERVICES_CACHE_KEY || "sitemap_services",
         value: sitemapData
       });
 

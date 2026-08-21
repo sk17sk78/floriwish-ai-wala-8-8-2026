@@ -24,7 +24,7 @@ function FooterTopLeft() {
       <div className="flex flex-row sm:flex-col items-center sm:items-start gap-2.5 pt-1 text-xs sm:text-sm md:text-base flex-wrap w-full">
         <Link
           target="_blank"
-          rel="noopener noreferrer"
+              rel="noopener noreferrer"
           href={whatsappContact()}
           prefetch={false}
           aria-label="Contact us on WhatsApp"
@@ -36,7 +36,7 @@ function FooterTopLeft() {
 
         <Link
           target="_blank"
-          rel="noopener noreferrer"
+              rel="noopener noreferrer"
           href={mobileContact()}
           prefetch={false}
           aria-label="Call us"

@@ -124,6 +124,7 @@ export default function CartHeader() {
                 <Link
                   href={whatsappContact(whatsappMessage())}
                   target="_blank"
+              rel="noopener noreferrer"
                   className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-green-50 transition-all text-green-700"
                 >
                   <WhatsappSVG dimensions={16} />

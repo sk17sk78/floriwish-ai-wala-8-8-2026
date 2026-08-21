@@ -1,3 +1,5 @@
+"use client";
+
 // libraries
 import Link from "next/link";
 
@@ -5,10 +7,7 @@ import Link from "next/link";
 import { User as UserIcon } from "lucide-react";
 
 // utils
-import { memo } from "react";
-
-// hooks
-import { useMemo } from "react";
+import { memo, useState, useEffect, useMemo } from "react";
 import { FRONTEND_LINKS } from "@/common/routes/frontend/staticLinks";
 
 function HeaderUserContent({
@@ -20,15 +19,22 @@ function HeaderUserContent({
   userName: string | null;
   onClick: () => void;
 }) {
-  // variables
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const userNameToShow = useMemo(
     () => userName?.split(" ")[0] || "Guest",
     [userName],
   );
 
+  const showLoggedIn = mounted && isAuthenticated;
+
   return (
     <>
-      {isAuthenticated ? (
+      {showLoggedIn ? (
         <Link
           href={FRONTEND_LINKS.DASHBOARD}
           prefetch={false}
@@ -37,7 +43,7 @@ function HeaderUserContent({
         >
           <div className="flex items-center gap-2 border border-charcoal-3/15 rounded-full px-3.5 py-1.5 transition-all duration-300 hover:bg-charcoal-3/5 hover:border-charcoal-3/25 bg-white/50 shadow-sm">
             <span className="relative overflow-hidden rounded-full aspect-square bg-gradient-to-br from-sienna-1/10 to-sienna-1/30 text-sienna-1 font-semibold w-6 h-6 grid place-items-center text-xs">
-              {userName?.slice(0, 1).toUpperCase()}
+              {userName?.slice(0, 1).toUpperCase() || "U"}
             </span>
             <span className="text-charcoal-3/95 font-medium text-sm">
               {userNameToShow.length > 10

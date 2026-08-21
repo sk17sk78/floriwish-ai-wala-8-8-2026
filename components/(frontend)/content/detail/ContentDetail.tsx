@@ -818,6 +818,7 @@ function ContentDetail({
             <Link
               href={whatsappContact(whatsappMessage)}
               target="_blank"
+              rel="noopener noreferrer"
               className="flex w-full items-center gap-3 rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4 transition-all duration-200 hover:border-emerald-200 hover:bg-emerald-50 hover:shadow-sm"
             >
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10">

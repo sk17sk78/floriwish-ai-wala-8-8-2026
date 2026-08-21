@@ -35,6 +35,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://floriwish.com"),
   title: "Floriwish - Send Gifts, Flowers, Cakes & Balloon Decoration",
   description: "Your One-Stop Shop for All Your Gifting & Celebration Needs",
   manifest: "/manifest.json",

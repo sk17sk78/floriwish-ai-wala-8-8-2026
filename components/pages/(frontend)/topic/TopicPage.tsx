@@ -80,6 +80,9 @@ function TopicPage({
       data: {
         Category: {
           name: topic.name || topic?.info?.heading || "",
+          categorySlug,
+          cityName: (topic?.city as CityDocument)?.name || (topic?.name ? topic.name.split(" in ")[1] : undefined),
+          image: (topic.media?.banner?.images?.[0]?.desktop as any)?.url || (topic.media?.banner?.images?.[0]?.mobile as any)?.url || "",
           breadcrumbs: [
             { label: "Homepage", url: "/" },
             ...breadcrumbs.map(({ label, link }) => ({ label, url: link }))
@@ -105,7 +108,7 @@ function TopicPage({
         }
       }
     }),
-    [slug, breadcrumbs, topic]
+    [slug, categorySlug, breadcrumbs, topic]
   );
 
   // event handlers

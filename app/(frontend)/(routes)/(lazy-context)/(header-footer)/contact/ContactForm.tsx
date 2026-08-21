@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { Send, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 
 export default function ContactForm() {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -15,6 +17,7 @@ export default function ContactForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("submitting");
+    setErrorMessage("");
 
     try {
       const res = await fetch("/api/action/contact", {
@@ -23,7 +26,11 @@ export default function ContactForm() {
         body: JSON.stringify(formData)
       });
 
-      if (!res.ok) throw new Error("Failed to submit");
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to submit message");
+      }
 
       setStatus("success");
       setFormData({
@@ -34,8 +41,9 @@ export default function ContactForm() {
         message: ""
       });
     } catch (error) {
-      console.error(error);
+      console.error("Contact form error:", error);
       setStatus("error");
+      setErrorMessage(error instanceof Error ? error.message : "Something went wrong. Please try again.");
     }
   };
 
@@ -45,19 +53,18 @@ export default function ContactForm() {
 
   if (status === "success") {
     return (
-      <div className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 text-center">
-        <div className="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-          <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-          </svg>
+      <div className="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-gray-100 text-center">
+        <div className="w-16 h-16 bg-[#f0fbf5] text-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <CheckCircle2 className="w-8 h-8" />
         </div>
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">Message Sent!</h3>
-        <p className="text-gray-500 mb-8">
-          Thank you for reaching out. We have received your message and will get back to you shortly.
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">Message Sent Successfully!</h3>
+        <p className="text-gray-500 mb-8 max-w-md mx-auto text-sm sm:text-base leading-relaxed">
+          Thank you for reaching out to Floriwish. Our celebration concierge team has received your message and will respond shortly.
         </p>
         <button
+          type="button"
           onClick={() => setStatus("idle")}
-          className="bg-[#b76e79] text-white font-bold py-3 px-8 rounded-xl hover:bg-[#a25a65] transition-all"
+          className="inline-flex items-center gap-2 bg-[#b76e79] hover:bg-[#a25d67] text-white font-semibold py-3 px-8 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
         >
           Send Another Message
         </button>
@@ -66,22 +73,21 @@ export default function ContactForm() {
   }
 
   return (
-    <div className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 relative">
-      {/* Decorative top border */}
-      <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#b76e79] to-[#d89ba5] rounded-t-[2.5rem]"></div>
+    <div className="bg-white p-7 sm:p-10 md:p-12 rounded-3xl shadow-sm border border-gray-100 relative">
+      <div className="mb-8">
+        <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 tracking-tight">
+          Send us a Message
+        </h3>
+        <p className="text-gray-500 text-sm sm:text-base">
+          Fill out the form below and we will get back to you directly.
+        </p>
+      </div>
 
-      <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-        Send us a Message
-      </h3>
-      <p className="text-gray-500 mb-8 border-b border-gray-100 pb-6 text-sm md:text-base">
-        Fill out the form below and we will get back to you directly.
-      </p>
-
-      <form className="space-y-6" onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Name */}
+      <form className="space-y-5" onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {/* Full Name */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
               Full Name <span className="text-rose-500">*</span>
             </label>
             <input
@@ -89,14 +95,15 @@ export default function ContactForm() {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="John Doe"
-              className="w-full px-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#b76e79]/20 focus:border-[#b76e79] transition-all text-gray-900 placeholder-gray-400"
+              placeholder="e.g. Rahul Sharma"
+              className="w-full px-4 py-3 bg-[#FAF7F2]/60 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#b76e79]/20 focus:border-[#b76e79] transition-all text-gray-900 placeholder-gray-400 text-sm"
               required
             />
           </div>
-          {/* Phone */}
+
+          {/* Phone Number */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
               Phone Number <span className="text-rose-500">*</span>
             </label>
             <input
@@ -104,8 +111,8 @@ export default function ContactForm() {
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              placeholder="+91 99999 00000"
-              className="w-full px-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#b76e79]/20 focus:border-[#b76e79] transition-all text-gray-900 placeholder-gray-400"
+              placeholder="+91 98765 43210"
+              className="w-full px-4 py-3 bg-[#FAF7F2]/60 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#b76e79]/20 focus:border-[#b76e79] transition-all text-gray-900 placeholder-gray-400 text-sm"
               required
             />
           </div>
@@ -113,7 +120,7 @@ export default function ContactForm() {
 
         {/* Email */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+          <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
             Email Address <span className="text-rose-500">*</span>
           </label>
           <input
@@ -121,52 +128,49 @@ export default function ContactForm() {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            placeholder="john@example.com"
-            className="w-full px-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#b76e79]/20 focus:border-[#b76e79] transition-all text-gray-900 placeholder-gray-400"
+            placeholder="rahul@example.com"
+            className="w-full px-4 py-3 bg-[#FAF7F2]/60 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#b76e79]/20 focus:border-[#b76e79] transition-all text-gray-900 placeholder-gray-400 text-sm"
             required
           />
         </div>
 
         {/* Subject */}
-        <div className="relative">
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-            Subject <span className="text-rose-500">*</span>
+        <div>
+          <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+            Inquiry Topic <span className="text-rose-500">*</span>
           </label>
           <select
             name="subject"
             value={formData.subject}
             onChange={handleChange}
-            className="w-full px-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#b76e79]/20 focus:border-[#b76e79] transition-all text-gray-900 appearance-none cursor-pointer"
+            className="w-full px-4 py-3 bg-[#FAF7F2]/60 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#b76e79]/20 focus:border-[#b76e79] transition-all text-gray-900 text-sm cursor-pointer"
             required
           >
-            <option value="" disabled className="text-gray-400">
-              Select a topic
+            <option value="" disabled>
+              Select a subject
             </option>
-            <option value="order_status">Order Status / Tracking</option>
-            <option value="bulk_order">Bulk / Corporate Order</option>
-            <option value="vendor_issue">Vendor / Partner Inquiry</option>
-            <option value="feedback">Feedback / Suggestion</option>
-            <option value="other">Other</option>
+            <option value="order_status">Order Status & Delivery Tracking</option>
+            <option value="custom_order">Custom Cake / Floral Design</option>
+            <option value="balloon_decor">Balloon & Event Decoration Booking</option>
+            <option value="bulk_corporate">Bulk / Corporate Gifting</option>
+            <option value="vendor_franchise">Vendor / Franchise Partnership</option>
+            <option value="feedback">Feedback & Suggestions</option>
+            <option value="other">Other Inquiry</option>
           </select>
-          <div className="absolute inset-y-0 right-4 top-8 flex items-center pointer-events-none text-gray-400">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </div>
         </div>
 
         {/* Message */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+          <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
             Your Message <span className="text-rose-500">*</span>
           </label>
           <textarea
             name="message"
             value={formData.message}
             onChange={handleChange}
-            placeholder="How can we help you today?"
-            rows={5}
-            className="w-full px-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#b76e79]/20 focus:border-[#b76e79] transition-all text-gray-900 placeholder-gray-400 resize-none"
+            placeholder="Tell us how we can help you..."
+            rows={4}
+            className="w-full px-4 py-3 bg-[#FAF7F2]/60 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#b76e79]/20 focus:border-[#b76e79] transition-all text-gray-900 placeholder-gray-400 text-sm resize-none"
             required
           ></textarea>
         </div>
@@ -176,15 +180,27 @@ export default function ContactForm() {
           <button
             type="submit"
             disabled={status === "submitting"}
-            className="w-full bg-[#b76e79] text-white font-bold text-lg py-4 rounded-xl hover:bg-[#a25a65] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
+            className="w-full bg-[#b76e79] hover:bg-[#a25d67] text-white font-bold text-base py-3.5 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {status === "submitting" ? "Sending..." : "Send Message"}
+            {status === "submitting" ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>Sending Message...</span>
+              </>
+            ) : (
+              <>
+                <span>Send Message</span>
+                <Send className="w-4 h-4" />
+              </>
+            )}
           </button>
         </div>
+
         {status === "error" && (
-          <p className="text-rose-500 text-sm text-center">
-            Something went wrong. Please try again later.
-          </p>
+          <div className="flex items-center gap-2 text-rose-600 text-sm bg-rose-50 p-3 rounded-xl border border-rose-100">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{errorMessage || "Something went wrong. Please try again later."}</span>
+          </div>
         )}
       </form>
     </div>

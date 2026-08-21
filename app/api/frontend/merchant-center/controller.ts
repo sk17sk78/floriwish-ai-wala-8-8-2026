@@ -8,20 +8,31 @@ import { get as getFromRedis, set as setToRedis } from "@/db/redis/methods";
 
 const { Contents } = models;
 
-const GMC_CACHE_KEY = "google_merchant_center_products_feed_v1";
+const GMC_CACHE_KEY = "google_merchant_center_products_feed_v2";
 
 /**
- * Maps internal category names to Google Product Categories
+ * Maps internal category & product names to official Google Product Taxonomy IDs
  * 166: Home & Garden > Plants > Flowers
  * 5420: Food, Beverages & Tobacco > Food Items > Bakery > Cakes
  * 5421: Home & Garden > Decor > Seasonal & Holiday Decorations > Gift Baskets
+ * 188: Apparel & Accessories > Jewelry
  */
-function getGoogleCategory(categoryName: string): string {
-    const name = (categoryName || "").toLowerCase();
-    if (name.includes("flower") || name.includes("bouquet") || name.includes("rose") || name.includes("plant")) return "166";
-    if (name.includes("cake") || name.includes("bakery") || name.includes("pastry")) return "5420";
-    if (name.includes("gift") || name.includes("combo") || name.includes("hamper") || name.includes("balloon")) return "5421";
-    return "166"; // Default
+function getGoogleCategory(categoryName: string, productName: string): string {
+    const combined = `${categoryName || ""} ${productName || ""}`.toLowerCase();
+    
+    if (combined.includes("kalire") || combined.includes("jeweller") || combined.includes("varmala") || combined.includes("jaimala")) {
+        return "188"; // Jewelry / Wedding accessories
+    }
+    if (combined.includes("cake") || combined.includes("bakery") || combined.includes("pastry") || combined.includes("bento")) {
+        return "5420"; // Bakery & Cakes
+    }
+    if (combined.includes("balloon") || combined.includes("decor") || combined.includes("gift") || combined.includes("combo") || combined.includes("hamper") || combined.includes("teddy")) {
+        return "5421"; // Decorations & Gift Baskets
+    }
+    if (combined.includes("flower") || combined.includes("bouquet") || combined.includes("rose") || combined.includes("orchid") || combined.includes("lily") || combined.includes("plant")) {
+        return "166"; // Plants & Flowers
+    }
+    return "166"; // Default standard
 }
 
 function cleanText(text: string | undefined | null, maxLength = 150): string {
@@ -36,7 +47,9 @@ function cleanText(text: string | undefined | null, maxLength = 150): string {
 
 export const getMerchantCenterData = async (): Promise<MerchantCenterProductsType[]> => {
     try {
-        // 1. Try Redis cache first (50ms response for GMC crawlers)
+        const canonicalDomain = DOMAIN && !DOMAIN.includes("localhost") ? DOMAIN.replace(/\/+$/, "") : "https://floriwish.com";
+
+        // 1. Try Redis cache first (instant response for GMC crawlers)
         const cachedData = await getFromRedis<MerchantCenterProductsType[]>({
             key: GMC_CACHE_KEY
         });
@@ -47,10 +60,10 @@ export const getMerchantCenterData = async (): Promise<MerchantCenterProductsTyp
 
         await connectDB();
 
-        // 2. Fetch using high-performance aggregation pipeline (lightweight wire transfer)
+        // 2. Fetch active products using aggregation pipeline
         const products = await Contents.aggregate([
-            { $match: { isActive: true, type: "product" } },
-            { $sort: { name: 1 } },
+            { $match: { isActive: true, type: { $in: ["product", "service"] } } },
+            { $sort: { updatedAt: -1 } },
             {
                 $lookup: {
                     from: "images",
@@ -91,16 +104,16 @@ export const getMerchantCenterData = async (): Promise<MerchantCenterProductsTyp
             const categoryName = p.categoryName || "";
             const rawImageUrl = p.imageUrl || "";
             const imageUrl = rawImageUrl
-                ? convertToCloudFrontUrl(rawImageUrl.startsWith("http") ? rawImageUrl : `${DOMAIN}${rawImageUrl.startsWith("/") ? "" : "/"}${rawImageUrl}`)
-                : `${DOMAIN}/placeholders/product.webp`;
+                ? convertToCloudFrontUrl(rawImageUrl.startsWith("http") ? rawImageUrl : `${canonicalDomain}${rawImageUrl.startsWith("/") ? "" : "/"}${rawImageUrl}`)
+                : `${canonicalDomain}/placeholders/product.webp`;
 
             const rawPrice = Number(p.price || p.mrp || 0);
             const priceFormatted = `${rawPrice.toFixed(2)} INR`;
 
             const skuId = String(p.sku || p._id || p.slug);
             const title = cleanText(p.name, 150);
-            const description = cleanText(p.seoDescription || p.name || "Floriwish online flower and gift delivery", 5000);
-            const productLink = `${DOMAIN}${FRONTEND_LINKS.PRODUCT_PAGE}/${p.slug}`;
+            const description = cleanText(p.seoDescription || p.name || "Floriwish online flower, cake and gift delivery", 5000);
+            const productLink = `${canonicalDomain}/product/${p.slug.replace(/^\/+/, "")}`;
 
             return {
                 id: skuId,
@@ -109,11 +122,11 @@ export const getMerchantCenterData = async (): Promise<MerchantCenterProductsTyp
                 link: productLink,
                 image_link: imageUrl,
                 price: priceFormatted,
-                availability: "in stock",
+                availability: "in_stock",
                 brand: "Floriwish",
                 condition: "new",
                 identifier_exists: "no",
-                google_product_category: getGoogleCategory(categoryName),
+                google_product_category: getGoogleCategory(categoryName, p.name),
                 shipping: "IN::Standard:0.00 INR",
                 store_code: "MAIN"
             };

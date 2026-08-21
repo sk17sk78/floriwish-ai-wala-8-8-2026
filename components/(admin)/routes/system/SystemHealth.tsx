@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Cloud, Database, Loader2, Package, Server } from "lucide-react";
 import { useState } from "react";
+import { X_API_KEY } from "@/common/constants/environmentVariables";
 
 interface HealthStatus {
   status: string;
@@ -34,7 +35,7 @@ export default function SystemHealth() {
     try {
       const response = await fetch("/api/health", {
         headers: {
-          "x-api-key": process.env.NEXT_PUBLIC_X_API_KEY || ""
+          "x-api-key": X_API_KEY
         }
       });
       const data = await response.json();
@@ -51,7 +52,7 @@ export default function SystemHealth() {
       const response = await fetch("/api/admin/seed-products", {
         method: "POST",
         headers: {
-          "x-api-key": process.env.NEXT_PUBLIC_X_API_KEY || ""
+          "x-api-key": X_API_KEY
         }
       });
       const data = await response.json();

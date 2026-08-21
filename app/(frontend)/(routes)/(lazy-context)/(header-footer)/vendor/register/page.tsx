@@ -10,7 +10,6 @@ import {
   CreditCard,
   PhoneCall,
   ShieldCheck,
-  Sparkles,
   Store,
   TrendingUp,
   Truck,
@@ -75,9 +74,8 @@ export default function VendorRegisterPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
         {/* Header Hero Section */}
         <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ad2355]/10 border border-[#ad2355]/20 text-[#ad2355] text-[11px] sm:text-xs font-semibold tracking-wide uppercase mb-3">
-            <Sparkles className="w-3 h-3" />
-            <span>Floriwish Partner Network</span>
+          <div className="inline-block px-3 py-1 rounded-full bg-[#ad2355]/10 border border-[#ad2355]/20 text-[#ad2355] text-[11px] sm:text-xs font-semibold tracking-wide uppercase mb-3">
+            Floriwish Partner Network
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 tracking-tight leading-tight">
             Grow Your Gifting Business <br className="hidden sm:inline" />

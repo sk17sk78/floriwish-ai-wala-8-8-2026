@@ -495,6 +495,7 @@ export default function CustomerReviewManagement() {
                       <Link
                         href={`/${prodType}/${prodSlug}`}
                         target="_blank"
+              rel="noopener noreferrer"
                         className="text-[#ad2355] font-semibold hover:underline inline-flex items-center gap-1 shrink-0 ml-1.5"
                       >
                         <span>View Page</span>

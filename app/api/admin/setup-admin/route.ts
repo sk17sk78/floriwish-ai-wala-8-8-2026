@@ -1,11 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/db/mongoose/connection";
 import models from "@/db/mongoose/models";
+import bcrypt from "bcryptjs";
+import { X_API_KEY } from "@/common/constants/environmentVariables";
+
 export async function POST(request: NextRequest) {
   try {
+    // Auth guard: only allow requests with a valid X-API-Key header
+    const apiKey = request.headers.get("x-api-key");
+    if (!apiKey || apiKey !== X_API_KEY) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
     await connectDB();
 
     const { email, password, name } = await request.json();
+
+    if (!email || !password) {
+      return NextResponse.json(
+        { success: false, message: "Email and password are required" },
+        { status: 400 }
+      );
+    }
 
     // Check if admin already exists
     const existingAdmin = await models.Admins.findOne({ 
@@ -19,8 +38,8 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // For demo purposes, we'll store password as plain text (in production, use proper hashing)
-    const hashedPassword = password;
+    // Hash password with bcrypt before storing
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     // Create admin user
     const admin = new models.Admins({

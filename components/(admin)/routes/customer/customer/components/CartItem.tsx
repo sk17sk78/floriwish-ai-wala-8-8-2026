@@ -155,6 +155,7 @@ export default function CartItem({
               <Link
                 href={`/product/${contentSlug}`}
                 target="_blank"
+              rel="noopener noreferrer"
                 className="text-zinc-400 hover:text-rose-600 transition-colors"
                 title="View product on website"
               >

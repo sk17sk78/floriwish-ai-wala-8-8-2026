@@ -11,63 +11,83 @@ import { DOMAIN } from "@/common/constants/environmentVariables";
 
 export const dynamic = "force-dynamic";
 
+function escapeXml(str: string): string {
+  if (!str) return "";
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
 export async function GET() {
   try {
+    const canonicalDomain = DOMAIN.includes("localhost") ? "https://floriwish.com" : DOMAIN;
+
     const [
-      homepageImages,
-      categoryImages,
       productImages,
+      categoryImages,
       serviceImages,
       topicImages,
       subTopicImages,
-      blogImages
+      blogImages,
+      homepageImages
     ] = await Promise.all([
-      getHomepageImagesSitemapData(),
-      getCategoryImagesSitemapData(),
       getProductImagesSitemapData(),
+      getCategoryImagesSitemapData(),
       getServiceImagesSitemapData(),
       getTopicImagesSitemapData(),
       getSubTopicImagesSitemapData(),
-      getBlogImagesSitemapData()
+      getBlogImagesSitemapData(),
+      getHomepageImagesSitemapData()
     ]);
 
     const allImageData = [
-      ...(homepageImages || []),
-      ...(categoryImages || []),
       ...(productImages || []),
+      ...(categoryImages || []),
       ...(serviceImages || []),
       ...(topicImages || []),
       ...(subTopicImages || []),
-      ...(blogImages || [])
-    ];
+      ...(blogImages || []),
+      ...(homepageImages || [])
+    ].filter((item) => item && item.images && item.images.length > 0);
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-  ${allImageData
-    .map((item) => {
-      const loc = `${DOMAIN}${item.slug.startsWith("/") ? "" : "/"}${item.slug}`;
-      return `
-  <url>
-    <loc>${loc}</loc>
-    ${item.images
-      .filter((img) => img)
+${allImageData
+  .map((item) => {
+    const slugPath = item.slug === "/" ? "" : item.slug.startsWith("/") ? item.slug : `/${item.slug}`;
+    const loc = `${canonicalDomain}${slugPath}`;
+    let rawTitle = (item.name || "Floriwish").trim().replace(/https?:\/\/localhost(:\d+)?/gi, "Floriwish");
+    const cleanTitle = escapeXml(rawTitle);
+
+    const imageBlocks = item.images
+      .filter((img) => typeof img === "string" && img.startsWith("http"))
       .map(
-        (img) => `
-    <image:image>
-      <image:loc>${img}</image:loc>
-      <image:caption>${item.name.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</image:caption>
+        (img) => `    <image:image>
+      <image:loc>${escapeXml(img)}</image:loc>
+      <image:title>${cleanTitle}</image:title>
+      <image:caption>${cleanTitle}</image:caption>
     </image:image>`
       )
-      .join("")}
+      .join("\n");
+
+    if (!imageBlocks) return "";
+
+    return `  <url>
+    <loc>${loc}</loc>
+${imageBlocks}
   </url>`;
-    })
-    .join("")}
+  })
+  .filter(Boolean)
+  .join("\n")}
 </urlset>`;
 
     return new Response(xml, {
       headers: {
-        "Content-Type": "application/xml",
+        "Content-Type": "application/xml; charset=utf-8",
         "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=43200"
       }
     });

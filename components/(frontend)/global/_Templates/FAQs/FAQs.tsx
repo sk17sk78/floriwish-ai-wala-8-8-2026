@@ -1,7 +1,7 @@
 "use client";
 
 // icons
-import { ChevronDown, HelpCircle, MessageCircleQuestion, Sparkles } from "lucide-react";
+import { ChevronDown, HelpCircle, MessageCircleQuestion } from "lucide-react";
 
 // types
 import { ClassNameType } from "@/common/types/reactTypes";

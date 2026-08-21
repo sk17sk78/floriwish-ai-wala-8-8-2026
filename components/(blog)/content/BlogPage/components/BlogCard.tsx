@@ -1,9 +1,9 @@
-/* eslint-disable @next/next/no-img-element */
 // icons
 import moment from "moment";
 
 // components
 import OptimizedImage from "@/components/ui/optimized-image";
+import NextImage from "@/components/custom/NextImage";
 import Link from "next/link";
 
 // types
@@ -49,7 +49,15 @@ export default function BlogCard({
           <div className="flex items-center gap-1.5 text-xs text-zinc-500 pt-1 border-t border-zinc-100 mt-1">
             <div className="h-5 w-5 rounded-full bg-rose-50 text-sienna-1 flex items-center justify-center font-bold text-[10px] uppercase shrink-0 overflow-hidden border border-rose-100">
               {authorPhoto ? (
-                <img src={authorPhoto} alt={authorName} className="h-full w-full object-cover" />
+                <div className="relative h-full w-full">
+                  <NextImage
+                    src={authorPhoto}
+                    alt={authorName || "Author"}
+                    fill
+                    sizes="20px"
+                    className="object-cover"
+                  />
+                </div>
               ) : (
                 initial
               )}

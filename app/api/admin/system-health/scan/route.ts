@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { X_API_KEY } from "@/common/constants/environmentVariables";
 
 export const dynamic = "force-dynamic";
 
@@ -538,7 +539,7 @@ async function probeEndpoint(api: RegisteredAPI, origin: string): Promise<APISca
     const res = await fetch(url, {
       method: api.method,
       headers: {
-        "x-api-key": process.env.NEXT_PUBLIC_X_API_KEY || "1tNMPQvO5jA8EgR2sJLI2MGoPKYqgo",
+        "x-api-key": X_API_KEY,
         "User-Agent": "Floriwish-API-Health-Monitor/2.0",
         Accept: "application/json, text/plain, */*",
       },

@@ -53,6 +53,7 @@ export default function VendorRegistrationBanner(
               <Link
                 href={`tel:${COMPANY_NUMBER}`}
                 target="_blank"
+              rel="noopener noreferrer"
               >
                 <div className="rounded-xl flex items-center justify-center gap-2 bg-ivory-1 py-3.5 font-medium shadow-md text-sienna-1 transition-all duration-300 cursor-pointer">
                   <Headphones
@@ -65,6 +66,7 @@ export default function VendorRegistrationBanner(
               <Link
                 href={whatsappContact()}
                 target="_blank"
+              rel="noopener noreferrer"
               >
                 <div className="rounded-xl flex items-center justify-center gap-2  bg-ivory-1 py-3.5 font-medium shadow-md text-green-700 transition-all duration-300 cursor-pointer">
                   <WhatsappSVG
@@ -77,6 +79,7 @@ export default function VendorRegistrationBanner(
               <Link
                 href={`mailto:${COMPANY_EMAIL}`}
                 target="_blank"
+              rel="noopener noreferrer"
               >
                 <div className="rounded-xl flex items-center justify-center gap-2 bg-ivory-1 py-3.5 font-medium shadow-md text-sienna-1 transition-all duration-300 cursor-pointer">
                   <Mail

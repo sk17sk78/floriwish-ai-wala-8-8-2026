@@ -16,6 +16,6 @@ export const WEBSITE_NAME = process.env.NEXT_PUBLIC_WEBSITE_NAME || "Floriwish";
 export const WEBSITE_HOST = process.env.NEXT_PUBLIC_WEBSITE_HOST || "floriwish.com";
 
 export const COMPANY_EMAIL_ENV = process.env.NEXT_PUBLIC_EMAIL || "info@floriwish.com";
-export const COMPANY_MOBILE_ENV = process.env.NEXT_PUBLIC_MOBILE || "+919876543210";
+export const COMPANY_MOBILE_ENV = process.env.NEXT_PUBLIC_MOBILE || "+918708388018";
 export const COMPANY_LOGO_URL_ENV = process.env.NEXT_PUBLIC_LOGO_URL || "";
 export const COMPANY_URL_ENV = process.env.NEXT_PUBLIC_URL || "https://floriwish.com";

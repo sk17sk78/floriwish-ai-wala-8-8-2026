@@ -81,7 +81,7 @@ export default function StickyButtons() {
       <Link
         href={`tel:${COMPANY_NUMBER}`}
         target="_blank"
-        rel="noopener noreferrer"
+              rel="noopener noreferrer"
         prefetch={false}
         aria-label="Call us"
         className="block"
@@ -99,7 +99,7 @@ export default function StickyButtons() {
       <Link
         href={whatsappContact(msg)}
         target="_blank"
-        rel="noopener noreferrer"
+              rel="noopener noreferrer"
         prefetch={false}
         aria-label="Contact us on WhatsApp"
         className="block"

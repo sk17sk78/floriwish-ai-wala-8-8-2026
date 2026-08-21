@@ -66,8 +66,9 @@ export const getHomepageImagesSitemapData = async (): Promise<
           });
         }
 
+        const brandName = WEBSITE_NAME && !WEBSITE_NAME.includes("http") ? WEBSITE_NAME : "Floriwish";
         return {
-          name: `${WEBSITE_NAME} Banner`,
+          name: `${brandName} Banner`,
           slug: "/",
           images
         };

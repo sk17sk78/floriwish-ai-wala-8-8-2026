@@ -31,6 +31,7 @@ export default function GlobalBG({ children }: { children: Children }) {
           <Link
             href={whatsappContact()}
             target="_blank"
+              rel="noopener noreferrer"
           >
             <div className="group aspect-square rounded-full p-4 bg-ivory-2 shadow-md border border-ash/50 text-purple-500 fill-purple-500 transition-all duration-300 cursor-pointer hover:bg-purple-500">
               <Phone
@@ -45,6 +46,7 @@ export default function GlobalBG({ children }: { children: Children }) {
           <Link
             href={whatsappContact()}
             target="_blank"
+              rel="noopener noreferrer"
           >
             <div className="group aspect-square rounded-full p-4 bg-ivory-2 shadow-md border border-ash/50 text-green-600 transition-all duration-300 cursor-pointer hover:bg-green-600 hover:text-white">
               <WhatsappSVG

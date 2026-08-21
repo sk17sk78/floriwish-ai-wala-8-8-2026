@@ -11,12 +11,14 @@ type SchemaOrgLayouts<T, K extends keyof T> = T[K] extends any[]
 // precise data filling is left ...
 export type SchemaOrgSections = {
   Home: [Schema.FAQPage, Schema.WebSite, Schema.Corporation];
-  Category: [
-    Schema.FAQPage,
-    Schema.WebSite,
-    Schema.BreadcrumbList,
-    Schema.Product
-  ];
+  Category: (
+    | Schema.FAQPage
+    | Schema.WebSite
+    | Schema.BreadcrumbList
+    | Schema.Product
+    | Schema.LocalBusiness
+    | any
+  )[];
   Content: [
     Schema.WebSite,
     Schema.WebPage,
@@ -131,6 +133,9 @@ export type SchemaDataType = {
           description?: string;
           // contents: ContentSchemaType[];
           product: ProductSchemaType;
+          categorySlug?: string;
+          cityName?: string;
+          image?: string;
         }
       : k extends "Content"
         ? {

@@ -38,7 +38,7 @@ function FooterBottomLeft() {
             key={idx}
             href={s.href}
             target="_blank"
-            rel="noopener noreferrer"
+              rel="noopener noreferrer"
             prefetch={false}
             aria-label={s.label}
             className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white border border-charcoal-3/15 text-charcoal-3/80 hover:text-sienna hover:border-sienna/40 flex items-center justify-center transition-all duration-200 shadow-2xs hover:scale-105"

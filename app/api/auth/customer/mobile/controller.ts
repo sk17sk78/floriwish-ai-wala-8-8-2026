@@ -104,10 +104,6 @@ export const send = async (mobileNumber: string): Promise<string> => {
     );
 
     if (!response.orderId) {
-      // console.log({
-      //   sendOTPErrorResponse: response
-      // });
-
       return "";
     }
 
@@ -127,10 +123,6 @@ export const resend = async (orderId: string): Promise<string> => {
     );
 
     if (!response.orderId) {
-      // console.log({
-      //   resendOTPErrorResponse: response
-      // });
-
       return "";
     }
 

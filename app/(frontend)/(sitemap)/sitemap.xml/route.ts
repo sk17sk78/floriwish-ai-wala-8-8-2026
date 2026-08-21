@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { COMPANY_URL_ENV } from "@/common/constants/environmentVariables";
+import { DOMAIN, COMPANY_URL_ENV } from "@/common/constants/environmentVariables";
 import { GENERATE_SITEMAP } from "@/config/sitemap";
 
 export const dynamic = "force-dynamic";
@@ -9,25 +9,30 @@ export async function GET() {
     return new NextResponse("", { status: 404 });
   }
 
-  const baseUrl = (COMPANY_URL_ENV || "https://floriwish.com").replace(/\/+$/, "");
-  const lastMod = new Date().toISOString();
+  const rawDomain = COMPANY_URL_ENV || DOMAIN || "https://floriwish.com";
+  const baseUrl = rawDomain.includes("localhost") ? "https://floriwish.com" : rawDomain.replace(/\/+$/, "");
+  const lastMod = new Date().toISOString().split("T")[0]; // YYYY-MM-DD format like Giftlaya
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
-    <loc>${baseUrl}/products/sitemap.xml</loc>
+    <loc>${baseUrl}/category/sitemap.xml</loc>
     <lastmod>${lastMod}</lastmod>
   </sitemap>
   <sitemap>
-    <loc>${baseUrl}/categories/sitemap.xml</loc>
+    <loc>${baseUrl}/page/sitemap.xml</loc>
     <lastmod>${lastMod}</lastmod>
   </sitemap>
   <sitemap>
-    <loc>${baseUrl}/pages/sitemap.xml</loc>
+    <loc>${baseUrl}/product/sitemap.xml</loc>
     <lastmod>${lastMod}</lastmod>
   </sitemap>
   <sitemap>
-    <loc>${baseUrl}/blogs/sitemap.xml</loc>
+    <loc>${baseUrl}/service/sitemap.xml</loc>
+    <lastmod>${lastMod}</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>${baseUrl}/blog/sitemap.xml</loc>
     <lastmod>${lastMod}</lastmod>
   </sitemap>
   <sitemap>

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { X_API_KEY } from "@/common/constants/environmentVariables";
 import {
   Activity,
   Server,
@@ -154,7 +155,7 @@ export default function SystemHealthMonitor() {
   const fetchInfraStatus = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/system-health/system-status", {
-        headers: { "x-api-key": process.env.NEXT_PUBLIC_X_API_KEY || "1tNMPQvO5jA8EgR2sJLI2MGoPKYqgo" },
+        headers: { "x-api-key": X_API_KEY },
       });
       const data = await res.json();
       if (data.success) {
@@ -165,15 +166,18 @@ export default function SystemHealthMonitor() {
     }
   }, []);
 
+  const isScanningRef = useRef(false);
+
   // Run Full API Scan
   const runFullScan = useCallback(async () => {
-    if (isScanning) return;
+    if (isScanningRef.current) return;
+    isScanningRef.current = true;
     setIsScanning(true);
     try {
       const res = await fetch("/api/admin/system-health/scan", {
         method: "POST",
         headers: {
-          "x-api-key": process.env.NEXT_PUBLIC_X_API_KEY || "1tNMPQvO5jA8EgR2sJLI2MGoPKYqgo",
+          "x-api-key": X_API_KEY,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({}),
@@ -194,16 +198,17 @@ export default function SystemHealthMonitor() {
     } catch (err: any) {
       showToast(err.message || "Network error during scan", "error");
     } finally {
+      isScanningRef.current = false;
       setIsScanning(false);
-      fetchInfraStatus();
     }
-  }, [isScanning, showToast, fetchInfraStatus]);
+  }, [showToast]);
 
-  // Initial Load
+  // Initial Load once on mount
   useEffect(() => {
     fetchInfraStatus();
     runFullScan();
-  }, [fetchInfraStatus, runFullScan]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Test Single API
   const handleTestSingleApi = async (item: APIScanItem) => {
@@ -212,7 +217,7 @@ export default function SystemHealthMonitor() {
       const res = await fetch("/api/admin/system-health/scan", {
         method: "POST",
         headers: {
-          "x-api-key": process.env.NEXT_PUBLIC_X_API_KEY || "1tNMPQvO5jA8EgR2sJLI2MGoPKYqgo",
+          "x-api-key": X_API_KEY,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ id: item.id }),

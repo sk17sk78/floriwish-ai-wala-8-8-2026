@@ -142,6 +142,7 @@ export default function FrontendProductColor({
                 <Link
                   href={whatsappContact()}
                   target="_blank"
+              rel="noopener noreferrer"
                   // prefetch
                   className="underline underline-offset-2 flex items-center justify-start gap-x-1 text-green-700"
                 >

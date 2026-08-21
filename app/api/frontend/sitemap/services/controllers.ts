@@ -5,36 +5,35 @@ import connectDB from "@/db/mongoose/connection";
 import models from "@/db/mongoose/models";
 const { Contents } = models;
 
-// utils
-import { handleError } from "@/common/utils/api/error";
-
 // types
-import { type MongooseErrorType } from "@/common/types/apiTypes";
 import { type SitemapData } from "@/common/types/sitemap";
+import { FRONTEND_LINKS } from "@/common/routes/frontend/staticLinks";
 
-// controllers
+// controllers - Only individual service packages / items (same as Giftlaya /s/ items)
 export const getSitemapData = async (): Promise<SitemapData[] | null> => {
   try {
     await connectDB();
 
-    const products = await Contents.find({
+    const services = await Contents.find({
       isActive: true,
       type: "service"
     })
       .select(["slug", "updatedAt"])
-      .sort({ updatedAt: -1 });
+      .sort({ updatedAt: -1 })
+      .lean();
 
-    if (!products) {
-      return null;
+    if (!services) {
+      return [];
     }
 
-    const sitemapData: SitemapData[] = products.map(({ slug, updatedAt }) => ({
-      slug: `s/${slug}`,
+    const sitemapData: SitemapData[] = services.map(({ slug, updatedAt }) => ({
+      slug: `product/${slug.trim().replace(/^\/+/, "")}`,
       updatedAt
     }));
 
     return sitemapData;
   } catch (error: any) {
-    return null;
+    console.error("Error fetching services sitemap data:", error);
+    return [];
   }
 };

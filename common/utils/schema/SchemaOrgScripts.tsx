@@ -154,10 +154,17 @@ export const SchemaOrgScripts = ({
 
   // CATEGORY ############################################
   if (pageType === "Category") {
-    const schema: SchemaOrgType<"Category"> = [
+    const schema: (SchemaOrgType<"Category">[number] | object)[] = [
       faqSchema({ faqs: Category?.faqs || [], url }),
       WEBSITE_SCHEMA,
       breadcrumbsSchema({ breadcrumbs: Category?.breadcrumbs || [], url }),
+      localBusinessSchema({
+        categorySlug: Category?.categorySlug,
+        categoryName: Category?.name,
+        cityName: Category?.cityName,
+        url,
+        image: Category?.image || ORGANIZATION_LOGO
+      }),
       productSchemaNew({
         name: Category?.product?.name || "Category",
         description: Category?.product?.description || "",
@@ -303,6 +310,115 @@ const faqSchema = ({
     name: ORGANIZATION_NAME
   }
 });
+
+export function getLocalBusinessType(
+  categorySlug: string = "",
+  categoryName: string = ""
+): string {
+  const combined = `${categorySlug} ${categoryName}`.toLowerCase();
+
+  // Flowers & Bouquets
+  if (
+    combined.includes("flower") ||
+    combined.includes("rose") ||
+    combined.includes("bouquet") ||
+    combined.includes("plant") ||
+    combined.includes("carnation") ||
+    combined.includes("lily") ||
+    combined.includes("orchid") ||
+    combined.includes("gerbera")
+  ) {
+    return "Florist";
+  }
+
+  // Cakes & Bakery
+  if (
+    combined.includes("cake") ||
+    combined.includes("bakery") ||
+    combined.includes("pastry") ||
+    combined.includes("cupcake")
+  ) {
+    return "Bakery";
+  }
+
+  // Balloon & Event / Wedding Decoration
+  if (
+    combined.includes("balloon") ||
+    combined.includes("decor") ||
+    combined.includes("wedding") ||
+    combined.includes("event") ||
+    combined.includes("party")
+  ) {
+    return "EventPlanner";
+  }
+
+  // Gifts & Hampers
+  if (
+    combined.includes("gift") ||
+    combined.includes("hamper") ||
+    combined.includes("combo") ||
+    combined.includes("chocolate")
+  ) {
+    return "GiftShop";
+  }
+
+  return "LocalBusiness";
+}
+
+const localBusinessSchema = ({
+  categorySlug,
+  categoryName,
+  cityName,
+  url,
+  image
+}: {
+  categorySlug?: string;
+  categoryName?: string;
+  cityName?: string;
+  url: string;
+  image?: string;
+}) => {
+  const businessType = getLocalBusinessType(categorySlug, categoryName);
+  const title = cityName
+    ? `${ORGANIZATION_NAME} - ${categoryName || "Gifts, Flowers & Cakes"} in ${cityName}`
+    : `${ORGANIZATION_NAME} - ${categoryName || "Gifts, Flowers & Cakes"}`;
+
+  return {
+    "@type": businessType,
+    "@id": `${url}#localbusiness`,
+    name: title,
+    url: url,
+    image: image || ORGANIZATION_LOGO,
+    telephone: MOBILE_NO,
+    priceRange: "₹₹",
+    currenciesAccepted: "INR",
+    paymentAccepted: "Cash, Credit Card, UPI, Net Banking",
+    parentOrganization: {
+      "@type": "Organization",
+      name: ORGANIZATION_NAME,
+      url: DEFAULT_URL,
+      logo: ORGANIZATION_LOGO
+    },
+    ...(cityName
+      ? {
+          areaServed: {
+            "@type": "City",
+            name: cityName
+          },
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: cityName,
+            addressCountry: "IN"
+          }
+        }
+      : {
+          areaServed: {
+            "@type": "Country",
+            name: "India"
+          }
+        })
+  };
+};
 
 const breadcrumbsSchema = ({
   url,

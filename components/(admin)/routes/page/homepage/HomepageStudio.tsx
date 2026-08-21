@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { X_API_KEY } from "@/common/constants/environmentVariables";
 import {
   Globe,
   Layout,
@@ -66,7 +67,7 @@ export default function HomepageStudio() {
     try {
       setIsLoading(true);
       const res = await fetch("/api/admin/homepage-management", {
-        headers: { "x-api-key": process.env.NEXT_PUBLIC_X_API_KEY || "1tNMPQvO5jA8EgR2sJLI2MGoPKYqgo" },
+        headers: { "x-api-key": X_API_KEY },
       });
       const data = await res.json();
       if (data.success && data.data) {
@@ -102,7 +103,7 @@ export default function HomepageStudio() {
       const res = await fetch("/api/admin/homepage-management", {
         method: "POST",
         headers: {
-          "x-api-key": process.env.NEXT_PUBLIC_X_API_KEY || "1tNMPQvO5jA8EgR2sJLI2MGoPKYqgo",
+          "x-api-key": X_API_KEY,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -260,7 +261,7 @@ export default function HomepageStudio() {
       showToast("Clearing homepage cache...", "info");
       const res = await fetch("/api/admin/reset-cache/redis", {
         method: "POST",
-        headers: { "x-api-key": process.env.NEXT_PUBLIC_X_API_KEY || "1tNMPQvO5jA8EgR2sJLI2MGoPKYqgo" },
+        headers: { "x-api-key": X_API_KEY },
       });
       if (res.ok) {
         showToast("Homepage cache cleared successfully", "success");
@@ -332,7 +333,7 @@ export default function HomepageStudio() {
           <a
             href="/"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="px-3.5 py-2 rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/80 text-xs font-semibold text-zinc-700 flex items-center gap-1.5 transition-colors cursor-pointer no-underline"
           >
             <ExternalLink width={14} height={14} />

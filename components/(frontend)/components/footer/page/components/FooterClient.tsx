@@ -14,7 +14,7 @@ function FooterClient({
   footerSections: FooterSectionDocument[];
 }) {
   return (
-    <footer className="w-full bg-[#fffdf9] border-t border-charcoal-3/15 pt-8 pb-16 sm:pt-12 sm:pb-12 md:pt-14 md:pb-14 mt-8">
+    <footer className="w-full bg-ivory-1 border-t border-ash-3/30 pt-8 pb-16 sm:pt-12 sm:pb-12 md:pt-14 md:pb-14 mt-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Grid: Logo/Contacts on Left + 2 Link Columns on Right */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 lg:gap-16 pb-8 sm:pb-10">
@@ -30,12 +30,12 @@ function FooterClient({
         </div>
 
         {/* ── App Install Section (Google Play / App Store / Laptop) ── */}
-        <div className="border-t border-charcoal-3/15 py-6 my-2">
+        <div className="border-t border-ash-3/30 py-6 my-2">
           <FooterAppInstall />
         </div>
 
         {/* Bottom Symmetrical Divider */}
-        <div className="border-t border-charcoal-3/15 pt-4 sm:pt-6 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 sm:gap-5">
+        <div className="border-t border-ash-3/30 pt-4 sm:pt-6 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 sm:gap-5">
           {/* Copyright on Left */}
           <FooterBottomRight />
 

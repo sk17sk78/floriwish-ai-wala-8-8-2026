@@ -85,6 +85,9 @@ function SubTopicPage({
       data: {
         Category: {
           name: subTopic.name || subTopic?.info?.heading || "name",
+          categorySlug,
+          cityName: (subTopic?.city as CityDocument)?.name || (subTopic?.name ? subTopic.name.split(" in ")[1] : undefined),
+          image: (subTopic.media?.banner?.images?.[0]?.desktop as any)?.url || (subTopic.media?.banner?.images?.[0]?.mobile as any)?.url || "",
           breadcrumbs: [
             { label: "Homepage", url: "/" },
             ...breadcrumbs.map(({ label, link }) => ({ label, url: link }))
@@ -110,7 +113,7 @@ function SubTopicPage({
         }
       }
     }),
-    [slug, breadcrumbs, subTopic]
+    [slug, categorySlug, breadcrumbs, subTopic]
   );
 
   // event handlers

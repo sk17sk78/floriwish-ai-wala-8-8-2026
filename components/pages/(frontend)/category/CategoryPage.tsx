@@ -62,6 +62,8 @@ function CategoryPage({
       data: {
         Category: {
           name: category.name || category?.info?.heading || "",
+          categorySlug: category.slug,
+          image: (category.media?.banner?.images?.[0]?.desktop as any)?.url || (category.media?.banner?.images?.[0]?.mobile as any)?.url || "",
           breadcrumbs: [
             { label: "Homepage", url: "/" },
             ...breadcrumbs.map(({ label, link }) => ({ label, url: link })),
@@ -87,8 +89,7 @@ function CategoryPage({
         },
       },
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [category],
   );
 
   // event handlers

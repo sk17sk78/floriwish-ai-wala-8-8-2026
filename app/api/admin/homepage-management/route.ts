@@ -30,7 +30,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
         "image": "https://floriwish.com/images/logo.png",
         "@id": "https://floriwish.com",
         "url": "https://floriwish.com",
-        "telephone": "+91 98765 43210",
+        "telephone": "+91 8708388018",
         "priceRange": "₹299 - ₹9999",
         "address": {
           "@type": "PostalAddress",

@@ -299,6 +299,7 @@ export default function TupleActions(
           title="Link"
           href={props.linkHref || "#"}
           target="_blank"
+              rel="noopener noreferrer"
           className="transition-all duration-300 hover:text-purple-600"
         >
           <ExternalLink

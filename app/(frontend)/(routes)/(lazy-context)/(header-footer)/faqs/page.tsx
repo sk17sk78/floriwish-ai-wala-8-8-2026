@@ -1,208 +1,247 @@
 import { Metadata } from "next";
 import Link from "next/link";
+import {
+  HelpCircle,
+  ChevronDown,
+  MessageCircle,
+  Phone,
+  ArrowRight,
+  Truck,
+  CreditCard,
+  Flower2,
+  Store
+} from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "FAQ | Floriwish",
+  title: "Frequently Asked Questions (FAQs) | Floriwish",
   description:
-    "Find answers to frequently asked questions about orders, delivery, payments, and partnering with Floriwish.",
+    "Find answers to frequently asked questions about flower delivery, midnight timings, cake orders, custom decorations, and payments on Floriwish.",
+  alternates: {
+    canonical: "https://floriwish.com/faqs",
+  },
+  openGraph: {
+    title: "Frequently Asked Questions (FAQs) | Floriwish",
+    description:
+      "Quick answers to all your questions about orders, same-day delivery, midnight surprises, and party decorations on Floriwish.",
+    url: "https://floriwish.com/faqs",
+  },
 };
 
-// Extracted data array to keep JSX clean and easy to update
-const faqData = [
+const FAQ_SECTIONS = [
   {
     category: "Orders & Delivery",
+    icon: Truck,
     questions: [
       {
-        q: "Do you offer same-day or midnight delivery?",
-        a: "Yes! We offer both same-day and midnight delivery options across our 500+ covered cities. You can select your preferred delivery time slot during the checkout process.",
+        q: "Do you offer same-day and midnight delivery?",
+        a: "Yes! We offer guaranteed same-day delivery (within 2-3 hours) and exact 11:59 PM midnight delivery across 150+ covered cities in India. You can choose your exact preferred delivery slot during checkout.",
       },
       {
-        q: "How can I track my order?",
-        a: "Once your order is dispatched, you will receive a tracking link via SMS and email. You can also log into your Floriwish account and view real-time updates under the 'My Orders' section.",
+        q: "How can I track my order in real-time?",
+        a: "Once your order is prepared and dispatched with our delivery rider, you will receive real-time tracking updates via WhatsApp and SMS. You can also track your status anytime under 'My Orders' on Floriwish.",
       },
       {
-        q: "Can I change my delivery address or date after placing an order?",
-        a: "Changes can be made up to 24 hours before the scheduled delivery time. Please contact our support team immediately with your Order ID to request any modifications.",
+        q: "Can I customize the delivery time or address after booking?",
+        a: "Yes, you can request changes up to 3 hours before your scheduled delivery slot. Simply contact our celebration support team via WhatsApp or call with your Order ID.",
+      },
+    ],
+  },
+  {
+    category: "Freshness & Products",
+    icon: Flower2,
+    questions: [
+      {
+        q: "Are the flowers delivered fresh?",
+        a: "100% yes. We do not store flowers in deep-freeze warehouses. Our local florists handpick fresh blooms at 5:00 AM daily from growers and arrange them just before your delivery time.",
+      },
+      {
+        q: "Are the cakes freshly baked or pre-made?",
+        a: "Every cake on Floriwish is baked fresh in licensed local artisan bakeries just 3 hours prior to dispatch. We never use pre-made frozen cake bases.",
+      },
+      {
+        q: "Can I get a handwritten message card?",
+        a: "Yes! Every order includes a complimentary greeting card written by hand with real pen and ink on textured luxury cardstock.",
       },
     ],
   },
   {
     category: "Payments & Refunds",
+    icon: CreditCard,
     questions: [
       {
-        q: "What payment methods do you accept?",
-        a: "We accept all major Credit/Debit cards, Net Banking, UPI (Google Pay, PhonePe, Paytm), and popular mobile wallets. All transactions are 100% secure and encrypted.",
+        q: "What payment options do you support?",
+        a: "We support all secure Indian payment methods including UPI (Google Pay, PhonePe, Paytm), Credit/Debit Cards, Net Banking, and popular wallets. All transactions are 256-bit encrypted.",
       },
       {
-        q: "What is your cancellation and refund policy?",
-        a: "Orders can be cancelled for a full refund if requested at least 24 hours prior to the delivery date. Custom or personalized items cannot be cancelled once processing has begun. Refunds typically reflect in your account within 5-7 business days.",
+        q: "What is your replacement or refund policy?",
+        a: "If an item arrives damaged or does not meet our high-quality standards, we provide an immediate free replacement or a full refund upon photo verification on WhatsApp.",
       },
       {
-        q: "Is there any hidden delivery charge?",
-        a: "Standard delivery is completely free! However, special requests like Midnight Delivery, Fixed-Time Delivery, or Early Morning Delivery may incur a nominal convenience fee, which is clearly displayed at checkout.",
+        q: "Are there any hidden delivery charges?",
+        a: "Standard delivery during normal daytime slots is completely free! Nominal convenience charges apply only for specialized fixed-time or midnight delivery slots.",
       },
     ],
   },
   {
-    category: "Products & Customization",
+    category: "Decorations & Partnerships",
+    icon: Store,
     questions: [
       {
-        q: "Can I customize a gift or flower arrangement?",
-        a: "Absolutely! Many of our products offer customization options like adding personalized messages, names on cakes, or choosing specific flower combinations. Look for the 'Customize' tag on the product page.",
+        q: "How does balloon and event decoration work?",
+        a: "Our professional decorator artists arrive directly at your home or venue with full styling kits to transform your space as per your chosen theme.",
       },
       {
-        q: "Are the flowers delivered fresh?",
-        a: "Yes, quality is our top priority. Our flowers are sourced directly from premium growers and are arranged by expert local florists just before delivery to ensure maximum freshness and longevity.",
-      },
-    ],
-  },
-  {
-    category: "Vendor & Franchise",
-    questions: [
-      {
-        q: "How do I become a vendor on Floriwish?",
-        a: "We are always looking for quality partners! Simply navigate to our 'Become a Vendor' page, fill out the application form with your business details, and our onboarding team will get in touch with you.",
-      },
-      {
-        q: "Who can apply for a Floriwish Franchise?",
-        a: "Anyone with an entrepreneurial spirit, a passion for customer service, and the required initial investment capacity can apply. Visit our Franchise page to submit an enquiry and view our requirements.",
+        q: "How can local florists or bakers partner with Floriwish?",
+        a: "We actively empower local boutique owners! Visit our 'Become a Vendor' or 'Explore Franchise' page to submit your details and join our nationwide artisan network.",
       },
     ],
   },
 ];
 
 export default function FAQPage() {
+  // Generate JSON-LD Structured Data for Google Rich Snippets
+  const jsonLdFaq = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": FAQ_SECTIONS.flatMap((sec) =>
+      sec.questions.map((item) => ({
+        "@type": "Question",
+        "name": item.q,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": item.a,
+        },
+      }))
+    ),
+  };
+
   return (
     <div className="min-h-screen w-full bg-white text-gray-800 font-poppins selection:bg-[#b76e79] selection:text-white">
-      {/* --- HERO SECTION --- */}
-      <section className="relative w-full bg-gradient-to-br from-[#FAF7F2] via-white to-[#f4e8ea] pt-24 pb-20 md:pt-32 md:pb-28 px-4 overflow-hidden">
-        {/* Decorative background blobs */}
-        <div className="absolute top-0 left-0 w-96 h-96 bg-[#b76e79] opacity-5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-rose-300 opacity-10 rounded-full blur-3xl translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
+      {/* JSON-LD Schema for Google Search Rich Results */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }}
+      />
 
-        <div className="max-w-3xl mx-auto text-center relative z-10">
-          <div className="inline-block px-5 py-2 bg-rose-50 text-[#b76e79] font-semibold text-sm rounded-full mb-6 border border-rose-100 shadow-sm uppercase tracking-wider">
-            Help Center
+      {/* ── 1. CLEAN HERO (White Canvas with Floriwish Rose Pill) ──────── */}
+      <section className="relative w-full bg-white pt-16 pb-10 md:pt-24 md:pb-14 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          
+          <div className="inline-block px-4 py-1.5 bg-rose-50 text-[#b76e79] font-semibold text-xs rounded-full mb-6 border border-rose-100 uppercase tracking-wider">
+            Help Center & FAQs
           </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-6 tracking-tight leading-tight">
-            How can we <span className="text-[#b76e79]">help you?</span>
+
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 mb-6 tracking-tight leading-tight">
+            Frequently Asked <span className="text-[#b76e79]">Questions</span>
           </h1>
-          <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
-            Browse through our frequently asked questions below to find quick
-            answers regarding your orders, payments, and our services.
+
+          <p className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
+            Find quick, clear answers regarding deliveries, midnight surprises, fresh bakes, custom decorations, and payments.
           </p>
+
         </div>
       </section>
 
-      {/* --- FAQ ACCORDION SECTION --- */}
-      <section className="max-w-4xl mx-auto px-4 py-16 md:py-24">
-        <div className="space-y-16">
-          {faqData.map((section, catIdx) => (
-            <div key={catIdx} className="relative">
-              {/* Category Header */}
-              <div className="flex items-center gap-4 mb-8">
-                <div className="h-px bg-gray-200 flex-1 hidden sm:block"></div>
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight text-center">
-                  {section.category}
-                </h2>
-                <div className="h-px bg-gray-200 flex-1 hidden sm:block"></div>
-              </div>
+      {/* ── 2. FAQ SECTIONS (Clean White Symmetrical Cards) ────────────── */}
+      <section className="max-w-5xl mx-auto px-4 py-8 md:py-14 border-t border-gray-100">
+        <div className="space-y-12">
+          {FAQ_SECTIONS.map((sec, secIdx) => {
+            const SectionIcon = sec.icon;
 
-              {/* Questions Container */}
-              <div className="bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl overflow-hidden">
-                {section.questions.map((item, qIdx) => {
-                  // Create a unique ID for the pure CSS checkbox hack
-                  const uniqueId = `faq-${catIdx}-${qIdx}`;
+            return (
+              <div key={secIdx} className="space-y-4">
+                
+                {/* Category Header with Clean Icon */}
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-rose-50 text-[#b76e79] flex items-center justify-center shrink-0">
+                    <SectionIcon className="w-4 h-4" />
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
+                    {sec.category}
+                  </h2>
+                </div>
 
-                  return (
-                    <div
-                      key={qIdx}
-                      className={`border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors duration-300`}
-                    >
-                      <input
-                        type="checkbox"
-                        id={uniqueId}
-                        className="peer hidden"
-                      />
+                {/* Questions Container */}
+                <div className="bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden divide-y divide-gray-100">
+                  {sec.questions.map((item, qIdx) => {
+                    const uniqueId = `faq-${secIdx}-${qIdx}`;
 
-                      <label
-                        htmlFor={uniqueId}
-                        className="group flex justify-between items-center font-semibold text-base md:text-lg cursor-pointer text-gray-900 px-6 md:px-8 py-5 md:py-6 select-none"
+                    return (
+                      <div
+                        key={qIdx}
+                        className="group hover:bg-[#FAF7F2]/40 transition-colors duration-150"
                       >
-                        <span className="pr-6 group-hover:text-[#b76e79] transition-colors duration-200">
-                          {item.q}
-                        </span>
-                        <span className="shrink-0 transition-all duration-300 peer-checked:rotate-180 peer-checked:bg-[#b76e79] peer-checked:text-white text-gray-400 group-hover:bg-rose-50 group-hover:text-[#b76e79] bg-gray-50/80 border border-gray-100 rounded-full p-2 shadow-sm">
-                          <svg
-                            fill="none"
-                            height="20"
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2.5"
-                            viewBox="0 0 24 24"
-                            width="20"
-                          >
-                            <path d="M6 9l6 6 6-6"></path>
-                          </svg>
-                        </span>
-                      </label>
+                        <input
+                          type="checkbox"
+                          id={uniqueId}
+                          className="peer hidden"
+                        />
 
-                      {/* Height Animation Container */}
-                      <div className="grid grid-rows-[0fr] opacity-0 transition-all duration-300 ease-in-out peer-checked:grid-rows-[1fr] peer-checked:opacity-100 px-6 md:px-8">
-                        <div className="overflow-hidden">
-                          <p className="text-gray-600 pb-6 md:pb-8 leading-relaxed pr-2 md:pr-12 text-sm md:text-base">
-                            {item.a}
-                          </p>
+                        <label
+                          htmlFor={uniqueId}
+                          className="flex justify-between items-center font-semibold text-sm sm:text-base text-gray-900 px-5 sm:px-6 py-4 sm:py-5 cursor-pointer select-none gap-4"
+                        >
+                          <span className="group-hover:text-[#b76e79] transition-colors duration-150">
+                            {item.q}
+                          </span>
+                          <span className="shrink-0 w-8 h-8 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-500 peer-checked:rotate-180 peer-checked:bg-[#b76e79] peer-checked:text-white peer-checked:border-[#b76e79] transition-all duration-200">
+                            <ChevronDown className="w-4 h-4" />
+                          </span>
+                        </label>
+
+                        <div className="grid grid-rows-[0fr] opacity-0 transition-all duration-200 ease-in-out peer-checked:grid-rows-[1fr] peer-checked:opacity-100 px-5 sm:px-6">
+                          <div className="overflow-hidden">
+                            <p className="text-gray-600 pb-5 text-sm sm:text-[15px] leading-relaxed pr-2 sm:pr-8">
+                              {item.a}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
+
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
-      {/* --- STILL NEED HELP CTA --- */}
-      <section className="px-4 pb-16 md:pb-24">
-        <div className="max-w-4xl mx-auto bg-gradient-to-br from-[#fff0f4] to-rose-50 rounded-[2.5rem] p-10 md:p-16 text-center border border-rose-100 shadow-sm relative overflow-hidden">
-          {/* Decorative background circle */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+      {/* ── 3. CLEAN STILL NEED HELP CTA (Matching About & Contact) ───── */}
+      <section className="px-4 pb-20 pt-4 border-t border-gray-100">
+        <div className="max-w-4xl mx-auto bg-white rounded-3xl p-8 sm:p-12 text-center border border-gray-100 shadow-sm mt-6">
+          <div className="w-12 h-12 rounded-2xl bg-rose-50 text-[#b76e79] flex items-center justify-center mx-auto mb-4 font-bold">
+            <HelpCircle className="w-6 h-6" />
+          </div>
 
-          <div className="relative z-10">
-            <div className="w-16 h-16 bg-white text-[#b76e79] rounded-2xl shadow-sm border border-rose-100 flex items-center justify-center mx-auto mb-6">
-              <svg
-                className="w-8 h-8"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                />
-              </svg>
-            </div>
-            <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
-              Still have questions?
-            </h2>
-            <p className="text-gray-600 text-lg mb-8 max-w-xl mx-auto leading-relaxed">
-              Can&apos;t find the answer you&apos;re looking for? Our dedicated
-              support team is always ready to assist you.
-            </p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 tracking-tight">
+            Still have questions?
+          </h2>
+          <p className="text-gray-600 text-sm sm:text-base mb-6 max-w-lg mx-auto">
+            Our dedicated celebration concierge team is reachable 7 days a week for order updates, custom requests, and delivery assistance.
+          </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/contact"
-              className="inline-block bg-[#b76e79] text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-[#a25a65] hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+              className="inline-flex items-center gap-2 bg-[#b76e79] hover:bg-[#a25d67] text-white px-7 py-3 rounded-xl font-semibold text-sm shadow-sm hover:shadow-md transition-all duration-200"
             >
-              Contact Support
+              <span>Contact Support</span>
+              <ArrowRight className="w-4 h-4" />
             </Link>
+            <a
+              href="https://wa.me/918708388018?text=Hi%20Floriwish,%20I%20have%20a%20question"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-white text-gray-700 hover:text-green-700 border border-gray-200 hover:border-green-300 px-7 py-3 rounded-xl font-semibold text-sm shadow-2xs hover:shadow-xs transition-all duration-200"
+            >
+              <MessageCircle className="w-4 h-4 text-green-600" />
+              <span>WhatsApp Chat</span>
+            </a>
           </div>
         </div>
       </section>
+
     </div>
   );
 }

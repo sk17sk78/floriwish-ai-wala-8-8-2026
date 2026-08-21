@@ -164,6 +164,7 @@ export default function OrderItem({
             {primaryImage && (
               <Link
                 target="_blank"
+              rel="noopener noreferrer"
                 href={`${DOMAIN}${content.type === "product" ? FRONTEND_LINKS.PRODUCT_PAGE : FRONTEND_LINKS.SERVICE_PAGE}/${content.slug}`}
               >
                 <NextImage

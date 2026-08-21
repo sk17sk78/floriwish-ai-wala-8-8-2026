@@ -18,6 +18,7 @@ export default function FooterTopLeft() {
       <Link
         href={whatsappContact()}
         target="_blank"
+              rel="noopener noreferrer"
         aria-label="Contact us on WhatsApp"
         // prefetch
         className="flex items-center justify-start gap-1.5 text-charcoal-2/95 mt-1.5 mb-0.5 transition-all duration-300 hover:text-sienna hover:brightness-75 hover:underline hover:underline-offset-4 max-sm:hidden"
@@ -32,6 +33,7 @@ export default function FooterTopLeft() {
       <Link
         href={mobileContact()}
         target="_blank"
+              rel="noopener noreferrer"
         aria-label="Call us"
         // prefetch
         className="flex items-center justify-start gap-1.5 text-charcoal-2/95 my-0.5 transition-all duration-300 hover:text-sienna hover:brightness-75 hover:underline hover:underline-offset-4 max-sm:hidden"

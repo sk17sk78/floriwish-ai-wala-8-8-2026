@@ -104,7 +104,7 @@ function MobileNavbar({
         {/* 3. Instagram Tab */}
         <Link
           target="_blank"
-          rel="noopener noreferrer"
+              rel="noopener noreferrer"
           href={INSTAGRAM_LINK}
           aria-label="Instagram"
           className="focus:outline-none"

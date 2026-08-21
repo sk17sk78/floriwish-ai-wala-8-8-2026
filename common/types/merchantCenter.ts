@@ -5,7 +5,7 @@ export type MerchantCenterProductsType = {
     link: string
     image_link: string
     price: string
-    availability: "in stock" | "out of stock"
+    availability: "in stock" | "in_stock" | "out of stock" | "out_of_stock"
     condition: "new"
     brand: string
     gtin?: string

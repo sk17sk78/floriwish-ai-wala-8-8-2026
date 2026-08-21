@@ -1,7 +1,8 @@
 // Homepage ISR — Revalidates every 60s for instant response time (<30ms TTFB) with background updates
 export const revalidate = 60;
 
-// requests
+import { type Metadata } from "next";
+
 // controllers
 import { getHomepageLayouts as getHomepageLayoutsFromController } from "@/app/api/frontend/homepage/controllers";
 
@@ -13,28 +14,63 @@ import {
   COMPANY_PRIMARY_BANNER,
   COMPANY_URL,
 } from "@/common/constants/companyDetails";
+import { WEBSITE_NAME } from "@/common/constants/environmentVariables";
 
 // components
 import BentoHomepage from "@/components/pages/(frontend)/Home/BentoHomepage";
 import BodyWrapper from "@/components/(frontend)/components/wrapper/BodyWrapper";
-import { WEBSITE_NAME } from "@/common/constants/environmentVariables";
 
 // types
 import { HomepageLayoutDocument } from "@/common/types/documentation/pages/homepageLayout";
 import { convertToCloudFrontUrl } from "@/common/utils/convertToCloudFrontUrl";
+import { getHomepageConfig } from "@/common/utils/getHomepageConfig";
 
-/* ---------------- META ---------------- */
-export const metadata = {
-  title: COMPANY_NAME,
-  description: COMPANY_META_DESCRIPTION,
-  alternates: { canonical: CANONICAL_LINK },
-  openGraph: {
-    title: COMPANY_NAME,
-    description: COMPANY_META_DESCRIPTION,
-    url: COMPANY_URL,
-    images: [COMPANY_PRIMARY_BANNER],
-  },
-};
+/* ---------------- DYNAMIC SEO METADATA ---------------- */
+export async function generateMetadata(): Promise<Metadata> {
+  const config = await getHomepageConfig();
+  const seo = config?.seo || {};
+
+  const title = seo.metaTitle || COMPANY_NAME;
+  const description = seo.metaDescription || COMPANY_META_DESCRIPTION;
+  const canonical = seo.canonicalUrl || CANONICAL_LINK || "https://floriwish.com";
+  const ogImage = seo.ogImage || COMPANY_PRIMARY_BANNER;
+  const twitterImage = seo.twitterImage || ogImage;
+
+  return {
+    title,
+    description,
+    keywords: seo.metaKeywords || [],
+    alternates: { canonical },
+    robots: {
+      index: seo.robotsIndex ?? true,
+      follow: seo.robotsFollow ?? true,
+    },
+    verification: {
+      google: seo.googleVerification || undefined,
+    },
+    openGraph: {
+      title: seo.ogTitle || title,
+      description: seo.ogDescription || description,
+      url: canonical,
+      siteName: "Floriwish",
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+      type: "website",
+    },
+    twitter: {
+      card: seo.twitterCardType === "summary" ? "summary" : "summary_large_image",
+      title: seo.twitterTitle || title,
+      description: seo.twitterDescription || description,
+      images: [twitterImage],
+    },
+  };
+}
 
 /* ---------------- DATA ---------------- */
 async function getHomepageLayouts(): Promise<HomepageLayoutDocument[]> {
@@ -44,9 +80,6 @@ async function getHomepageLayouts(): Promise<HomepageLayoutDocument[]> {
     return (documents ?? []).filter(
       (item): item is HomepageLayoutDocument => Boolean(item),
     ).map((item) => {
-      // Strip large text content from RSC payload to prevent Next.js 14
-      // ec() recursive String.replace stack overflow. Text content is
-      // fetched client-side via CustomTypedContent using the layout _id.
       if (item.type === "text" && item.layout?.text && item.layout.text.length > 1000) {
         return {
           ...item,
@@ -62,14 +95,19 @@ async function getHomepageLayouts(): Promise<HomepageLayoutDocument[]> {
 
 /* ---------------- PAGE ---------------- */
 export default async function Home() {
-  const homepageLayouts = await getHomepageLayouts();
+  const [homepageLayouts, config] = await Promise.all([
+    getHomepageLayouts(),
+    getHomepageConfig()
+  ]);
+
+  const pageH1 = config?.seo?.pageTitle || WEBSITE_NAME;
+  const structuredData = config?.seo?.structuredData;
 
   // Find the first banner for LCP Discovery
   const firstBanner = homepageLayouts.find((l) => l.type === "banner");
   const firstImage = firstBanner?.layout?.banner?.images?.[0];
   const desktopLcpUrl = convertToCloudFrontUrl((firstImage?.desktop as any)?.url) || COMPANY_PRIMARY_BANNER;
   const rawMobileUrl = convertToCloudFrontUrl((firstImage?.mobile as any)?.url);
-  // Use dedicated mobile URL only when it differs from desktop
   const mobileLcpUrl = rawMobileUrl && rawMobileUrl !== desktopLcpUrl
     ? rawMobileUrl
     : desktopLcpUrl;
@@ -77,7 +115,17 @@ export default async function Home() {
 
   return (
     <>
-      {/* LCP Preload for Desktop: Tell browser to download hero image IMMEDIATELY */}
+      {/* Dynamic JSON-LD Structured Data Schema */}
+      {structuredData && (
+        <script
+          id="homepage-jsonld-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: structuredData }}
+          suppressHydrationWarning
+        />
+      )}
+
+      {/* LCP Preload for Desktop */}
       {desktopLcpUrl && (
         <link
           rel="preload"
@@ -91,7 +139,7 @@ export default async function Home() {
           fetchPriority="high"
         />
       )}
-      {/* LCP Preload for Mobile (separate link with media query so mobile PageSpeed picks it up) */}
+      {/* LCP Preload for Mobile */}
       {hasDedicatedMobile && mobileLcpUrl && (
         <link
           rel="preload"
@@ -108,7 +156,7 @@ export default async function Home() {
       )}
       <BodyWrapper fullWidth>
         <main>
-          <h1 className="visually-hidden">{WEBSITE_NAME}</h1>
+          <h1 className="visually-hidden" suppressHydrationWarning>{pageH1}</h1>
           <BentoHomepage data={homepageLayouts} inFrontend />
         </main>
       </BodyWrapper>

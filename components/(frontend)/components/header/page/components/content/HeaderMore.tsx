@@ -71,7 +71,7 @@ function HeaderMore() {
         <a
           href={whatsappContact()}
           target="_blank"
-          rel="noopener noreferrer"
+              rel="noopener noreferrer"
           className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-charcoal-3 hover:text-[#25D366] transition-colors"
         >
           <WhatsappSVG dimensions={18} className="text-[#25D366]" />

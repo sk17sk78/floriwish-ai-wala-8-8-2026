@@ -359,7 +359,7 @@ export default function VendorRegistrations() {
                         <a
                           href={`https://wa.me/${r.whatsapp.replace(/\D/g, "")}`}
                           target="_blank"
-                          rel="noopener noreferrer"
+              rel="noopener noreferrer"
                           className="text-[11px] text-emerald-700 font-medium hover:underline flex items-center gap-1 mt-0.5"
                         >
                           <MessageSquare className="w-3 h-3 shrink-0" /> WA: {r.whatsapp}
@@ -378,7 +378,7 @@ export default function VendorRegistrations() {
                         <a
                           href={r.socialLink}
                           target="_blank"
-                          rel="noopener noreferrer"
+              rel="noopener noreferrer"
                           className="text-[11px] text-rose-600 font-medium hover:underline inline-flex items-center gap-0.5 mt-0.5"
                         >
                           <span>{r.socialPlatform || "Social"}</span>

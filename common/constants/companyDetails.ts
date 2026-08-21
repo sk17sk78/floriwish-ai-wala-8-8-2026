@@ -1,9 +1,9 @@
 import { COMPANY_EMAIL_ENV, COMPANY_LOGO_URL_ENV, COMPANY_MOBILE_ENV, COMPANY_URL_ENV, WEBSITE_NAME } from "./environmentVariables";
 
 export const COMPANY_NAME = "Floriwish.com";
-export const COMPANY_NUMBER = "+918708388018";
-export const COMPANY_WHATSAPP = "+918708388018";
-export const COMPANY_EMAIL = "Info@Floriwish.com";
+export const COMPANY_NUMBER = COMPANY_MOBILE_ENV;
+export const COMPANY_WHATSAPP = COMPANY_MOBILE_ENV;
+export const COMPANY_EMAIL = "info@floriwish.com";
 export const COMPANY_LOGO_URL = COMPANY_LOGO_URL_ENV;
 export const COMPANY_PRIMARY_BANNER = "https://d22rebqllszdz8.cloudfront.net/c738cc2b-aab2-472f-925d-c673915cfacc/a35c7f6964a04132.webp";
 export const COMPANY_URL = COMPANY_URL_ENV;

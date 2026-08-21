@@ -1,177 +1,182 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import ContactForm from "./ContactForm";
+import {
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
+  MessageCircle,
+  HelpCircle,
+  ArrowRight
+} from "lucide-react";
+import {
+  COMPANY_ADDRESS,
+  COMPANY_EMAIL,
+  COMPANY_NAME,
+  COMPANY_NUMBER,
+} from "@/common/constants/companyDetails";
 
 export const metadata: Metadata = {
   title: "Contact Us | Floriwish",
   description:
-    "Have a question or need help with your order? Get in touch with the Floriwish support team.",
+    "Have a question or need assistance with your order? Get in touch with the Floriwish celebration support team via phone, email, or WhatsApp.",
+  alternates: {
+    canonical: "https://floriwish.com/contact",
+  },
+  openGraph: {
+    title: "Contact Us | Floriwish",
+    description:
+      "Reach out to Floriwish for order updates, custom floral & cake styling, or event bookings.",
+    url: "https://floriwish.com/contact",
+  },
 };
 
 export default function ContactPage() {
   return (
     <div className="min-h-screen w-full bg-white text-gray-800 font-poppins selection:bg-[#b76e79] selection:text-white">
-      {/* --- HERO SECTION --- */}
-      <section className="relative w-full bg-gradient-to-br from-[#FAF7F2] via-white to-[#f4e8ea] pt-24 pb-20 md:pt-32 md:pb-28 px-4 overflow-hidden">
-        {/* Decorative background blobs */}
-        <div className="absolute top-0 left-0 w-96 h-96 bg-[#b76e79] opacity-5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-rose-300 opacity-10 rounded-full blur-3xl translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
-
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="inline-block px-5 py-2 bg-rose-50 text-[#b76e79] font-semibold text-sm rounded-full mb-6 border border-rose-100 shadow-sm uppercase tracking-wider">
+      
+      {/* ── 1. HERO SECTION (Clean White Canvas) ───────────────────────── */}
+      <section className="relative w-full bg-white pt-16 pb-10 md:pt-24 md:pb-14 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          
+          <div className="inline-block px-4 py-1.5 bg-rose-50 text-[#b76e79] font-semibold text-xs rounded-full mb-6 border border-rose-100 uppercase tracking-wider">
             We&apos;re Here For You
           </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-6 tracking-tight leading-tight">
+
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 mb-6 tracking-tight leading-tight">
             Get in <span className="text-[#b76e79]">Touch</span>
           </h1>
-          <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
-            Whether you have a question about an order, want to partner with us,
-            or just want to say hello, we&apos;re ready to listen.
+
+          <p className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
+            Whether you have a question about an order, want a bespoke celebration setup, or just want to connect, we are ready to assist.
           </p>
+
         </div>
       </section>
 
-      {/* --- MAIN CONTACT SECTION --- */}
-      <section className="max-w-7xl mx-auto px-4 py-16 md:py-24 relative -mt-10 z-20">
-        <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
-          {/* Left Column: Contact Information Cards */}
-          <div className="lg:w-5/12 w-full pt-4">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
-              We&apos;re here to help!
-            </h2>
-            <p className="text-gray-600 text-lg mb-10 leading-relaxed">
-              Reach out to us through any of the channels below. Our dedicated
-              support team usually responds within a few hours.
-            </p>
-
-            <div className="space-y-6">
-              {/* Address Card */}
-              <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex items-start gap-5 group">
-                <div className="bg-[#fff0f4] w-14 h-14 rounded-2xl flex items-center justify-center text-[#b76e79] shrink-0 group-hover:scale-110 transition-transform duration-300">
-                  <svg
-                    className="w-7 h-7"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-bold text-xl text-gray-900 mb-2">
-                    Head Office
-                  </h3>
-                  <p className="text-gray-500 leading-relaxed">
-                    Dwarka Mor, Near Mohan Garden,
-                    <br />
-                    New Delhi, India - 110059
-                  </p>
-                </div>
-              </div>
-
-              {/* Phone Card */}
-              <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex items-start gap-5 group">
-                <div className="bg-[#f0fbf5] w-14 h-14 rounded-2xl flex items-center justify-center text-green-600 shrink-0 group-hover:scale-110 transition-transform duration-300">
-                  <svg
-                    className="w-7 h-7"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-bold text-xl text-gray-900 mb-2">
-                    Call Us
-                  </h3>
-                  <p className="text-gray-600 leading-relaxed font-medium">
-                    +91 8708388018
-                  </p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Mon - Sun (9:00 AM to 9:00 PM)
-                  </p>
-                </div>
-              </div>
-
-              {/* Email Card */}
-              <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex items-start gap-5 group">
-                <div className="bg-[#f6f0ff] w-14 h-14 rounded-2xl flex items-center justify-center text-purple-600 shrink-0 group-hover:scale-110 transition-transform duration-300">
-                  <svg
-                    className="w-7 h-7"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-bold text-xl text-gray-900 mb-2">
-                    Email Us
-                  </h3>
-                  <a
-                    href="mailto:Info@Floriwish.com"
-                    className="block text-gray-600 hover:text-[#b76e79] transition-colors leading-relaxed"
-                  >
-                    Info@Floriwish.com
-                  </a>
-                </div>
-              </div>
+      {/* ── 2. MAIN CONTACT SECTION (2-COLUMN GRID) ───────────────────── */}
+      <section className="max-w-7xl mx-auto px-4 py-6 md:py-12 border-t border-gray-100">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start pt-6">
+          
+          {/* Left Column: Contact Cards & Location */}
+          <div className="lg:col-span-5 space-y-6">
+            
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 tracking-tight">
+                How can we help today?
+              </h2>
+              <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
+                Connect directly with our celebration concierge team through your preferred channel.
+              </p>
             </div>
+
+            {/* Direct Channel Cards */}
+            <div className="space-y-4 pt-2">
+              
+              {/* WhatsApp Instant Support */}
+              <a
+                href={`https://wa.me/918708388018?text=Hi%20Floriwish,%20I%20have%20an%20inquiry`}
+                target="_blank"
+              rel="noopener noreferrer"
+                className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:border-[#b76e79]/40 hover:shadow-md transition-all flex items-start gap-4 group block"
+              >
+                <div className="w-12 h-12 rounded-xl bg-green-50 text-green-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  <MessageCircle className="w-6 h-6" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-bold text-base text-gray-900">WhatsApp Chat</h3>
+                    <span className="text-[10px] font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full uppercase tracking-wider">Fastest</span>
+                  </div>
+                  <p className="text-sm font-semibold text-gray-800 mt-0.5">+91 8708388018</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Instant chat for live updates & custom orders</p>
+                </div>
+              </a>
+
+              {/* Direct Phone Call */}
+              <a
+                href="tel:+918708388018"
+                className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:border-[#b76e79]/40 hover:shadow-md transition-all flex items-start gap-4 group block"
+              >
+                <div className="w-12 h-12 rounded-xl bg-[#fff0f4] text-[#b76e79] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  <Phone className="w-6 h-6" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-base text-gray-900">Call Support</h3>
+                  <p className="text-sm font-semibold text-gray-800 mt-0.5">+91 8708388018</p>
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1">
+                    <Clock className="w-3.5 h-3.5 text-[#b76e79]" />
+                    <span>Mon - Sun (9:00 AM – 9:00 PM)</span>
+                  </div>
+                </div>
+              </a>
+
+              {/* Email Support */}
+              <a
+                href={`mailto:${COMPANY_EMAIL}`}
+                className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:border-[#b76e79]/40 hover:shadow-md transition-all flex items-start gap-4 group block"
+              >
+                <div className="w-12 h-12 rounded-xl bg-[#f6f0ff] text-purple-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  <Mail className="w-6 h-6" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-base text-gray-900">Email Us</h3>
+                  <p className="text-sm font-semibold text-gray-800 mt-0.5">{COMPANY_EMAIL}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">For corporate inquiries, feedback & partnerships</p>
+                </div>
+              </a>
+
+              {/* Head Office Address */}
+              <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                  <MapPin className="w-6 h-6" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-base text-gray-900">Head Office</h3>
+                  <p className="text-sm text-gray-600 mt-0.5 leading-relaxed">
+                    {COMPANY_ADDRESS}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">Delhi NCR, India</p>
+                </div>
+              </div>
+
+            </div>
+
           </div>
 
-          {/* Right Column: Premium Contact Form */}
-          <div className="lg:w-7/12 w-full">
+          {/* Right Column: Clean Modern Form */}
+          <div className="lg:col-span-7 w-full">
             <ContactForm />
           </div>
+
         </div>
       </section>
 
-      {/* --- QUICK HELP CTA --- */}
-      <section className="px-4 pb-16 md:pb-24">
-        <div className="max-w-5xl mx-auto bg-gray-50/80 rounded-[2.5rem] p-10 md:p-16 text-center border border-gray-100 shadow-sm relative overflow-hidden">
-          {/* Subtle background flair */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-rose-100/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
-
-          <div className="relative z-10">
-            <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
-              Need an immediate answer?
-            </h2>
-            <p className="text-gray-600 text-lg mb-8 max-w-2xl mx-auto">
-              Check out our frequently asked questions. We might have already
-              answered what you are looking for!
-            </p>
+      {/* ── 3. QUICK HELP STRIP (FAQ CALLOUT) ─────────────────────────── */}
+      <section className="bg-white px-4 pb-20 pt-6">
+        <div className="max-w-4xl mx-auto bg-white rounded-3xl p-8 sm:p-12 text-center border border-gray-100 shadow-sm">
+          <div className="w-12 h-12 rounded-2xl bg-rose-50 text-[#b76e79] flex items-center justify-center mx-auto mb-4 font-bold">
+            <HelpCircle className="w-6 h-6" />
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 tracking-tight">
+            Need an Immediate Answer?
+          </h2>
+          <p className="text-gray-600 text-sm sm:text-base mb-6 max-w-lg mx-auto">
+            Check our Frequently Asked Questions about delivery slots, midnight timing, payment options, and cake customizations.
+          </p>
+          <div>
             <Link
-              href="/faq"
-              className="inline-block bg-white text-[#b76e79] px-10 py-4 rounded-xl font-bold text-lg border border-gray-200 hover:border-[#b76e79] hover:shadow-md transition-all duration-200 hover:-translate-y-1"
+              href="/faqs"
+              className="inline-flex items-center gap-2 bg-[#b76e79] hover:bg-[#a25d67] text-white px-7 py-3 rounded-xl font-semibold text-sm shadow-sm hover:shadow-md transition-all duration-200"
             >
-              Visit Help Center / FAQ
+              <span>Visit FAQs & Help Center</span>
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
       </section>
+
     </div>
   );
 }

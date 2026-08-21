@@ -65,6 +65,7 @@ export default function FrontedTransactionHeader() {
             href={whatsappContact()}
             // prefetch
             target="_blank"
+              rel="noopener noreferrer"
             className="flex items-center flex-col justify-center gap-1 cursor-pointer transition-all duration-300 hover:text-green-500"
           >
             <div className="rounded-full grid place-items-center w-10 bg-green-500 text-white aspect-square">
@@ -77,6 +78,7 @@ export default function FrontedTransactionHeader() {
             href={`tel"${COMPANY_NUMBER}`}
             // prefetch
             target="_blank"
+              rel="noopener noreferrer"
             className="flex items-center flex-col justify-center gap-1 cursor-pointer transition-all duration-300 hover:text-amber-500"
           >
             <div className="rounded-full grid place-items-center w-10 bg-amber-500 text-white aspect-square">

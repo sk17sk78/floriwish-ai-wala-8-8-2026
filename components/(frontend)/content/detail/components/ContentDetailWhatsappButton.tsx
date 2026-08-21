@@ -41,6 +41,7 @@ function ContentDetailWhatsappButton() {
     <Link
       href={whatsappContact(msg)}
       target="_blank"
+              rel="noopener noreferrer"
       prefetch={false}
     >
       <div

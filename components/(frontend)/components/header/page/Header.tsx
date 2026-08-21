@@ -66,47 +66,89 @@ async function Header({
       ],
     },
     {
-      label: "Cakes",
-      order: 4,
-      path: "/cakes",
-    },
-    {
-      label: "Balloon Decor",
-      order: 5,
-      path: "/balloon-decoration",
-    },
-    {
-      label: "Wedding",
-      order: 6,
+      label: "Services & Decor",
+      order: 3,
       sections: [
         {
-          heading: "Wedding Services",
+          heading: "Balloon & Party Decor",
           links: [
-            {
-              label: "First Night Room Decoration",
-              path: "/first-night-room-decoration",
-            },
-            { label: "Jaimala / Varmala", path: "/wedding-varmala-jaimala" },
+            { label: "All Balloon Decor", path: "/balloon-decoration" },
+            { label: "Ring & Arch Setup", path: "/balloon-ring-decoration" },
+            { label: "Balloon Wall Decor", path: "/balloon-wall-decoration" },
+            { label: "Theme Balloon Setup", path: "/balloon-theme-decoration" },
+            { label: "Room Decoration", path: "/room-decoration" },
+          ],
+        },
+        {
+          heading: "Occasions & Baby Welcome",
+          links: [
+            { label: "Anniversary Decoration", path: "/anniversary-decoration-services" },
+            { label: "Baby Shower Decor", path: "/baby-shower-decoration" },
+            { label: "Newborn Baby Welcome", path: "/newborn-baby-welcome-decoration" },
+            { label: "Bride Welcome Setup", path: "/bride-welcome-decoration" },
+          ],
+        },
+        {
+          heading: "Wedding & Corporate",
+          links: [
+            { label: "First Night Room Decor", path: "/first-night-room-decoration" },
             { label: "Wedding Car Decor", path: "/wedding-car-decorations" },
             { label: "Haldi Decoration", path: "/haldi-decoration-service" },
             { label: "Mehndi Decoration", path: "/mehndi-decoration-service" },
+            { label: "Wedding House Decor", path: "/wedding-house-decoration" },
+            { label: "Corporate Office Decor", path: "/best-corporate-decoration-for-offices-business-events" },
           ],
         },
       ],
     },
     {
-      label: "Personalized",
-      order: 7,
+      label: "Cakes",
+      order: 4,
       sections: [
         {
-          heading: "Coming Soon",
-          links: [],
+          heading: "Trending Cakes",
+          links: [
+            { label: "All Cakes", path: "/cakes" },
+            { label: "Bento Cakes", path: "/bento-cakes" },
+            { label: "Designer Theme Cakes", path: "/designer-theme-cakes" },
+            { label: "Baby Shower Cakes", path: "/baby-shower-cakes" },
+          ],
+        },
+        {
+          heading: "Popular Flavours",
+          links: [
+            { label: "Chocolate Cakes", path: "/chocolate-cakes" },
+            { label: "Black Forest Cakes", path: "/black-forest-cakes" },
+            { label: "Red Velvet Cakes", path: "/red-velvet-cakes" },
+            { label: "Truffle Cakes", path: "/truffle-cakes" },
+            { label: "Fruit Cakes", path: "/fruit-cakes" },
+            { label: "Butterscotch Cakes", path: "/butterscotch-cakes" },
+            { label: "Rasmalai Cakes", path: "/rasmalai-cakes" },
+          ],
+        },
+      ],
+    },
+    {
+      label: "Wedding",
+      order: 5,
+      sections: [
+        {
+          heading: "Wedding Special",
+          links: [
+            { label: "Jaimala / Varmala", path: "/wedding-varmala-jaimala" },
+            { label: "Flower Jewellery", path: "/flower-jewellery" },
+            { label: "First Night Room Decor", path: "/first-night-room-decoration" },
+            { label: "Wedding Car Decor", path: "/wedding-car-decorations" },
+            { label: "Haldi Decoration", path: "/haldi-decoration-service" },
+            { label: "Mehndi Decoration", path: "/mehndi-decoration-service" },
+            { label: "Wedding House Decor", path: "/wedding-house-decoration" },
+          ],
         },
       ],
     },
     {
       label: "Premium",
-      order: 8,
+      order: 6,
       path: "/flowers/india",
     },
     // {

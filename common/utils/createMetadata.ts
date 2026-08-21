@@ -35,6 +35,6 @@ export const createMetadata = async ({
     alternates: {
       canonical: url
     },
-    metadataBase: url
+    metadataBase: new URL(DOMAIN)
   };
 };
