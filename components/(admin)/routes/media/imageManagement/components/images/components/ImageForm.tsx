@@ -1,3 +1,5 @@
+"use client";
+
 // icons
 import { ImagePlus } from "lucide-react";
 
@@ -7,10 +9,7 @@ import { useDispatch, useSelector } from "@/store/withType";
 import { useToast } from "@/components/ui/use-toast";
 
 // redux
-import {
-  // createFolderAction,
-  selectFolder
-} from "@/store/features/media/folderSlice";
+import { selectFolder } from "@/store/features/media/folderSlice";
 
 // components
 import {
@@ -47,11 +46,7 @@ export default function ImageForm(
   const { userName, withFolders, onUpload } = props;
 
   // hooks
-  // const dispatch = useDispatch();
   const { toast } = useToast();
-
-  // redux
-  // const folderStatus = useSelector(selectFolder.status);
 
   const { documents: folders, options: folderOptions } = useSelector((state) =>
     selectFolder.documentList(state, {
@@ -62,20 +57,21 @@ export default function ImageForm(
   );
 
   // states
+  const [open, setOpen] = useState(false);
   const [folderId, setFolderId] = useState<string>(
     withFolders ? props.selectedFolder : ""
   );
   const [selectedImages, setSelectedImages] = useState<ImageDocument[]>([]);
 
   // event handlers
-  const handleSelectImages = (selectedImages: SelectedImages[]) => {
+  const handleSelectImages = (incomingImages: SelectedImages[]) => {
     const folder =
       withFolders && folderId
         ? folders.find(({ _id }) => String(_id) === String(folderId))
         : undefined;
 
     setSelectedImages(
-      selectedImages.map(
+      incomingImages.map(
         ({ alt, extension, width, height, size, data }) =>
           ({
             defaultAlt: alt,
@@ -104,29 +100,27 @@ export default function ImageForm(
         description: "No Images Selected",
         variant: "warning"
       });
-
       return;
     }
 
     if (withFolders && !folderId) {
       toast({
         title: "WARNING",
-        description: "Select Folder",
+        description: "Please select a folder to upload image",
         variant: "warning"
       });
-
       return;
     }
 
     onUpload(selectedImages);
+    setOpen(false);
+    setSelectedImages([]);
+    toast({
+      title: "SUCCESS",
+      description: `${selectedImages.length} image(s) uploaded successfully`,
+      variant: "success"
+    });
   };
-
-  // side effects
-  // useEffect(() => {
-  //   if (folderStatus === "idle") {
-  //     dispatch(createFolderAction.fetchDocuments());
-  //   }
-  // }, [folderStatus, dispatch]);
 
   useEffect(() => {
     if (withFolders) {
@@ -134,8 +128,8 @@ export default function ImageForm(
         ? folders.find(({ _id }) => String(_id) === String(folderId))
         : undefined;
 
-      setSelectedImages(
-        [...selectedImages].map(
+      setSelectedImages((prevImages) =>
+        prevImages.map(
           (selectedImage) =>
             ({
               ...selectedImage,
@@ -149,7 +143,6 @@ export default function ImageForm(
         )
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [withFolders, folders, folderId]);
 
   useEffect(() => {
@@ -159,22 +152,30 @@ export default function ImageForm(
   }, [props]);
 
   return (
-    <Dialog>
-      <DialogTrigger>
-        <span className="transition-all duration-300 hover:bg-emerald-100/50 hover:text-emerald-700 aspect-square rounded-full">
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <button
+          type="button"
+          aria-label="Upload New Image"
+          className="p-1.5 transition-all duration-300 hover:bg-emerald-100/50 hover:text-emerald-700 active:scale-95 aspect-square rounded-full flex items-center justify-center border-none bg-transparent cursor-pointer"
+        >
           <ImagePlus
             strokeWidth={1.5}
             width={24}
             height={24}
           />
-        </span>
+        </button>
       </DialogTrigger>
-      <DialogContent className="sm:min-w-[600px] md:min-w-[760px] flex flex-col justify-start gap-0 overflow-auto scrollbar-hide">
+      <DialogContent
+        overlayClassName="!z-[100001]"
+        className="sm:min-w-[600px] md:min-w-[760px] flex flex-col justify-start gap-0 overflow-auto scrollbar-hide !z-[100002]"
+      >
         <DialogHeader>
-          <DialogTitle></DialogTitle>
+          <DialogTitle className="text-xl font-semibold text-zinc-900 pb-2">
+            Upload Image(s)
+          </DialogTitle>
         </DialogHeader>
-        <span className="text-2xl font-light pb-3">Upload Image(s)</span>
-        <div>
+        <div className="space-y-4 pt-2">
           {withFolders && (
             <Input
               type="dropdown"
@@ -183,12 +184,12 @@ export default function ImageForm(
               validCheck={false}
               labelConfig={{
                 label: "Folder",
-                layoutStyle: "grid grid-cols-[180px_1fr] items-center"
+                layoutStyle: "grid grid-cols-[140px_1fr] items-center"
               }}
               name="folder"
               nullOption
               customInitialValuePlaceholderLabel="Select Folder"
-              className="my-4"
+              className="my-2"
               options={folderOptions}
               customValue={{
                 value: folderId,
@@ -206,22 +207,23 @@ export default function ImageForm(
             emptyFieldErrorText="At least one image is required"
             onImagesSelect={handleSelectImages}
           />
-          <div className="flex items-center justify-center *:w-fit gap-x-5">
-            <div
-              className="hover:underline hover:underline-offset-2 px-4 cursor-pointer"
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              className="px-4 py-2 text-sm text-zinc-600 hover:text-zinc-900 cursor-pointer"
               onClick={() => {
                 setSelectedImages([]);
               }}
             >
               Reset
-            </div>
-            <DialogClose>
-              <Submit
-                masked
-                label="Upload"
-                onClick={handleUpload}
-              />
-            </DialogClose>
+            </button>
+            <button
+              type="button"
+              onClick={handleUpload}
+              className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-medium text-sm rounded-xl shadow-md transition-all cursor-pointer"
+            >
+              Upload
+            </button>
           </div>
         </div>
       </DialogContent>

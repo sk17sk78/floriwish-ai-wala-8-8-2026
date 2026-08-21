@@ -1,7 +1,7 @@
 // config
 import { OPTIMIZE_IMAGE } from "@/config/image";
 
-import { ChangeEvent, useEffect, useId, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { CustomSelectInputType, SelectedImages } from "./static/types";
 import { IMAGE_MAX_SIZE } from "@/common/constants/imageMaxSize";
 import { getImageProps } from "./utils/getImageProps";
@@ -23,14 +23,17 @@ export default function Select(props: CustomSelectInputType) {
     onImagesSelect
   } = props;
 
-  const inputId = useId();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [images, setImages] = useState<SelectedImages[]>([]);
   const [imgSelectedAtleastOnce, setImgSelectedAtleastOnce] =
     useState<boolean>(false);
 
-  const handleMaskedInputClick = () =>
-    (document.getElementById(inputId) as HTMLElement).click();
+  const handleMaskedInputClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
 
   const handleImgFieldChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
@@ -52,7 +55,7 @@ export default function Select(props: CustomSelectInputType) {
                 .replace(/[^A-Za-z0-9\s]/g, "")
                 .replace(/\s+/g, " "),
               data: imgData.split(",")[1],
-              extension: imgFile.type.split("/")[1],
+              extension: imgFile.type.split("/")[1] || "webp",
               height: img.height,
               width: img.width,
               name: imgFile.name,
@@ -72,11 +75,11 @@ export default function Select(props: CustomSelectInputType) {
   const handleImgDelete = (imgSrc: string) =>
     setImages((prev) => prev.filter(({ url }) => url !== imgSrc));
 
-  const deleteAllImages = () => setImages((prev) => []);
+  const deleteAllImages = () => setImages([]);
 
   useEffect(() => {
     if (images.length && !imgSelectedAtleastOnce)
-      setImgSelectedAtleastOnce((prev) => true);
+      setImgSelectedAtleastOnce(true);
   }, [imgSelectedAtleastOnce, images]);
 
   useEffect(() => {
@@ -86,16 +89,17 @@ export default function Select(props: CustomSelectInputType) {
 
   return (
     <div
-      className={` ${images.length ? "pb-4 pt-2 border" : "border-[3px] border-dashed"} ${showEmptyFieldError ? (images.length || !imgSelectedAtleastOnce ? "border-charcoal-3/30" : "border-rose-300/80") : "border-charcoal-3/30"}  overflow-hidden rounded-xl mt-3 mb-5 gap-4`}
+      className={` ${images.length ? "pb-4 pt-2 border" : "border-[3px] border-dashed"} ${showEmptyFieldError ? (images.length || !imgSelectedAtleastOnce ? "border-charcoal-3/30" : "border-rose-300/80") : "border-charcoal-3/30"} overflow-hidden rounded-xl mt-3 mb-5 gap-4`}
     >
       {images.length ? (
         <div className="flex flex-col justify-start">
           <div className="flex items-center justify-between px-4 pb-1.5 mb-5 border-b border-charcoal-3/30">
-            <span className="text-lg">Selected Images</span>
+            <span className="text-lg font-medium">Selected Images ({images.length})</span>
             <div className="flex items-center justify-end gap-2">
               <div
-                className="rounded-full transition-all duration-300 cursor-pointer p-2.5 hover:bg-charcoal-3/10"
+                className="rounded-full transition-all duration-300 cursor-pointer p-2 hover:bg-charcoal-3/10"
                 onClick={handleMaskedInputClick}
+                title="Add more images"
               >
                 <Plus
                   strokeWidth={1.5}
@@ -105,8 +109,9 @@ export default function Select(props: CustomSelectInputType) {
               </div>
 
               <div
-                className="rounded-full transition-all duration-300 cursor-pointer p-2.5 hover:bg-rose-100 hover:text-rose-500"
+                className="rounded-full transition-all duration-300 cursor-pointer p-2 hover:bg-rose-100 hover:text-rose-500"
                 onClick={deleteAllImages}
+                title="Clear all"
               >
                 <Trash
                   strokeWidth={1.5}
@@ -117,12 +122,12 @@ export default function Select(props: CustomSelectInputType) {
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-6 gap-4 px-4 py-2">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 px-4 py-2">
             {images.map(({ url, alt }, index) => {
               return (
                 <div
                   key={index}
-                  className="relative rounded-xl border border-charcoal-3/50 flex items-center justify-center aspect-square"
+                  className="relative rounded-xl border border-charcoal-3/30 overflow-hidden flex items-center justify-center aspect-square shadow-xs group"
                 >
                   <NextImage
                     src={url}
@@ -134,12 +139,12 @@ export default function Select(props: CustomSelectInputType) {
                   />
                   <div
                     onClick={() => handleImgDelete(url)}
-                    className="absolute top-0 right-0 translate-x-[calc(50%_-_3px)] -translate-y-[calc(50%_-_3px)] rounded-full bg-red-600 text-white p-1 cursor-pointer transition-all duration-300 hover:bg-red-700"
+                    className="absolute top-1.5 right-1.5 rounded-full bg-red-600/90 text-white p-1 cursor-pointer transition-all duration-200 hover:bg-red-700 shadow-md"
                   >
                     <X
-                      strokeWidth={1.5}
-                      width={16}
-                      height={16}
+                      strokeWidth={2}
+                      width={14}
+                      height={14}
                     />
                   </div>
                 </div>
@@ -148,70 +153,44 @@ export default function Select(props: CustomSelectInputType) {
           </div>
         </div>
       ) : (
-        // NO IMAGE SELECTED YET ---------------------------------------------------------
+        // NO IMAGE SELECTED YET
         <div
           onClick={handleMaskedInputClick}
-          className={`cursor-pointer flex items-center justify-center flex-col gap-2 py-14 px-5 w-full text-center ${imgSelectedAtleastOnce && showEmptyFieldError ? "text-rose-400 bg-rose-50/50" : "text-charcoal-3/50"} ${className || ""}`}
+          className={`cursor-pointer flex items-center justify-center flex-col gap-2 py-12 px-5 w-full text-center hover:bg-zinc-50/60 transition-colors ${imgSelectedAtleastOnce && showEmptyFieldError ? "text-rose-400 bg-rose-50/50" : "text-charcoal-3/60"} ${className || ""}`}
         >
           <MousePointerClick
             strokeWidth={1.5}
             width={36}
             height={36}
+            className="text-emerald-600"
           />
-          <span>
+          <span className="text-sm font-medium text-zinc-700">
             {imgSelectedAtleastOnce && showEmptyFieldError
               ? props.emptyFieldErrorText
-              : "Select Images"}
+              : "Click to Browse & Upload Images"}
           </span>
+          <span className="text-[11px] text-zinc-400">JPG, PNG, WEBP up to 5MB</span>
         </div>
       )}
-      <SelectInput
-        handleImgFieldChange={handleImgFieldChange}
-        isDisabled={isDisabled}
-        isRequired={isRequired}
-        multipleAllowed={multipleAllowed}
+      <input
+        ref={fileInputRef}
+        type="file"
         name={name}
-        type={type}
-        id={inputId}
+        accept={
+          type === "image"
+            ? "image/*"
+            : type === "video"
+              ? "video/*"
+              : type === "pdf"
+                ? "application/pdf"
+                : ""
+        }
+        multiple={multipleAllowed}
+        className="hidden"
+        required={isRequired || false}
+        disabled={isDisabled || false}
+        onChange={handleImgFieldChange}
       />
     </div>
   );
 }
-
-const SelectInput = ({
-  name,
-  multipleAllowed,
-  isRequired,
-  isDisabled,
-  handleImgFieldChange,
-  type,
-  id
-}: {
-  type: CustomSelectInputType["type"];
-  name: string;
-  multipleAllowed: boolean;
-  isRequired: boolean;
-  isDisabled: boolean | undefined;
-  id: string;
-  handleImgFieldChange: (e: ChangeEvent<HTMLInputElement>) => void;
-}) => (
-  <input
-    id={id}
-    type="file"
-    name={name}
-    accept={
-      type === "image"
-        ? "image/*"
-        : type === "video"
-          ? "video/*"
-          : type === "pdf"
-            ? "application/pdf"
-            : ""
-    }
-    multiple={multipleAllowed}
-    className="hidden"
-    required={isRequired || false}
-    disabled={isDisabled || false}
-    onChange={handleImgFieldChange}
-  />
-);

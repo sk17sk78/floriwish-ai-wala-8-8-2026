@@ -1,24 +1,26 @@
 "use client";
 
-import { useEffect, useCallback, memo } from "react";
+import React, { useState, useEffect, useCallback, memo } from "react";
+import { Bell, X, Sparkles, CheckCircle2 } from "lucide-react";
 import { requestFCMToken, listenToForegroundMessages, detectPlatform } from "@/config/firebase";
 import { useOptionalAppStates } from "@/hooks/useAppState/useAppState";
 
-const STORAGE_KEY = "floriwish_push_native_v1";
+const STORAGE_KEY = "floriwish_push_prompt_dismissed_v2";
 
 /**
- * Headless Native Push Notification Manager
+ * Universal Native Push Notification Trigger Component
  *
- * 100% Official Browser/Device Native Notification Flow:
- * - NO custom/fake popups, modals, or HTML permission dialogs.
- * - Uses browser's official `Notification.requestPermission()`.
- * - Cross-device: Chrome, Safari, Edge, Android, iOS PWA / iPad, Desktop.
- * - Dispatches actual OS/System notifications on incoming messages.
- * - Returns `null` (zero DOM overhead).
+ * Fully compliant with Chrome, Safari (Mac/iPad/iOS 16.4+), and Android WebKit security standards.
+ * Modern browsers strictly require an explicit user click gesture to display the native
+ * browser permission popup ("floriwish.com wants to send you notifications").
  */
 function NotificationPrompt() {
   const appStates = useOptionalAppStates();
   const customerId = appStates?.auth?.data?.customerId || null;
+
+  const [showPrompt, setShowPrompt] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   // ─── Register FCM Token with Backend ─────────────────────────────────────────
   const registerToken = useCallback(async (userId?: string | null) => {
@@ -92,12 +94,15 @@ function NotificationPrompt() {
     });
   }, []);
 
-  // ─── Request Native Browser Permission ───────────────────────────────────────
-  const requestNativePermission = useCallback(async () => {
+  // ─── Synchronous User Gesture Permission Handler ──────────────────────────────
+  // Triggered DIRECTLY on user click so Safari/iOS/Chrome will pop up the native dialog
+  const handleAllowClick = async () => {
     if (typeof window === "undefined" || !("Notification" in window)) return;
-    if (Notification.permission !== "default") return;
 
     try {
+      setIsProcessing(true);
+
+      // 1. Request native permission directly within user click gesture
       let permission: NotificationPermission = "default";
       try {
         permission = await Notification.requestPermission();
@@ -108,101 +113,151 @@ function NotificationPrompt() {
       }
 
       if (permission === "granted") {
+        setIsSuccess(true);
         localStorage.setItem(STORAGE_KEY, "granted");
         await registerToken(customerId);
         setupForegroundListener();
-      } else if (permission === "denied") {
+
+        // Dismiss after showing success state briefly
+        setTimeout(() => {
+          setShowPrompt(false);
+        }, 1800);
+      } else {
         localStorage.setItem(STORAGE_KEY, "denied");
+        setShowPrompt(false);
       }
     } catch (err) {
-      console.warn("[FCM] Native permission request notice:", err);
+      console.warn("[FCM] Permission request error:", err);
+      setShowPrompt(false);
+    } finally {
+      setIsProcessing(false);
     }
-  }, [customerId, registerToken, setupForegroundListener]);
+  };
 
-  // ─── Main Lifecycle Effect ───────────────────────────────────────────────────
+  const handleDismiss = () => {
+    localStorage.setItem(STORAGE_KEY, "dismissed_" + Date.now());
+    setShowPrompt(false);
+  };
+
+  // ─── Main Lifecycle Check ────────────────────────────────────────────────────
   useEffect(() => {
     if (typeof window === "undefined" || !("Notification" in window)) return;
 
-    let cleanupFn: (() => void) | undefined;
-
-    const startNotificationFlow = () => {
-      // Ensure Service Worker is registered
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker
-          .register("/firebase-messaging-sw.js", { scope: "/" })
-          .catch(() => {});
-      }
-
-      const currentPermission = Notification.permission;
-
-      // 1. Permission already granted → register token & listen
-      if (currentPermission === "granted") {
-        registerToken(customerId);
-        setupForegroundListener();
-        return;
-      }
-
-      // 2. Permission already denied → do nothing
-      if (currentPermission === "denied") {
-        return;
-      }
-
-      // 3. Permission is default → request native permission
-      const savedState = localStorage.getItem(STORAGE_KEY);
-      if (savedState === "denied") return;
-
-      // Trigger official browser prompt on first user gesture or after gentle delay
-      const handleUserGesture = () => {
-        if (Notification.permission === "default") {
-          requestNativePermission();
-        }
-        window.removeEventListener("click", handleUserGesture);
-        window.removeEventListener("touchstart", handleUserGesture);
-      };
-
-      window.addEventListener("click", handleUserGesture, { once: true });
-      window.addEventListener("touchstart", handleUserGesture, { once: true });
-
-      const timer = setTimeout(() => {
-        if (Notification.permission === "default") {
-          requestNativePermission();
-        }
-      }, 2500);
-
-      cleanupFn = () => {
-        clearTimeout(timer);
-        window.removeEventListener("click", handleUserGesture);
-        window.removeEventListener("touchstart", handleUserGesture);
-      };
-    };
-
-    if ("requestIdleCallback" in window) {
-      const idleId = (window as any).requestIdleCallback(startNotificationFlow, { timeout: 3000 });
-      return () => {
-        if ("cancelIdleCallback" in window) {
-          (window as any).cancelIdleCallback(idleId);
-        }
-        if (cleanupFn) cleanupFn();
-      };
-    } else {
-      const timer = setTimeout(startNotificationFlow, 1500);
-      return () => {
-        clearTimeout(timer);
-        if (cleanupFn) cleanupFn();
-      };
+    // Register service worker
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/firebase-messaging-sw.js", { scope: "/" })
+        .catch(() => {});
     }
-  }, [customerId, registerToken, setupForegroundListener, requestNativePermission]);
 
-  // ─── Re-register when customer logs in ───────────────────────────────────────
-  useEffect(() => {
-    if (!customerId || typeof window === "undefined") return;
-    if (!("Notification" in window) || Notification.permission !== "granted") return;
+    const currentPermission = Notification.permission;
 
-    registerToken(customerId);
-  }, [customerId, registerToken]);
+    // If already granted, register & listen immediately
+    if (currentPermission === "granted") {
+      registerToken(customerId);
+      setupForegroundListener();
+      return;
+    }
 
-  // Pure headless component — 100% native browser UI, zero DOM footprint
-  return null;
+    // If already denied in browser, do not show banner
+    if (currentPermission === "denied") {
+      return;
+    }
+
+    // Check if dismissed recently (within 3 days)
+    const dismissedVal = localStorage.getItem(STORAGE_KEY);
+    if (dismissedVal && dismissedVal.startsWith("dismissed_")) {
+      const timestamp = parseInt(dismissedVal.replace("dismissed_", ""), 10);
+      if (!isNaN(timestamp) && Date.now() - timestamp < 3 * 24 * 60 * 60 * 1000) {
+        return;
+      }
+    }
+
+    // Show prompt after 2 seconds on page
+    const timer = setTimeout(() => {
+      if (Notification.permission === "default") {
+        setShowPrompt(true);
+      }
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [customerId, registerToken, setupForegroundListener]);
+
+  if (!showPrompt) return null;
+
+  return (
+    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-[99999] animate-in fade-in slide-in-from-bottom-5 duration-300">
+      <div className="relative overflow-hidden bg-white/95 backdrop-blur-md border border-rose-200/80 shadow-2xl rounded-2xl p-4.5 sm:p-5 text-zinc-900">
+        {/* Subtle decorative glow */}
+        <div className="absolute -top-10 -right-10 w-28 h-28 bg-[#ad2355]/10 rounded-full blur-2xl pointer-events-none" />
+
+        <div className="flex items-start gap-3.5">
+          {/* Bell Icon Badge */}
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#ad2355] to-[#8e1944] text-white flex items-center justify-center shrink-0 shadow-md">
+            {isSuccess ? (
+              <CheckCircle2 className="w-6 h-6 text-white animate-in zoom-in-50 duration-200" />
+            ) : (
+              <Bell className="w-5 h-5 text-white animate-bounce" />
+            )}
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 min-w-0 pr-6">
+            <div className="flex items-center gap-1.5">
+              <h4 className="text-sm font-bold text-zinc-900 tracking-tight">
+                {isSuccess ? "Notifications Enabled!" : "Turn On Order Updates"}
+              </h4>
+              {!isSuccess && <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />}
+            </div>
+
+            <p className="text-xs text-zinc-600 mt-1 leading-relaxed">
+              {isSuccess
+                ? "You will now receive instant delivery status & surprise alerts."
+                : "Get live order tracking, delivery notifications, and exclusive offers."}
+            </p>
+
+            {/* Action Buttons */}
+            {!isSuccess && (
+              <div className="flex items-center gap-2.5 mt-3.5">
+                <button
+                  type="button"
+                  onClick={handleAllowClick}
+                  disabled={isProcessing}
+                  className="px-4 py-2 rounded-xl bg-[#ad2355] hover:bg-[#8e1944] active:scale-95 text-white text-xs font-semibold shadow-sm transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+                >
+                  {isProcessing ? (
+                    <span>Opening prompt...</span>
+                  ) : (
+                    <span>Allow Notifications</span>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleDismiss}
+                  className="px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-600 hover:text-zinc-900 text-xs font-medium transition-all cursor-pointer"
+                >
+                  Later
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Close button */}
+          {!isSuccess && (
+            <button
+              type="button"
+              onClick={handleDismiss}
+              aria-label="Close notification prompt"
+              className="absolute top-3 right-3 p-1 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default memo(NotificationPrompt);
