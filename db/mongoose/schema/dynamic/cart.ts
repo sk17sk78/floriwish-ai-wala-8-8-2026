@@ -71,3 +71,7 @@ cartSchema.index({
   createdBy: "text",
   updatedBy: "text"
 });
+
+// Performance indexes
+cartSchema.index({ customer: 1, isActive: 1 });
+cartSchema.index({ isOrdered: 1, createdAt: -1 });

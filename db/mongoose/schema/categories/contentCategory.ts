@@ -102,3 +102,6 @@ contentCategorySchema.index({
   createdBy: "text",
   updatedBy: "text"
 });
+
+// Performance index
+contentCategorySchema.index({ slug: 1, isActive: 1 });

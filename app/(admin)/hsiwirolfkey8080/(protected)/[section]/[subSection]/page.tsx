@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 // components
 import AdminRoleAuth from "@/common/utils/admin/roleAuth";
 

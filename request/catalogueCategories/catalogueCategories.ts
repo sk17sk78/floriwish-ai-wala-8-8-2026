@@ -24,8 +24,10 @@ export const fetchCatalogueCategories = (renderingStrategy?: "SSR" | "ISR") => {
             ? { ssr: true }
             : { isr: true, revalidate: CATALOGUE_CATEGORY_REFRESH_INTERVAL };
 
+        const baseUrl = typeof window !== "undefined" ? "" : DOMAIN;
+
         const response: Response = await fetch(
-          `${DOMAIN}/api/frontend/catalogue-categories`,
+          `${baseUrl}/api/frontend/catalogue-categories`,
           {
             method: "GET",
             headers: { "x-api-key": XApiKey },

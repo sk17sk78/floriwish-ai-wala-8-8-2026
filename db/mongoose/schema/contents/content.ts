@@ -169,6 +169,14 @@ contentSchema.index({
   updatedBy: "text"
 });
 
+// Performance compound indexes
+contentSchema.index({ slug: 1, isActive: 1 });
+contentSchema.index({ "category.primary": 1, isActive: 1 });
+contentSchema.index({ "category.related": 1, isActive: 1 });
+contentSchema.index({ type: 1, isActive: 1, slug: 1 });
+contentSchema.index({ "tag.aiTags": 1, isActive: 1 });
+contentSchema.index({ "quality.rating.count": -1, isActive: 1 });
+
 // middlewares
 contentSchema.pre("save", async function (next) {
   const doc = this as ContentDocument;

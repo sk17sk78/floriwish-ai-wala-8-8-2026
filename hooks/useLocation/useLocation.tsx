@@ -65,17 +65,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
 
   // side effects
   useEffect(() => {
-    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-      const idleId = (window as any).requestIdleCallback(handleLoadData, { timeout: 2500 });
-      return () => {
-        if ("cancelIdleCallback" in window) {
-          (window as any).cancelIdleCallback(idleId);
-        }
-      };
-    } else {
-      const timer = setTimeout(handleLoadData, 1500);
-      return () => clearTimeout(timer);
-    }
+    handleLoadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

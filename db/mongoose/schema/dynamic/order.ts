@@ -61,3 +61,8 @@ orderSchema.index({
   createdBy: "text",
   updatedBy: "text"
 });
+
+// Performance indexes
+orderSchema.index({ id: 1 });
+orderSchema.index({ cart: 1 });
+orderSchema.index({ createdAt: -1 });

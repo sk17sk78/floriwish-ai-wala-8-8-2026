@@ -22,6 +22,17 @@ import { type ContentCategoryDocument } from "@/common/types/documentation/categ
 import { type NextRequest, NextResponse } from "next/server";
 import { connectRedis, redisClient } from "@/db/redis/redis-client";
 
+// In-memory L1 cache for search (<1ms response)
+let inMemorySearchPayloadCache: {
+  data: {
+    aiTags: AITagDocument[];
+    categories: ContentCategoryDocument[];
+    contents: ContentDocument[];
+  };
+  timestamp: number;
+} | null = null;
+const SEARCH_L1_TTL_MS = 60 * 1000;
+
 export const GET = async (
   req: NextRequest,
 ): Promise<
@@ -32,6 +43,17 @@ export const GET = async (
   }>
 > => {
   try {
+    const now = Date.now();
+
+    // 1. Check In-Memory L1 Cache
+    if (
+      inMemorySearchPayloadCache &&
+      now - inMemorySearchPayloadCache.timestamp < SEARCH_L1_TTL_MS
+    ) {
+      return Response(successData(inMemorySearchPayloadCache.data));
+    }
+
+    // 2. Check Redis L2 Cache
     let cachedData: string | null = null;
     try {
       await connectRedis();
@@ -55,28 +77,28 @@ export const GET = async (
         }>(notFoundErrorResponse);
       }
 
+      const payload = { aiTags, categories, contents };
+      inMemorySearchPayloadCache = { data: payload, timestamp: now };
+
       try {
         await redisClient.set(
           "search",
-          JSON.stringify({ aiTags, categories, contents }),
+          JSON.stringify(payload),
+          { EX: 300 }
         );
       } catch (redisSetError) {
         // Ignore cache write error
       }
 
-      return Response(
-        successData({
-          aiTags,
-          categories,
-          contents,
-        }),
-      );
+      return Response(successData(payload));
     } else {
+      const parsed = JSON.parse(cachedData);
+      inMemorySearchPayloadCache = { data: parsed, timestamp: now };
       return Response(
         successData({
-          aiTags: JSON.parse(cachedData).aiTags,
-          categories: JSON.parse(cachedData).categories,
-          contents: JSON.parse(cachedData).contents,
+          aiTags: parsed.aiTags,
+          categories: parsed.categories,
+          contents: parsed.contents,
         }),
       );
     }

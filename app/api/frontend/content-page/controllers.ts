@@ -524,76 +524,114 @@ export const getCoupons = async ({
   }
 };
 
+// In-memory L1 cache for suggestions
+const inMemorySuggestionsCache = new Map<string, { data: ContentDocument; timestamp: number }>();
+const SUGGESTIONS_L1_TTL_MS = 120 * 1000; // 120 seconds
+
 export const getContentPageDetailsV = async ({
   slug
 }: {
   slug: string;
 }): Promise<ContentDocument | null> => {
+  const cacheKey = `${CONTENT_PAGE_CACHE_KEY}_suggestions_${slug}`;
+  const now = Date.now();
+
   try {
+    // 1. In-Memory L1 Cache (<1ms)
+    const l1 = inMemorySuggestionsCache.get(cacheKey);
+    if (l1 && (now - l1.timestamp) < SUGGESTIONS_L1_TTL_MS) {
+      return l1.data;
+    }
+
+    // 2. Redis L2 Cache
+    const cachedDocument = await getFromRedis<ContentDocument>({ key: cacheKey });
+    if (cachedDocument) {
+      inMemorySuggestionsCache.set(cacheKey, { data: cachedDocument, timestamp: now });
+      return cachedDocument;
+    }
+
     await connectDB();
 
     const document = await Contents.findOne({
       isActive: true,
       slug
-    }).select(["category.primary", "tag.aiTags", "tag.relatedAITags"]);
+    })
+      .select(["category.primary", "tag.aiTags", "tag.relatedAITags"])
+      .lean();
 
     if (!document) {
       return null;
     }
 
+    const primaryCategory = document.category?.primary;
+    const aiTags = document.tag?.aiTags || [];
+    const relatedAITags = document.tag?.relatedAITags || [];
+
     const [coupons, aiTagContents, relatedAITagContents, categoryContents] =
       await Promise.all([
-        await Coupons.find({
-          isActive: true,
-          $or: [
-            { applicableCategories: { $size: 0 } },
-            { applicableCategories: document.category.primary }
-          ]
-        })
-          .select([
-            "type",
-            "code",
-            "description",
-            "minimumOrderAmount",
-            "valid",
-            "limitPerCustomer",
-            "discount.type",
-            "discount.limit",
-            "discount.percentage"
-          ])
-          .limit(10),
-        await Contents.find({
-          slug: { $ne: slug },
-          isActive: true,
-          "tag.aiTags": { $in: document.tag?.aiTags }
-        })
-          .select(SELECT.contentSuggestion)
-          .populate(POPULATE.contentSuggestion)
-          .limit(20),
-        await Contents.find({
-          slug: { $ne: slug },
-          isActive: true,
-          "tag.aiTags": { $in: document.tag?.relatedAITags }
-        })
-          .select(SELECT.contentSuggestion)
-          .populate(POPULATE.contentSuggestion)
-          .limit(20),
-        await Contents.find({
-          slug: { $ne: slug },
-          isActive: true,
-          "category.primary": document.category.primary
-        })
-          .select(SELECT.contentSuggestion)
-          .populate(POPULATE.contentSuggestion)
-          .limit(20)
+        primaryCategory
+          ? Coupons.find({
+              isActive: true,
+              $or: [
+                { applicableCategories: { $size: 0 } },
+                { applicableCategories: primaryCategory }
+              ]
+            })
+              .select([
+                "type",
+                "code",
+                "description",
+                "minimumOrderAmount",
+                "valid",
+                "limitPerCustomer",
+                "discount.type",
+                "discount.limit",
+                "discount.percentage"
+              ])
+              .limit(10)
+              .lean()
+          : Promise.resolve([]),
+        aiTags.length > 0
+          ? Contents.find({
+              slug: { $ne: slug },
+              isActive: true,
+              "tag.aiTags": { $in: aiTags }
+            })
+              .select(SELECT.contentSuggestion)
+              .populate(POPULATE.contentSuggestion)
+              .limit(20)
+              .lean()
+          : Promise.resolve([]),
+        relatedAITags.length > 0
+          ? Contents.find({
+              slug: { $ne: slug },
+              isActive: true,
+              "tag.aiTags": { $in: relatedAITags }
+            })
+              .select(SELECT.contentSuggestion)
+              .populate(POPULATE.contentSuggestion)
+              .limit(20)
+              .lean()
+          : Promise.resolve([]),
+        primaryCategory
+          ? Contents.find({
+              slug: { $ne: slug },
+              isActive: true,
+              "category.primary": primaryCategory
+            })
+              .select(SELECT.contentSuggestion)
+              .populate(POPULATE.contentSuggestion)
+              .limit(20)
+              .lean()
+          : Promise.resolve([])
       ]);
 
     const shuffledAITagContents = getRandomElements({
-      array: aiTagContents,
+      array: aiTagContents as any[],
       count: 12
     });
 
-    const filteredRelatedAITagContents = relatedAITagContents.filter(
+    const filteredRelatedAITagContents = (relatedAITagContents as any[]).filter(
       ({ _id }) =>
         !shuffledAITagContents.find(({ _id: id }) => String(id) === String(_id))
     );
@@ -602,7 +640,7 @@ export const getContentPageDetailsV = async ({
       count: 12
     });
 
-    const filteredCategoryContents = categoryContents.filter(
+    const filteredCategoryContents = (categoryContents as any[]).filter(
       ({ _id }) =>
         !shuffledAITagContents.find(
           ({ _id: id }) => String(id) === String(_id)
@@ -616,18 +654,23 @@ export const getContentPageDetailsV = async ({
       count: 16
     });
 
-    const documentObj = document.toObject();
+    const documentObj: any = {
+      ...document,
+      _coupons: coupons,
+      _suggestions: {
+        aiTag: aiTags.length ? shuffledAITagContents : [],
+        relatedAITag: relatedAITags.length ? shuffledRelatedAITagContents : [],
+        category: shuffledCategoryContents
+      } as unknown as ContentSuggestionDocument
+    };
 
-    documentObj._coupons = coupons;
-    documentObj._suggestions = {
-      aiTag: documentObj.tag?.aiTags?.length ? shuffledAITagContents : [],
-      relatedAITag: documentObj.tag?.relatedAITags?.length
-        ? shuffledRelatedAITagContents
-        : [],
-      category: shuffledCategoryContents
-    } as unknown as ContentSuggestionDocument;
+    const finalResult = JSON.parse(JSON.stringify(documentObj)) as ContentDocument;
 
-    return documentObj;
+    // Cache in L1 & L2
+    inMemorySuggestionsCache.set(cacheKey, { data: finalResult, timestamp: now });
+    await setToRedis({ key: cacheKey, value: finalResult, ttl: 180 });
+
+    return finalResult;
   } catch (error: any) {
     console.error(`❌ DB Error in getContentPageDetailsV for ${slug}:`, error);
     return null;
@@ -642,9 +685,10 @@ export const getProductSlugs = async (): Promise<ContentDocument[] | null> => {
       type: "product"
     })
       .select(["slug"])
-      .sort({ slug: 1 });
+      .sort({ slug: 1 })
+      .lean();
 
-    return documents;
+    return documents as unknown as ContentDocument[];
   } catch (error: any) {
     console.error('[ERR getProductSlugs]', error);
     return null;
@@ -677,44 +721,136 @@ export const getFullProductData = async (slug: string): Promise<ContentDocument 
       return cachedDocument;
     }
 
-    // 3. Cache miss - fetch from MongoDB
-    const [i, ii, iii, iv] = await Promise.all([
-      getContentPageDetailsI({ slug }),
-      getContentPageDetailsII({ slug }),
-      getContentPageDetailsIII({ slug }),
-      getContentPageDetailsIV({ slug })
+    // 3. Cache miss - fetch from MongoDB in a single unified query
+    await connectDB();
+
+    const [document, initialCoupons] = await Promise.all([
+      Contents.findOne({
+        isActive: true,
+        slug
+      })
+        .select([
+          "name",
+          "slug",
+          "category",
+          "media",
+          "availability",
+          "detail",
+          "quality",
+          "delivery",
+          "price",
+          "edible",
+          "seoMeta",
+          "createdAt",
+          "customization",
+          "addons",
+          "variants",
+          "tag"
+        ])
+        .populate([
+          ...POPULATE.contentBasic,
+          ...POPULATE.contentCustomization,
+          ...POPULATE.addon,
+          {
+            path: "variants.label",
+            select: ["label"]
+          },
+          {
+            path: "variants.reference.reference",
+            select: [
+              "name",
+              "slug",
+              "price.base.mrp",
+              "price.base.price",
+              "price.cities.city",
+              "price.cities.mrp",
+              "price.cities.price"
+            ],
+            populate: [
+              {
+                path: "media.primary",
+                select: SELECT.image
+              }
+            ],
+            strictPopulate: false
+          },
+          {
+            path: "variants.custom.unit",
+            select: ["name", "abbr", "serves"],
+            strictPopulate: false
+          },
+          {
+            path: "variants.custom.variants",
+            select: ["label", "price", "value"],
+            populate: [
+              {
+                path: "image",
+                select: SELECT.image
+              }
+            ],
+            strictPopulate: false
+          }
+        ])
+        .lean(),
+      Coupons.find({ isActive: true })
+        .select([
+          "type",
+          "code",
+          "description",
+          "minimumOrderAmount",
+          "valid",
+          "limitPerCustomer",
+          "discount.type",
+          "discount.limit",
+          "discount.percentage",
+          "applicableCategories"
+        ])
+        .limit(20)
+        .lean()
     ]);
 
-    if (!i || !ii || !iii || !iv) {
+    if (!document) {
       return null;
     }
 
-    const docObj = i.toObject();
+    const docObj: any = { ...document };
 
-    // Fetch coupons separately using the primary category ID
-    const coupons = await getCoupons({ 
-      categoryId: (docObj.category?.primary as any)?._id || docObj.category?.primary 
-    });
+    // Process availability
+    if (
+      docObj?.availability?.availableAt === "cities" &&
+      docObj?.availability?.limitAvailability
+    ) {
+      if (docObj?.price?.cities?.length) {
+        docObj.availability.cities = docObj.price.cities.map(
+          ({ city }: any) => city as string
+        );
+      } else {
+        docObj.availability.cities = [];
+      }
+    }
 
-    const rawDocument = {
-      ...docObj,
-      availability: ii.availability,
-      customization: iii.customization,
-      addons: iii.addons,
-      variants: iv.variants,
-      _coupons: coupons
-    };
+    // Match coupons for this category
+    const categoryId = String(
+      (docObj.category?.primary as any)?._id || docObj.category?.primary || ""
+    );
+    const matchedCoupons = (initialCoupons || []).filter((c: any) => {
+      if (!c.applicableCategories || c.applicableCategories.length === 0) return true;
+      return c.applicableCategories.some((catId: any) => String(catId) === categoryId);
+    }).slice(0, 10);
 
-    const document = JSON.parse(JSON.stringify(rawDocument)) as unknown as ContentDocument;
+    docObj._coupons = matchedCoupons;
+
+    const parsedDocument = JSON.parse(JSON.stringify(docObj)) as unknown as ContentDocument;
 
     // Cache the result in Memory L1 and Redis
-    inMemoryProductCache.set(cacheKey, { data: document, timestamp: now });
+    inMemoryProductCache.set(cacheKey, { data: parsedDocument, timestamp: now });
     await setToRedis({
       key: cacheKey,
-      value: document
+      value: parsedDocument,
+      ttl: 300
     });
 
-    return document;
+    return parsedDocument;
   } catch (error: any) {
     console.error('[ERR getFullProductData]', slug, error);
     return null;

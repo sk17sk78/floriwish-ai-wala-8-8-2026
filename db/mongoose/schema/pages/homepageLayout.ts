@@ -90,6 +90,9 @@ homepageLayoutSchema.index({
   updatedBy: "text"
 });
 
+// Performance index
+homepageLayoutSchema.index({ isActive: 1, order: 1 });
+
 // Middlewares
 homepageLayoutSchema.pre("save", async function (next) {
   const doc = this as HomepageLayoutDocument;

@@ -94,3 +94,8 @@ couponSchema.index({
   createdBy: "text",
   updatedBy: "text"
 });
+
+// Performance compound indexes
+couponSchema.index({ code: 1, isActive: 1 });
+couponSchema.index({ isActive: 1, applicableCategories: 1 });
+couponSchema.index({ isActive: 1, isPublic: 1 });

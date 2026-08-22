@@ -119,3 +119,6 @@ subSubSubTopicSchema.index({
   createdBy: "text",
   updatedBy: "text"
 });
+
+// Performance index
+subSubSubTopicSchema.index({ slug: 1, subSubTopic: 1, isActive: 1 });

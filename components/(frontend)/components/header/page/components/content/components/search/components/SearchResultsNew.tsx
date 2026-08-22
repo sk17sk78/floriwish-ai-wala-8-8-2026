@@ -28,7 +28,9 @@ function SearchResultsNew({
   onKeywordClick: (keyword: string) => void;
   collapse: () => void;
 }) {
-  if (isLoading && keyword.trim().length > 0 && indices.length === 0) {
+  const hasKeyword = keyword.trim().length > 0;
+
+  if (isLoading && hasKeyword && indices.length === 0) {
     return (
       <div className="flex flex-col gap-4 py-4 animate-pulse">
         <div className="h-6 w-32 bg-gray-200 rounded" />
@@ -45,32 +47,59 @@ function SearchResultsNew({
     );
   }
 
-  return indices.length > 0 ? (
-    <>
-      <SearchResultContentCategoriesAITagsNew
-        categories={aiTagsAndCategories?.categories || []}
-        aiTags={aiTagsAndCategories?.aiTags || []}
-        collapse={collapse}
-      />
-      <SearchResultContentsNew
-        contents={contents}
-        indices={indices}
-        collapse={collapse}
-      />
-    </>
-  ) : (
-    <>
-      <SearchTrendingKeywordsNew
-        trendingKeywords={aiTagsAndCategories?.trendingKeywords || []}
-        onKeywordClick={onKeywordClick}
-        collapse={collapse}
-      />
-      <SearchSuggestedKeywordsNew
-        suggestedKeywords={aiTagsAndCategories?.suggestedKeywords || []}
-        onKeywordClick={onKeywordClick}
-        collapse={collapse}
-      />
-    </>
+  // 1. If no search keyword, ALWAYS show trending and suggested keywords
+  if (!hasKeyword) {
+    return (
+      <>
+        <SearchTrendingKeywordsNew
+          trendingKeywords={aiTagsAndCategories?.trendingKeywords || []}
+          onKeywordClick={onKeywordClick}
+          collapse={collapse}
+        />
+        <SearchSuggestedKeywordsNew
+          suggestedKeywords={aiTagsAndCategories?.suggestedKeywords || []}
+          onKeywordClick={onKeywordClick}
+          collapse={collapse}
+        />
+      </>
+    );
+  }
+
+  // 2. Keyword is present and matches were found
+  if (indices.length > 0) {
+    return (
+      <>
+        <SearchResultContentCategoriesAITagsNew
+          categories={aiTagsAndCategories?.categories || []}
+          aiTags={aiTagsAndCategories?.aiTags || []}
+          collapse={collapse}
+        />
+        <SearchResultContentsNew
+          contents={contents}
+          indices={indices}
+          collapse={collapse}
+        />
+      </>
+    );
+  }
+
+  // 3. Keyword is present but no products match
+  return (
+    <div className="py-8 text-center">
+      <p className="text-zinc-500 text-sm">
+        No results found for &ldquo;<span className="font-semibold text-zinc-800">{keyword.trim()}</span>&rdquo;
+      </p>
+      <p className="text-zinc-400 text-xs mt-1">
+        Try checking your spelling or search for flowers, cakes, balloons, or gifts.
+      </p>
+      <div className="mt-6 text-left">
+        <SearchTrendingKeywordsNew
+          trendingKeywords={aiTagsAndCategories?.trendingKeywords || []}
+          onKeywordClick={onKeywordClick}
+          collapse={collapse}
+        />
+      </div>
+    </div>
   );
 }
 

@@ -89,6 +89,7 @@ function SearchContentUI({
   // Master product pool & client cache for instant 0ms responses
   const masterPoolRef = useRef<SearchContentsType[]>([]);
   const searchCacheRef = useRef<Map<string, SearchContentsType[]>>(new Map());
+  const activeKeywordRef = useRef<string>("");
 
   // Helper to merge items into master pool without duplicates
   const mergeIntoMasterPool = useCallback((newItems: SearchContentsType[]) => {
@@ -102,11 +103,17 @@ function SearchContentUI({
   // Fetch from API
   const fetchCityWiseContentList = useCallback(
     async (searchKey?: string) => {
+      const trimmedKey = (searchKey || "").trim();
+
+      // Guard: If searchKey is stale compared to current input, ignore
+      if (trimmedKey.toLowerCase() !== activeKeywordRef.current.trim().toLowerCase()) {
+        return;
+      }
+
       const cityId = selectedCity === null ? "null" : String(selectedCity._id);
       const url = new URL(API_SEARCH_CONTENTS);
       url.searchParams.set("cityId", cityId);
 
-      const trimmedKey = (searchKey || "").trim();
       const cacheKey = `${cityId}_${trimmedKey.toLowerCase()}`;
 
       if (trimmedKey) {
@@ -118,15 +125,23 @@ function SearchContentUI({
 
       // Check client memory cache
       if (searchCacheRef.current.has(cacheKey)) {
+        if (trimmedKey.toLowerCase() !== activeKeywordRef.current.trim().toLowerCase()) {
+          return;
+        }
         const cached = searchCacheRef.current.get(cacheKey) || [];
-        setContents(cached);
-        setResults(cached.map((_, i) => i));
+        if (trimmedKey) {
+          setContents(cached);
+          setResults(cached.map((_, i) => i));
+        } else {
+          setContents([]);
+          setResults([]);
+        }
         setIsLoading(false);
         return;
       }
 
-      // Only show loading if we don't have instant results already visible
-      if (masterPoolRef.current.length === 0 || !trimmedKey) {
+      // Only show loading if we don't have instant results already visible and keyword is present
+      if (trimmedKey && masterPoolRef.current.length === 0) {
         setIsLoading(true);
       }
 
@@ -142,11 +157,16 @@ function SearchContentUI({
         searchCacheRef.current.set(cacheKey, newContents);
         mergeIntoMasterPool(newContents);
 
+        // Guard: Discard stale response if user cleared or changed input while in-flight
+        if (trimmedKey.toLowerCase() !== activeKeywordRef.current.trim().toLowerCase()) {
+          return;
+        }
+
         if (trimmedKey) {
           setContents(newContents);
           setResults(newContents.map((_, i) => i));
         } else {
-          setContents(newContents);
+          setContents([]);
           setResults([]);
         }
 
@@ -163,11 +183,13 @@ function SearchContentUI({
   // Instant real-time search on keyword change
   const handleKeywordChange = useCallback(
     (newKeyword: string) => {
+      activeKeywordRef.current = newKeyword;
       setKeyword(newKeyword);
 
       const trimmed = newKeyword.trim();
       if (!trimmed) {
         setResults([]);
+        setContents([]);
         setIsLoading(false);
         return;
       }
@@ -197,25 +219,28 @@ function SearchContentUI({
 
   // Fast 120ms Debounced API fetch for deeper results
   useEffect(() => {
+    activeKeywordRef.current = keyword;
     const trimmed = keyword.trim();
     if (trimmed.length > 0) {
       const timeoutId = setTimeout(() => {
         fetchCityWiseContentList(trimmed);
       }, 120);
       return () => clearTimeout(timeoutId);
-    } else if (trimmed.length === 0 && hasFocused) {
-      fetchCityWiseContentList();
+    } else {
+      // Immediately reset when keyword is cleared
+      setResults([]);
+      setContents([]);
+      setIsLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [keyword]);
+  }, [keyword, fetchCityWiseContentList]);
 
   useEffect(() => {
-    if (hasFocused && keyword.length === 0) {
-      fetchCityWiseContentList();
+    if (hasFocused && keyword.trim().length === 0) {
+      setResults([]);
+      setContents([]);
       onLoadData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasFocused]);
+  }, [hasFocused, keyword, onLoadData]);
 
   useEffect(() => {
     if (

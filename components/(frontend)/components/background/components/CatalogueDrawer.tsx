@@ -51,14 +51,15 @@ function CatalogueDrawer({
       </div>
 
       <Sheet open={showDrawer} onOpenChange={onOpenChange}>
-        <SheetContent className="h-device w-device z-[900] !px-4 duration-300 ease-in-out">
-          <div className="h-device text-charcoal-2 bg-ivory-1 w-full transition-all duration-300 overflow-auto grid grid-cols-1 auto-rows-min">
-            <CatalogueDrawerContent
-              onClose={() => {
-                onOpenChange(false);
-              }}
-            />
-          </div>
+        <SheetContent
+          side="bottom"
+          className="h-[85dvh] max-h-[85dvh] w-full rounded-t-3xl border-t border-zinc-200/80 bg-white p-0 shadow-2xl z-[99999] duration-300 ease-out focus:outline-none overflow-hidden"
+        >
+          <CatalogueDrawerContent
+            onClose={() => {
+              onOpenChange(false);
+            }}
+          />
         </SheetContent>
       </Sheet>
     </>

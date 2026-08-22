@@ -56,8 +56,18 @@ const nextConfig = {
   staticPageGenerationTimeout: 300,
   generateEtags: true, // Enable ETags — 304 Not Modified for repeat visitors (faster)
 
-  // Enable external server packages for Redis and Database drivers
+  // Enable external server packages and import optimizations
   experimental: {
+    optimizePackageImports: [
+      "lucide-react",
+      "@radix-ui/react-accordion",
+      "@radix-ui/react-context-menu",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-icons",
+      "@radix-ui/react-popover",
+      "@radix-ui/react-toast",
+      "@radix-ui/react-tooltip",
+    ],
     serverComponentsExternalPackages: [
       "mongoose",
       "redis",
@@ -65,10 +75,6 @@ const nextConfig = {
       "bcrypt",
       "mongodb",
       "firebase-admin",
-    ],
-    optimizePackageImports: [
-      "lucide-react",
-      "@radix-ui/react-icons",
     ],
   },
   compiler: {
@@ -99,6 +105,33 @@ const nextConfig = {
   transpilePackages: [], // Explicitly empty to prevent redundant transpilation of modern packages
   async headers() {
     return [
+      {
+        source: "/api/frontend/cart/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "private, no-cache, no-store, must-revalidate",
+          },
+        ],
+      },
+      {
+        source: "/api/frontend/location/detect",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "private, no-cache, no-store, must-revalidate",
+          },
+        ],
+      },
+      {
+        source: "/api/auth/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "private, no-cache, no-store, must-revalidate",
+          },
+        ],
+      },
       {
         source: "/api/frontend/:path*",
         headers: [
@@ -151,7 +184,7 @@ const nextConfig = {
           },
           {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=()",
+            value: "camera=(), microphone=(), geolocation=(self)",
           },
         ],
       },

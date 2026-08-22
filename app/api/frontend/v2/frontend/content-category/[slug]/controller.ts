@@ -16,13 +16,27 @@ import { CONTENT_CATEGORY_PAGE_CACHE_KEY } from "@/common/constants/cacheKeys";
 import { transformProductToListItem } from "@/common/utils/product/transformProduct";
 import { resolveActiveGlobalCategoryBanner } from "@/common/utils/category/resolveCategoryBanner";
 
+// In-memory L1 cache for category pages (<1ms response)
+const inMemoryCategoryCache = new Map<string, { data: any; timestamp: number }>();
+const CATEGORY_L1_TTL_MS = 60 * 1000; // 60 seconds
+
 export const getCategoryData = async (slug: string) => {
   const cacheKey = `${CONTENT_CATEGORY_PAGE_CACHE_KEY}_v4_${slug}`;
+  const now = Date.now();
+
+  // 1. Check In-Memory L1 Cache
+  const l1 = inMemoryCategoryCache.get(cacheKey);
+  if (l1 && (now - l1.timestamp) < CATEGORY_L1_TTL_MS) {
+    return l1.data;
+  }
+
+  // 2. Check Redis L2 Cache
   const cachedDocument = await getFromRedis<any>({
     key: cacheKey
   });
 
   if (cachedDocument) {
+    inMemoryCategoryCache.set(cacheKey, { data: cachedDocument, timestamp: now });
     return cachedDocument;
   }
 
@@ -312,9 +326,11 @@ export const getCategoryData = async (slug: string) => {
 
   const finalResult = JSON.parse(JSON.stringify(categoryResult));
 
+  inMemoryCategoryCache.set(cacheKey, { data: finalResult, timestamp: now });
   await setToRedis({
     key: cacheKey,
-    value: finalResult
+    value: finalResult,
+    ttl: 300
   });
 
   return finalResult;

@@ -104,3 +104,6 @@ topicSchema.index({
   createdBy: "text",
   updatedBy: "text"
 });
+
+// Performance index
+topicSchema.index({ slug: 1, category: 1, isActive: 1 });

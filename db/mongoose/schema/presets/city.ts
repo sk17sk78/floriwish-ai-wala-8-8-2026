@@ -65,3 +65,7 @@ citySchema.index({
   createdBy: "text",
   updatedBy: "text"
 });
+
+// Performance indexes
+citySchema.index({ name: 1, isActive: 1 });
+citySchema.index({ isActive: 1, isTopCity: 1 });

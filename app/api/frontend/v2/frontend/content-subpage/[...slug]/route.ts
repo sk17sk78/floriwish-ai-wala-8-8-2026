@@ -15,6 +15,10 @@ import { SUB_TOPIC_PAGE_CACHE_KEY } from "@/common/constants/cacheKeys";
 
 const { ContentCategories, Topics, SubTopics } = models;
 
+// In-memory L1 cache (<1ms response)
+const inMemoryV2SubTopicCache = new Map<string, { data: any; timestamp: number }>();
+const SUBTOPIC_L1_TTL_MS = 60 * 1000;
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { slug: string[] } }
@@ -39,11 +43,24 @@ export async function GET(
       { status: 404 }
     );
 
+  const cacheKey = `${SUB_TOPIC_PAGE_CACHE_KEY}_${categorySlug}_${topicSlug}_${subTopicSlug}`;
+  const now = Date.now();
+
+  // 1. Check In-Memory L1 Cache
+  const l1 = inMemoryV2SubTopicCache.get(cacheKey);
+  if (l1 && (now - l1.timestamp) < SUBTOPIC_L1_TTL_MS) {
+    return NextResponse.json(l1.data, { status: 200 });
+  }
+
+  // 2. Check Redis L2 Cache
   const cachedDocument = await getFromRedis<any>({
-    key: `${SUB_TOPIC_PAGE_CACHE_KEY}_${categorySlug}_${topicSlug}_${subTopicSlug}`
+    key: cacheKey
   });
 
-  if (!cachedDocument) {
+  if (cachedDocument) {
+    inMemoryV2SubTopicCache.set(cacheKey, { data: cachedDocument, timestamp: now });
+    return NextResponse.json(cachedDocument, { status: 200 });
+  }
     await connectDB();
     const LIMIT = 32;
 
@@ -516,18 +533,16 @@ export async function GET(
       }
     ]);
 
+    const resultData = Array.isArray(subtopicPageData)
+      ? subtopicPageData[0]
+      : subtopicPageData;
+
+    inMemoryV2SubTopicCache.set(cacheKey, { data: resultData, timestamp: now });
     await setToRedis({
-      key: `${SUB_TOPIC_PAGE_CACHE_KEY}_${categorySlug}_${topicSlug}_${subTopicSlug}`,
-      value: Array.isArray(subtopicPageData)
-        ? subtopicPageData[0]
-        : subtopicPageData
+      key: cacheKey,
+      value: resultData,
+      ttl: 300
     });
 
-    return NextResponse.json(
-      Array.isArray(subtopicPageData) ? subtopicPageData[0] : subtopicPageData,
-      { status: 200 }
-    );
-  } else {
-    return NextResponse.json(cachedDocument, { status: 200 });
-  }
+    return NextResponse.json(resultData, { status: 200 });
 }

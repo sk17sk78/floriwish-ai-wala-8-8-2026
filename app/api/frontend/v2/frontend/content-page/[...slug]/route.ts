@@ -14,6 +14,10 @@ const { ContentCategories, Topics } = models;
 // constants
 import { TOPIC_PAGE_CACHE_KEY } from "@/common/constants/cacheKeys";
 
+// In-memory L1 cache (<1ms response)
+const inMemoryV2TopicCache = new Map<string, { data: any; timestamp: number }>();
+const TOPIC_L1_TTL_MS = 60 * 1000;
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { slug: string[] } }
@@ -34,11 +38,24 @@ export async function GET(
     );
   }
 
+  const cacheKey = `${TOPIC_PAGE_CACHE_KEY}_${categorySlug}_${topicSlug}`;
+  const now = Date.now();
+
+  // 1. Check In-Memory L1 Cache
+  const l1 = inMemoryV2TopicCache.get(cacheKey);
+  if (l1 && (now - l1.timestamp) < TOPIC_L1_TTL_MS) {
+    return NextResponse.json(l1.data, { status: 200 });
+  }
+
+  // 2. Check Redis L2 Cache
   const cachedDocument = await getFromRedis<any>({
-    key: `${TOPIC_PAGE_CACHE_KEY}_${categorySlug}_${topicSlug}`
+    key: cacheKey
   });
 
-  if (!cachedDocument) {
+  if (cachedDocument) {
+    inMemoryV2TopicCache.set(cacheKey, { data: cachedDocument, timestamp: now });
+    return NextResponse.json(cachedDocument, { status: 200 });
+  }
     await connectDB();
     const LIMIT = 32;
 
@@ -481,16 +498,14 @@ export async function GET(
       }
     ]);
 
+    const resultData = Array.isArray(topicPageData) ? topicPageData[0] : topicPageData;
+
+    inMemoryV2TopicCache.set(cacheKey, { data: resultData, timestamp: now });
     await setToRedis({
-      key: `${TOPIC_PAGE_CACHE_KEY}_${categorySlug}_${topicSlug}`,
-      value: Array.isArray(topicPageData) ? topicPageData[0] : topicPageData
+      key: cacheKey,
+      value: resultData,
+      ttl: 300
     });
 
-    return NextResponse.json(
-      Array.isArray(topicPageData) ? topicPageData[0] : topicPageData,
-      { status: 200 }
-    );
-  } else {
-    return NextResponse.json(cachedDocument, { status: 200 });
-  }
+    return NextResponse.json(resultData, { status: 200 });
 }
